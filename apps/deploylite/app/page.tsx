@@ -2,8 +2,8 @@ import React from 'react'
 
 const page = () => {
   return (
-    <div className='bg-blue-500'>
-      hello i am docs
+    <div className='bg-green-600'>
+      app of deploylite
     </div>
   )
 }
