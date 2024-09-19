@@ -1,5 +1,5 @@
 {
-  "name": "fullstack-build-server",
+  "name": "fullstack-builder-image",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

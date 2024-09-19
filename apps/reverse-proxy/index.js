@@ -9,6 +9,7 @@ app.use((req,res)=>{
     const hostname = req.hostname;
     const subdomain = hostname.split('.')[0];
     const resolvesto = `${BASE_URL}/${subdomain}`;
+    console.log(hostname,subdomain,resolvesto);
     return proxy.web(req,res,{target:resolvesto,changeOrigin:true});
 })
 proxy.on('proxyReq',(proxyReq,req,res)=>{

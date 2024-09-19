@@ -1,1 +1,0 @@
-console.log("build server starting and up end running");
