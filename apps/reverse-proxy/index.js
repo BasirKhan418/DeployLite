@@ -3,16 +3,13 @@ const httpProxy = require('http-proxy');
 const app = express();
 const port = 8000;
 //ADD ENV
-const BASE_URL= "https://deploylite.s3.ap-south-1.amazonaws.com/__outputs"
+const BASE_URL= "https://deploylitedev.s3.ap-south-1.amazonaws.com/__outputs"
 const proxy = httpProxy.createProxy();
 app.use((req,res)=>{
     const hostname = req.hostname;
     const subdomain = hostname.split('.')[0];
     const resolvesto = `${BASE_URL}/${subdomain}`;
     console.log(hostname,subdomain,resolvesto);
-    if(subdomain=="basir"){
-        return proxy.web(req,res,{target:"http://13.235.246.242:9000",changeOrigin:true});
-    }
     return proxy.web(req,res,{target:resolvesto,changeOrigin:true});
 })
 proxy.on('proxyReq',(proxyReq,req,res)=>{
