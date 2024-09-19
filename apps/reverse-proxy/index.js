@@ -10,6 +10,9 @@ app.use((req,res)=>{
     const subdomain = hostname.split('.')[0];
     const resolvesto = `${BASE_URL}/${subdomain}`;
     console.log(hostname,subdomain,resolvesto);
+    if(subdomain=="basir"){
+        return proxy.web(req,res,{target:"http://13.235.246.242:9000",changeOrigin:true});
+    }
     return proxy.web(req,res,{target:resolvesto,changeOrigin:true});
 })
 proxy.on('proxyReq',(proxyReq,req,res)=>{
