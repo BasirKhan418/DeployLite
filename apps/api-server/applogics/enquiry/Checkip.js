@@ -1,5 +1,5 @@
 import {DescribeTasksCommand} from "@aws-sdk/client-ecs"
-import { EC2Client, DescribeNetworkInterfacesCommand } from '@aws-sdk/client-ec2';
+import { EC2Client, DescribeNetworkInterfacesCommand} from '@aws-sdk/client-ec2';
 import client from "../../client/client.js"
 const Checkip = async(req,res)=>{
     const {taskArn} = req.body;
