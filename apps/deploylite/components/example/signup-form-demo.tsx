@@ -4,6 +4,7 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { cn } from "@/lib/utils";
 import { Toaster, toast } from 'sonner'
+import { useRouter } from "next/navigation";
 import {
   IconBrandGithub,
   IconBrandGoogle,
@@ -12,10 +13,12 @@ import {
 import { useState } from "react";
 import { tailspin } from 'ldrs'
 
+
 tailspin.register()
 
 
 export default function SignupForm() {
+  const router = useRouter()
   //states
   const [form, setForm] = useState({
     firstname: "",
@@ -24,7 +27,7 @@ export default function SignupForm() {
     password: "",
     confirmPassword: "",
   })
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 //handlechanges
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({
@@ -56,6 +59,9 @@ export default function SignupForm() {
     setLoading(false)
    if(result.success){
      toast.success(result.message)
+      setTimeout(()=>{
+        router.push('/verifyemail?token='+result.token);
+      },3000)
      setForm({
       firstname: "",
       lastname: "",
@@ -66,6 +72,9 @@ export default function SignupForm() {
   }
     else if(!result.verify){
       toast.error(result.message)
+      setTimeout(()=>{
+        router.push('/verifyemail?token='+result.token);
+      },3000)
     }
     else{
       toast.error(result.message)
@@ -115,6 +124,7 @@ export default function SignupForm() {
         <button
           className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
           type="submit"
+          disabled={loading}
         >
          {loading ? <Loader /> : <ButtonText />}
          

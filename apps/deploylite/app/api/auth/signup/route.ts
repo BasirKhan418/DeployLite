@@ -21,7 +21,7 @@ if(finduser!=null){
         let token = jwt.sign({email:finduser.email,username:finduser.username},process.env.SECRET_KEY||"")
         //sending token with payload
         await SendVeriyEmail(finduser.email,token,finduser.name)
-        return NextResponse.json({status: 'error',message: 'Please verify your email for accessing your account',success: false,verify:false})
+        return NextResponse.json({status: 'error',message: 'Your email is not yet verified. Please check your inbox as we have sent you a verification email to complete the process and continue using our services. Redirecting to email verification page...',success: false,verify:false,token:token})
     }
     return NextResponse.json({status: 'error',message: 'Already have an account with this email',success: false,verify:true})
 }
@@ -40,7 +40,7 @@ await user.save();
  let token = jwt.sign({email:user.email,username:user.username},process.env.SECRET_KEY||"")
  //sending token with payload
  await SendVeriyEmail(user.email,token,user.name)
-return NextResponse.json({status: 'success',message: 'User created successfully. Please Verify your account to continue',success: true})
+return NextResponse.json({status: 'success',message: 'User created successfully. Please Verify your account to continue',success: true,token:token})
 }
 catch(err:any){
     return NextResponse.json({status: 'error',message: err.message,success: false})

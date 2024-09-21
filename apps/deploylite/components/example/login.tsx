@@ -1,8 +1,14 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { cn } from "@/lib/utils";
+import { Toaster,toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { tailspin } from 'ldrs'
+
+
+tailspin.register()
 import {
   IconBrandGithub,
   IconBrandGoogle,
@@ -10,12 +16,46 @@ import {
 } from "@tabler/icons-react";
 
 export default function Login() {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const router = useRouter()
+  //all aplication states
+  const [form,setForm] = useState({
+    email:"",
+    password:""
+  })
+  const [loading,setLoading] = useState(false)
+  //handle changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({
+      ...form,
+      [e.target.id]: e.target.value,
+    });
+  };
+  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form submitted");
+    setLoading(true)
+    const res = await fetch('/api/auth/login',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(form)  
+    })
+    const result = await res.json()
+    setLoading(false)
+    if(result.success){
+      toast.success(result.message)
+      setTimeout(()=>{
+       router.push('/')
+      },2000)
+    }
+    else{
+      toast.error(result.message)
+    }
+
   };
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
+      <Toaster position="top-right"/>
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
         Welcome to DeployLite
       </h2>
@@ -26,18 +66,18 @@ export default function Login() {
       <form className="my-8" onSubmit={handleSubmit}>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="email">Email Address</Label>
-          <Input id="email" placeholder="john@deploylite.tech" type="email" />
+          <Input id="email" placeholder="basir@deploylite.tech" type="email" onChange={handleChange} value={form.email}/>
         </LabelInputContainer>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="password">Password</Label>
-          <Input id="password" placeholder="••••••••" type="password" />
+          <Input id="password" placeholder="••••••••" type="password" onChange={handleChange} value={form.password}/>
         </LabelInputContainer>
 
         <button
           className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
           type="submit"
         >
-          Log in &rarr;
+         {loading ? <Loader/> : <ButtonText/>}
           <BottomGradient />
         </button>
 
@@ -83,3 +123,20 @@ const LabelInputContainer = ({
     </div>
   );
 };
+
+//
+const Loader = ()=>{
+  return (
+    <span className="ml-2 flex justify-center items-center"><l-tailspin
+  size="30"
+  stroke="4"
+  speed="1" 
+  color="white" 
+></l-tailspin></span>
+  )
+}
+const ButtonText = ()=>{
+  return (
+    <span>Login &rarr;</span>
+  )
+}
