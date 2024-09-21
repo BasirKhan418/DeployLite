@@ -1,10 +1,11 @@
-import React from 'react'
 
+import React from 'react'
+import Hero from '@/utils/Banners/Hero'
 const page = () => {
   return (
-    <div className='bg-green-600'>
-      app of deploylite
-    </div>
+    <>
+    <Hero/>
+    </>
   )
 }
 
