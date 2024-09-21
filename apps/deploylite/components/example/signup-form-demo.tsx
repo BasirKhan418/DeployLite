@@ -12,6 +12,7 @@ import {
 } from "@tabler/icons-react";
 import { useState } from "react";
 import { tailspin } from 'ldrs'
+import Head from "next/head";
 
 
 tailspin.register()
@@ -82,7 +83,10 @@ export default function SignupForm() {
   };
   return (
     <>
-
+<Head>
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<meta name="google-signin-client_id" content="834865492691-vojfi1q8i6r0m2p29a3gn067mhqbsham.apps.googleusercontent.com"/>
+</Head>
     <Toaster position="top-right" />  
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
@@ -136,8 +140,14 @@ export default function SignupForm() {
         <div className="flex flex-col space-y-4">
         
           <button
-            className=" relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
-            type="submit"
+            className=" g-signin2 relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
+              data-onsuccess="onSignIn"
+              type="button"
+              onClick={()=>{
+              let url  = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI}&scope=${process.env.NEXT_PUBLIC_GOOGLE_SCOPE}&response_type=${"code"}&access_type=${"offline"}`
+              window.open(url,"_self");
+
+              }}
           >
             <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
             <span className="text-neutral-700 dark:text-neutral-300 text-sm">
