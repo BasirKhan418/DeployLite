@@ -12,11 +12,9 @@ import {
   IconBrandOnlyfans,
 } from "@tabler/icons-react";
 import { useState } from "react";
-import { tailspin } from 'ldrs'
 import Head from "next/head";
+import LoginLoader from "@/utils/Loaders/LoginLoader";
 
-
-tailspin.register()
 
 
 export default function SignupForm() {
@@ -131,7 +129,7 @@ export default function SignupForm() {
           type="submit"
           disabled={loading}
         >
-         {loading ? <Loader /> : <ButtonText />}
+         {loading ? <LoginLoader /> : <ButtonText />}
          
           <BottomGradient />
         </button>
@@ -190,18 +188,8 @@ const LabelInputContainer = ({
   );
 };
 
-const Loader = ()=>{
-  return (
-    <span className="ml-2 flex justify-center items-center"><l-tailspin
-  size="30"
-  stroke="4"
-  speed="1" 
-  color="white" 
-></l-tailspin></span>
-  )
-}
 const ButtonText = ()=>{
   return (
-    <span>Sign up &rarr;</span>
+    <>Sign up &rarr;</>
   )
 }

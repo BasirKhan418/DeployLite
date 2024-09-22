@@ -4,10 +4,9 @@ import { CheckCircle,Mail } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { Toaster,toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import { tailspin } from 'ldrs'
-
-tailspin.register()
-const Page = () => {
+import LoginLoader from '@/utils/Loaders/LoginLoader';
+import { Suspense } from 'react';
+const PageComponent = () => {
     const [loading, setLoading] = useState(false)
     const Search = useSearchParams()
     const router = useRouter()
@@ -86,7 +85,7 @@ const VerifyUser = async()=>{
             </p>
           </div>
           <button className="w-full bg-indigo-600 text-white rounded-lg py-3 font-semibold hover:bg-indigo-700 transition duration-300 ease-in-out" onClick={SendEmail}>
-          {loading ? <Loader/> : <ButtonText/>}
+          {loading ? <LoginLoader/> : <ButtonText/>}
           </button>
         </div>
         <div className="bg-gray-50 px-8 py-4 border-t border-gray-200">
@@ -100,19 +99,16 @@ const VerifyUser = async()=>{
   )
 }
 
-export default Page
-const Loader = ()=>{
-    return (
-      <span className="ml-2 flex justify-center items-center"><l-tailspin
-    size="30"
-    stroke="4"
-    speed="1" 
-    color="white" 
-  ></l-tailspin></span>
-    )
-  }
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PageComponent />
+    </Suspense>
+  );
+}
+
   const ButtonText = ()=>{
     return (
-      <span>Resend Email</span>
+      <>Resend Email</>
     )
   }

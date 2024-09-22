@@ -5,15 +5,15 @@ import { Input } from '../../../components/ui/input'
 import { cn } from "@/lib/utils";
 import { Toaster,toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { tailspin } from 'ldrs'
-tailspin.register()
+import LoginLoader from "@/utils/Loaders/LoginLoader";
+import { Suspense } from "react";
 import {
   IconBrandGithub,
   IconBrandGoogle,
   IconBrandOnlyfans,
 } from "@tabler/icons-react";
 import { useSearchParams } from "next/navigation";
-export default function Login() {
+ function ResetComponent() {
 const searchurl = useSearchParams()
   const router = useRouter()
   //all aplication states
@@ -101,7 +101,7 @@ const searchurl = useSearchParams()
           className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
           type="submit"
         >
-         {loading ? <Loader/> : <ButtonText/>}
+         {loading ? <LoginLoader/> : <ButtonText/>}
           <BottomGradient />
         </button>
 
@@ -139,20 +139,15 @@ const LabelInputContainer = ({
     </div>
   );
 };
-
-//
-const Loader = ()=>{
-  return (
-    <span className="ml-2 flex justify-center items-center"><l-tailspin
-  size="30"
-  stroke="4"
-  speed="1" 
-  color="white" 
-></l-tailspin></span>
-  )
-}
+export default function Page() {
+    return (
+      <Suspense fallback={<div>Loading...</div>}>
+        <ResetComponent />
+      </Suspense>
+    );
+  }
 const ButtonText = ()=>{
   return (
-    <span>Reset Now &rarr;</span>
+    <>Reset Now &rarr;</>
   )
 }

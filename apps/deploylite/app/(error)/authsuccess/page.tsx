@@ -18,10 +18,12 @@ const AuthSuccessPage = () => {
     if (parts.length === 2) return parts.pop().split(';').shift();
   }
   
- const reason = getCookie("reason")
- const username = getCookie("username")
- const email = getCookie("email");
+let username ;
+let email;
   useEffect(() => {
+    const reason = getCookie("reason")
+    username = getCookie("username")
+    email = getCookie("email");
     setTimeout(() => setShowContent(true), 300);
     if(reason=="login"){
       setTitle("Welcome back!")
@@ -78,6 +80,7 @@ const AuthSuccessPage = () => {
               </div>
               <div className="flex items-center text-gray-600">
                 <Mail className="w-4 h-4 mr-2" />
+                {/* @ts-ignore */}
                 <span>Email: {email?.replace("%40","@")}</span>
               </div>
             </AlertDescription>

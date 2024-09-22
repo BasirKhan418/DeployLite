@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertTriangle, ArrowLeft } from 'lucide-react';
 import { cookies } from 'next/headers';
-const AuthErrorPage = ({ reason = "An error occurred during authentication" }) => {
+const AuthErrorPage = () => {
     const cook = cookies();
     let msg = cook.get("msg");
     let message = msg?.value;
@@ -22,7 +22,7 @@ const AuthErrorPage = ({ reason = "An error occurred during authentication" }) =
             <AlertTriangle className="w-8 h-8 text-red-600 mr-3 animate-pulse" />
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">Authentication Failed</h2>
           </div>
-          <p className="text-gray-600 mb-8 text-lg">{reason}{" "}{message}</p>
+          <p className="text-gray-600 mb-8 text-lg">{"An error occurred during authentication"}{" "}{message}</p>
           <a
             className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg flex items-center justify-center no-underline"
             href='/login'

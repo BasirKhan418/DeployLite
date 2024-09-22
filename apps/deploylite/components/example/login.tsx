@@ -5,10 +5,8 @@ import { Input } from "../ui/input";
 import { cn } from "@/lib/utils";
 import { Toaster,toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { tailspin } from 'ldrs'
 import Link from "next/link";
-
-tailspin.register()
+import LoginLoader from "@/utils/Loaders/LoginLoader";
 import {
   IconBrandGithub,
   IconBrandGoogle,
@@ -84,7 +82,7 @@ export default function Login() {
           className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
           type="submit"
         >
-         {loading ? <Loader/> : <ButtonText/>}
+         {loading ? <LoginLoader/> : <ButtonText/>}
           <BottomGradient />
         </button>
         <div className="flex justify-center items-center mt-4">
@@ -141,19 +139,8 @@ const LabelInputContainer = ({
   );
 };
 
-//
-const Loader = ()=>{
-  return (
-    <span className="ml-2 flex justify-center items-center"><l-tailspin
-  size="30"
-  stroke="4"
-  speed="1" 
-  color="white" 
-></l-tailspin></span>
-  )
-}
 const ButtonText = ()=>{
   return (
-    <span>Login &rarr;</span>
+    <>Login &rarr;</>
   )
 }
