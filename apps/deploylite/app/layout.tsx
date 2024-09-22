@@ -6,6 +6,7 @@ import "./globals.css";
 import { usePathname } from "next/navigation";
 import { ThemeProvider } from 'next-themes';
 import Sidebar from "@/utils/Sidebar/Sidebar";
+import StoreProvider from "./StoreProvider";
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -30,6 +31,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <StoreProvider>
         <NextTopLoader
   color="#2299DD"
   initialPosition={0.08}
@@ -45,9 +47,10 @@ export default function RootLayout({
   zIndex={1600}
   showAtBottom={false}
 />
-<ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-{(pathname !== '/login' && pathname !== '/signup') ? <Sidebar>{children}</Sidebar> : children}
+<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+{(pathname !== '/login' && pathname !== '/signup' &&pathname!='/autherror'&&pathname!='/authsuccess') ? <Sidebar>{children}</Sidebar> : children}
 </ThemeProvider>
+</StoreProvider>
       </body>
       
     </html>

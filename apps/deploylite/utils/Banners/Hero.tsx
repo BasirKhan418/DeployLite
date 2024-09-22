@@ -2,13 +2,8 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, Cloud, Zap, Shield, CheckCircle } from 'lucide-react'
-
 export default function Hero() {
   const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   if (!mounted) return null
 
