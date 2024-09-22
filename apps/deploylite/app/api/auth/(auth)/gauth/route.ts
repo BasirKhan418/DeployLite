@@ -1,7 +1,7 @@
 
 import { NextRequest,NextResponse } from "next/server";
-import ConnectDb from "../../../../../middleware/connectdb";
-import User from "../../../../../models/User";
+import ConnectDb from "../../../../../../middleware/connectdb";
+import User from "../../../../../../models/User";
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
 import { cookies } from "next/headers";

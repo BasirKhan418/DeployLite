@@ -5,6 +5,7 @@ import { Input } from "../ui/input";
 import { cn } from "@/lib/utils";
 import { Toaster, toast } from 'sonner'
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   IconBrandGithub,
   IconBrandGoogle,
@@ -134,6 +135,10 @@ export default function SignupForm() {
          
           <BottomGradient />
         </button>
+        <div className="flex justify-center items-center mt-4">
+          <span className="text-sm text-neutral-700 dark:text-neutral-300 ">Already have an account? <Link href="/login" className="underline text-green-500 mx-1">Login Now</Link>
+        </span>
+        </div>
 
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 

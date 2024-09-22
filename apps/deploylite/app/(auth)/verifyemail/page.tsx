@@ -6,12 +6,13 @@ import { Toaster,toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { tailspin } from 'ldrs'
 
-
 tailspin.register()
 const Page = () => {
     const [loading, setLoading] = useState(false)
     const Search = useSearchParams()
     const router = useRouter()
+    //check if user is authenticated
+
     //send verify email
     const SendEmail = async()=>{
         setLoading(true)

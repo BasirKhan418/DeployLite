@@ -5,7 +5,6 @@ import type { NextRequest } from 'next/server'
 export function middleware(req: NextRequest) {
     // Add a header to the response
     console.log(req.url)
-    console.log("caught in middleware")
     return NextResponse.next()
 }
  

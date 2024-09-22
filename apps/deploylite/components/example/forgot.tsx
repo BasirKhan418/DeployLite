@@ -15,12 +15,11 @@ import {
   IconBrandOnlyfans,
 } from "@tabler/icons-react";
 
-export default function Login() {
+export default function Forgot() {
   const router = useRouter()
   //all aplication states
   const [form,setForm] = useState({
-    email:"",
-    password:""
+    email:""
   })
   const [loading,setLoading] = useState(false)
   //handle changes
@@ -33,20 +32,17 @@ export default function Login() {
   const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true)
-    const res = await fetch('/api/auth/login',{
+    const res = await fetch('/api/auth/reset',{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(form)  
+      body: JSON.stringify({status:"forgot",email:form.email})  
     })
     const result = await res.json()
     setLoading(false)
     if(result.success){
       toast.success(result.message)
-      setTimeout(()=>{
-       router.push('/')
-      },2000)
     }
     else{
       toast.error(result.message)
@@ -57,10 +53,10 @@ export default function Login() {
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
       <Toaster position="top-right"/>
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
-        Welcome to DeployLite
+      Forgot your password?  
       </h2>
       <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
-        Login to your account to get started with DeployLite and start deploying your application.
+      No worries! Reset your password to regain access and continue deploying your applications with DeployLite
       </p>
 
       <form className="my-8" onSubmit={handleSubmit}>
@@ -71,12 +67,6 @@ export default function Login() {
         <div className="flex justify-end absolute right-10 mb-8">
           <Link href="/forgot" className="text-sm text-neutral-700 dark:text-neutral-300 hover:underline">Forgot password?</Link>
         </div>
-        <LabelInputContainer className="mb-4 ">
-        
-          <Label htmlFor="password">Password</Label>
-          
-          <Input id="password" placeholder="••••••••" type="password" onChange={handleChange} value={form.password}/>
-        </LabelInputContainer>
         
       
 
@@ -88,7 +78,7 @@ export default function Login() {
           <BottomGradient />
         </button>
         <div className="flex justify-center items-center mt-4">
-          <span className="text-sm text-neutral-700 dark:text-neutral-300 ">Don’t have an account? <Link href="/signup" className="underline text-green-500 mx-1">Create an account</Link>
+          <span className="text-sm text-neutral-700 dark:text-neutral-300 hover:underline">Yaa I Remember? <Link href="/signup" className="underline text-green-500 mx-1">Login Now</Link>
         </span>
         </div>
 
@@ -96,22 +86,7 @@ export default function Login() {
 
         <div className="flex flex-col space-y-4">
         
-        <button
-            className=" g-signin2 relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
-              data-onsuccess="onSignIn"
-              type="button"
-              onClick={()=>{
-              let url  = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI}&scope=${process.env.NEXT_PUBLIC_GOOGLE_SCOPE}&response_type=${"code"}&access_type=${"offline"}`
-              window.open(url,"_self");
-
-              }}
-          >
-            <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-            <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-              Google
-            </span>
-            <BottomGradient />
-          </button>
+        
         </div>
       </form>
     </div>
@@ -154,6 +129,6 @@ const Loader = ()=>{
 }
 const ButtonText = ()=>{
   return (
-    <span>Login &rarr;</span>
+    <span>Forgot Now &rarr;</span>
   )
 }

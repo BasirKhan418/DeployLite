@@ -1,7 +1,7 @@
 import { NextRequest,NextResponse } from "next/server"
 import mongoose from 'mongoose';
-import ConnectDb from '../../../../../middleware/connectdb'
-import User from '../../../../../models/User'
+import ConnectDb from '../../../../../../middleware/connectdb'
+import User from '../../../../../../models/User'
 import cryptojs from 'crypto-js'
 import jwt from 'jsonwebtoken'
 import { cookies } from 'next/headers'

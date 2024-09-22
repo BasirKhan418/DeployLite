@@ -48,7 +48,7 @@ export default function RootLayout({
   showAtBottom={false}
 />
 <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-{(pathname !== '/login' && pathname !== '/signup' &&pathname!='/autherror'&&pathname!='/authsuccess') ? <Sidebar>{children}</Sidebar> : children}
+{(pathname !== '/login' && pathname !== '/signup' &&pathname!='/autherror'&&pathname!='/authsuccess'&&pathname!='/forgot'&&pathname!='/reset'&&pathname!='/verifyemail') ? <Sidebar>{children}</Sidebar> : children}
 </ThemeProvider>
 </StoreProvider>
       </body>

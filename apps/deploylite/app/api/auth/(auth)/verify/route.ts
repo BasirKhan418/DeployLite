@@ -1,9 +1,9 @@
 import { NextRequest,NextResponse } from "next/server";
-import ConnectDb from "../../../../../middleware/connectdb";
+import ConnectDb from "../../../../../../middleware/connectdb";
 import Verify from "@/html/Verify";
 import ErrorTemplate from "@/html/ErrorTemplate";
 import jwt, { JwtPayload } from 'jsonwebtoken'
-import User from "../../../../../models/User";
+import User from "../../../../../../models/User";
 import SendVeriyEmail from "@/emails/auth/SendVerifyEmail";
 export const GET = async(req:NextRequest,res:NextResponse)=>{
   

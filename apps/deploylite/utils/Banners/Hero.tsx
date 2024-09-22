@@ -3,9 +3,6 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, Cloud, Zap, Shield, CheckCircle } from 'lucide-react'
 export default function Hero() {
-  const [mounted, setMounted] = useState(false)
-
-  if (!mounted) return null
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-900 text-white min-h-screen flex items-center">

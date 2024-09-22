@@ -11,13 +11,14 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { MenuIcon, HomeIcon, RocketIcon, LayersIcon, SettingsIcon, PlusIcon, ChevronDownIcon, UserIcon, WalletIcon, LogOutIcon, CreditCardIcon, BellIcon, SunIcon, MoonIcon, CodeIcon, ServerIcon, GlobeIcon, DatabaseIcon } from 'lucide-react'
-
+import LogoutModal from '../modals/LogoutModal'
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [unreadNotifications, setUnreadNotifications] = useState(3)
   const [isProjectsOpen, setIsProjectsOpen] = useState(false)
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -296,7 +297,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   Settings
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={()=>setIsOpen(true)}>
                   <LogOutIcon className="mr-2 h-4 w-4" />
                   Log out
                 </DropdownMenuItem>
@@ -304,7 +305,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </DropdownMenu>
           </div>
         </header>
-
+        <LogoutModal isOpen={isOpen} setIsOpen={setIsOpen} />
         {/* Main content */}
         <main className="flex-1 overflow-y-auto">
           {children}
