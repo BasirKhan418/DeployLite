@@ -43,7 +43,7 @@ export default function Login() {
     if(result.success){
       toast.success(result.message)
       setTimeout(()=>{
-       router.push('/')
+       window.open("/","_self");
       },2000)
     }
     else{
