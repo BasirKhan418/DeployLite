@@ -4,6 +4,7 @@ import ConnectDb from '../../../../../../middleware/connectdb'
 import User from '../../../../../../models/User'
 import cryptojs from 'crypto-js'
 import jwt from 'jsonwebtoken'
+import Wallet from '../../../../../../models/Wallet'
 import SendVeriyEmail from "@/emails/auth/SendVerifyEmail";
 export const GET = async()=>{
     return NextResponse.json({status: 'success'})
@@ -36,6 +37,12 @@ let user = new User({
     username:username
 })
 await user.save();
+let wallet = new Wallet({
+    userid:user._id,
+    balance:process.env.WALLET_BALANCE||0,
+    transactions:[{amount:process.env.WALLET_BALANCE||0,description:"Signup Bonous Credited",type:"credit",date:new Date()}]
+})
+await wallet.save();
  //creating token
  let token = jwt.sign({email:user.email,username:user.username},process.env.SECRET_KEY||"")
  //sending token with payload

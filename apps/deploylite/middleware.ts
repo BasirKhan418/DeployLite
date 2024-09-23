@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
- 
+ import { cookies } from 'next/headers'
+import {  redirect } from 'next/navigation';
 // This function can be marked `async` if using `await` inside
 export function middleware(req: NextRequest) {
-    // Add a header to the response
-    console.log(req.url)
-    return NextResponse.next()
-}
+  return NextResponse.next()
+  }
  
 // See "Matching Paths" below to learn more
 export const config = {

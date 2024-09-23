@@ -5,6 +5,7 @@ import User from "../../../../../../models/User";
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
 import { cookies } from "next/headers";
+import Wallet from "../../../../../../models/Wallet";
 export const GET = async(req:NextRequest,res:NextResponse)=>{
     const { searchParams } = new URL(req.url);
     const cook = cookies();
@@ -70,6 +71,12 @@ export const GET = async(req:NextRequest,res:NextResponse)=>{
         authtoken: access_token
     })
     await user.save();
+    let wallet = new Wallet({
+      userid:user._id,
+      balance:process.env.WALLET_BALANCE||0,
+      transactions:[{amount:process.env.WALLWT_BALANCE||0,description:"Signup Bonous Credited",type:"credit",date:new Date()}]
+  })
+  await wallet.save();
     //creating token
     let token = jwt.sign({email:userInfo.email,name:userInfo.name,username:username},process.env.JWT_SECRET||"");
     // setting cookies

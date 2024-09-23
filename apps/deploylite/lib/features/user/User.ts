@@ -1,26 +1,46 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-export interface ProductState {
-    items: string[];
+export interface UserState {
+    user: {
+        name: string,
+        username:string,
+        email: string,
+        img: string,
+        authtoken?: string,
+        githubid?: string,
+        githubtoken?: string
+        isverified: boolean,
+        is0auth: boolean,
+    };
 }
 
-const initialState: ProductState = {
-    items: [],
+const initialState: UserState = {
+    user: {
+        name:"",
+        username:"",
+        email:"",
+        img:"",
+        authtoken:"",
+        githubid:"",
+        githubtoken:"",
+        isverified:false,
+        is0auth:false
+    },
 };
 
-export const productSlice = createSlice({
-    name: 'product',
+export const userSlice = createSlice({
+    name: 'user',
     initialState,
     reducers: {
         add: (state, action) => {
             // Magic
             // Immer will handle the mutation
-            state.items.push(action.payload);
+            state.user=action.payload
         },
     },
 });
 
 // Action creators are generated for each case reducer function
-export const { add } = productSlice.actions;
+export const { add } = userSlice.actions;
 
-export default productSlice.reducer;
+export default userSlice.reducer;

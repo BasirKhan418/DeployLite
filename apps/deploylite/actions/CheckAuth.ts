@@ -4,16 +4,14 @@ const CheckAuth =  () => {
     try{
         const cook = cookies()
         let token: any = cook.get("token");
-        console.log(token.value)
         if (token) {
-            const decoded = jwt.verify(token.value, process.env.SECRET_KEY|| "");
-            return true;
+            const decoded:any = jwt.verify(token.value, process.env.SECRET_KEY|| "");
+            return {result:true,email:decoded.email};
         }
-        return false;
+        return {result:false};
     }
     catch(err){
-        console.log(err)
-        return false;
+        return {result:false};
     }
 }
 export default CheckAuth
