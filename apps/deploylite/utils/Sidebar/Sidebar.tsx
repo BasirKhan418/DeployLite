@@ -11,9 +11,11 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { useAppSelector } from '@/lib/hook'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { MenuIcon, HomeIcon, RocketIcon, LayersIcon, SettingsIcon, PlusIcon, ChevronDownIcon, UserIcon, WalletIcon, LogOutIcon, CreditCardIcon, BellIcon, SunIcon, MoonIcon, CodeIcon, ServerIcon, GlobeIcon, DatabaseIcon } from 'lucide-react'
+import { MenuIcon, HomeIcon, RocketIcon, LayersIcon, SettingsIcon, PlusIcon, ChevronDownIcon, UserIcon, WalletIcon, LogOutIcon, CreditCardIcon, BellIcon, SunIcon, MoonIcon, CodeIcon, ServerIcon, GlobeIcon, DatabaseIcon, Router,Rocket } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import LogoutModal from '../modals/LogoutModal'
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const router = useRouter()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [unreadNotifications, setUnreadNotifications] = useState(3)
   const [isProjectsOpen, setIsProjectsOpen] = useState(false)
@@ -102,7 +104,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* Sidebar for larger screens */}
       <aside className="hidden md:flex w-64 flex-col bg-background border-r">
         <div className="p-4">
-          <h2 className="text-2xl font-bold">DeployLite</h2>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+            <Rocket className="w-6 h-6 mr-2 text-blue-500" />
+            DeployLite
+          </h1>
         </div>
         <ScrollArea className="flex-grow">
           <nav className="space-y-2 p-4">
@@ -213,14 +218,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <DropdownMenuContent>
                 <DropdownMenuLabel>Wallet</DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <Link href={"/wallet"}>
                 <DropdownMenuItem>
                   <WalletIcon className="mr-2 h-4 w-4" />
                   View Wallet
                 </DropdownMenuItem>
+                </Link>
+                <Link href={"/wallet"}>
                 <DropdownMenuItem>
                   <CreditCardIcon className="mr-2 h-4 w-4" />
                   Recharge Balance
                 </DropdownMenuItem>
+                </Link>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -287,18 +296,29 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>{user.name}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <Link href="/profile">
                 <DropdownMenuItem>
                   <UserIcon className="mr-2 h-4 w-4" />
                   Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                </Link>
+                <Link href="/billing">
+                <DropdownMenuItem
+                >
                   <WalletIcon className="mr-2 h-4 w-4" />
                   Billing
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                </Link>
+
+                <Link href={"/settings"}>
+               
+                <DropdownMenuItem 
+        
+                >
                   <SettingsIcon className="mr-2 h-4 w-4" />
                   Settings
                 </DropdownMenuItem>
+                </Link>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={()=>setIsOpen(true)}>
                   <LogOutIcon className="mr-2 h-4 w-4" />
