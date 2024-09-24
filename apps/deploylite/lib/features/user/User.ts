@@ -11,6 +11,8 @@ export interface UserState {
         githubtoken?: string
         isverified: boolean,
         is0auth: boolean,
+        bio: string,
+        phone: string
     };
 }
 
@@ -24,7 +26,9 @@ const initialState: UserState = {
         githubid:"",
         githubtoken:"",
         isverified:false,
-        is0auth:false
+        is0auth:false,
+        bio:"",
+        phone:""
     },
 };
 

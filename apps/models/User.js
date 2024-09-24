@@ -10,6 +10,8 @@ githubid:{type:String,required:false},
 githubtoken:{type:String,required:false},
 isverified:{type:Boolean,default:false},
 is0auth:{type:Boolean,default:false},
+bio:{type:String,default:""},
+phone:{type:String,default:""},
 },{timestamps:true})
 mongoose.models = {}
 export default mongoose.model.User||mongoose.model('User',UserSchema);
