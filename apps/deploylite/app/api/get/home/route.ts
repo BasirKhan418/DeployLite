@@ -3,12 +3,16 @@ import ConnectDb from "../../../../../middleware/connectdb";
 import User from "../../../../../models/User";
 import CheckAuth from "@/actions/CheckAuth";
 import Wallet from "../../../../../models/Wallet";
+import { cookies } from "next/headers";
 export const GET = async(req:NextRequest,res:NextResponse)=>{
+    const cook =cookies()
     try{
         await ConnectDb();
     let result = CheckAuth()
     if(!result.result){
-        return NextResponse.redirect(`${process.env.NEXT_URL}/login`)
+        console.log('result',result)
+        console.log("not authenticated")
+        console.log(cook.get('token'))
     }
     let user = await User.findOne({ email: result.email }).select('-password');
     let wallet = await Wallet.findOne({userid:user._id});

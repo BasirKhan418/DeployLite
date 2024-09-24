@@ -6,6 +6,7 @@ import cryptojs from 'crypto-js'
 import jwt from 'jsonwebtoken'
 import Wallet from '../../../../../../models/Wallet'
 import SendVeriyEmail from "@/emails/auth/SendVerifyEmail";
+import Notification from "../../../../../../models/Notification";
 export const GET = async()=>{
     return NextResponse.json({status: 'success'})
 }
@@ -43,6 +44,12 @@ let wallet = new Wallet({
     transactions:[{amount:process.env.WALLET_BALANCE||0,description:"Signup Bonous Credited",type:"credit",date:new Date()}]
 })
 await wallet.save();
+  //create notification
+  let newnot = new Notification({
+    email:user.email,
+    userid:user._id,
+  })
+    await newnot.save();
  //creating token
  let token = jwt.sign({email:user.email,username:user.username},process.env.SECRET_KEY||"")
  //sending token with payload

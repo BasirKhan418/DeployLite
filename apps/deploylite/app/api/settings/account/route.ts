@@ -63,6 +63,10 @@ export const PUT = async(req: NextRequest,res:NextResponse) => {
         return NextResponse.json({message:"User not found",success:false})
     }
     //return the response based on the event
+    //if the user using 0auth then return the response based on the event
+    if(user.is0auth){
+        return NextResponse.json({message:"You are using 0auth. You cannot turn on two factor authentication. Only for password based login",success:false})
+    }
     if(data.twofactor){
         return NextResponse.json({message:"OTP based Two factor authentication has been turned on successfully",success:true,user})
     }

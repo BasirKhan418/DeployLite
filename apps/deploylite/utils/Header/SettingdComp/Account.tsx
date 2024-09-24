@@ -73,6 +73,10 @@ const Account = () => {
     }
     //const onchecked chnege
     const twoFactorChange = async() => {
+      if(user.is0auth){
+        toast.error('Two-Factor Authentication is not allowed for OAuth users. If you have signed up with Google or Github you cannot enable two-factor authentication.It is only for password based login.');
+        return
+      }
         setLoading(true)
         const res = await fetch('/api/settings/account',{
             method: 'PUT',
@@ -119,7 +123,7 @@ const Account = () => {
                     <Input id="confirmPassword" type="password" value={form.confirmPassword} onChange={handleChange} />
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Switch id="twoFactor" defaultChecked={user.twofactor||false} onCheckedChange={twoFactorChange}/>
+                    <Switch id="twoFactor" defaultChecked={user.twofactor||false} onCheckedChange={twoFactorChange} />
                     <Label htmlFor="twoFactor">Enable Two-Factor Authentication</Label>
                   </div>
                 </CardContent>

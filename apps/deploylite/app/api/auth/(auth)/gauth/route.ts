@@ -6,6 +6,7 @@ import axios from 'axios';
 import jwt from 'jsonwebtoken';
 import { cookies } from "next/headers";
 import Wallet from "../../../../../../models/Wallet";
+import Notification from "../../../../../../models/Notification";
 export const GET = async(req:NextRequest,res:NextResponse)=>{
     const { searchParams } = new URL(req.url);
     const cook = cookies();
@@ -45,7 +46,7 @@ export const GET = async(req:NextRequest,res:NextResponse)=>{
         let checkuser2 = await User.findOne({email:userInfo.email,is0auth:true});
         if(checkuser2!=null){
             //creating token
-         let token = jwt.sign({email:checkuser2 .email,name:checkuser2.name,username:checkuser2.username},process.env.JWT_SECRET||"");
+         let token = jwt.sign({email:checkuser2 .email,name:checkuser2.name,username:checkuser2.username},process.env.SECRET_KEY||"");
         //  setting cookie
          cook.set("reason","login",{maxAge:180})
          cook.set("username",checkuser2.username,{maxAge:180})
@@ -74,11 +75,17 @@ export const GET = async(req:NextRequest,res:NextResponse)=>{
     let wallet = new Wallet({
       userid:user._id,
       balance:process.env.WALLET_BALANCE||0,
-      transactions:[{amount:process.env.WALLWT_BALANCE||0,description:"Signup Bonous Credited",type:"credit",date:new Date()}]
+      transactions:[{amount:process.env.WALLET_BALANCE||0,description:"Signup Bonous Credited",type:"credit",date:new Date()}]
   })
   await wallet.save();
+  //create notification
+  let newnot = new Notification({
+    userid:user._id,
+    email:user.email,
+  })
+    await newnot.save();
     //creating token
-    let token = jwt.sign({email:userInfo.email,name:userInfo.name,username:username},process.env.JWT_SECRET||"");
+    let token = jwt.sign({email:userInfo.email,name:userInfo.name,username:username},process.env.SECRET_KEY||"");
     // setting cookies
     cook.set("token",token,{httpOnly:true,path:"/",expires:new Date(Date.now() + 1000*60*60*24*7)});
     cook.set("reason","create",{maxAge:180})

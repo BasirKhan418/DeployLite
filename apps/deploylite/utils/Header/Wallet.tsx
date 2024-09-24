@@ -27,16 +27,23 @@ import {
   FileTextIcon,
   RefreshCwIcon
 } from 'lucide-react'
-
+import { useAppSelector } from '@/lib/hook'
+import { useRouter } from 'next/navigation'
 export default function ImprovedPlatformWallet() {
-  const [balance, setBalance] = useState(1234.56)
+  const wallet = useAppSelector(state => state.wallet.wallet)
   const [addFundsAmount, setAddFundsAmount] = useState('')
-
-  const handleAddFunds = () => {
-    setBalance(prevBalance => prevBalance + parseFloat(addFundsAmount))
-    setAddFundsAmount('')
-  }
-
+  const midnightIST = new Date();
+  midnightIST.setHours(24, 0, 0, 0); // Set time to midnight (12:00 AM)
+  let date = midnightIST.toLocaleString('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  })
+  const router = useRouter()
   return (
     <div className={`min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300`}>
       <div className="max-w-7xl mx-auto p-4 md:p-8">
@@ -46,13 +53,15 @@ export default function ImprovedPlatformWallet() {
             <div className="bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900 dark:to-indigo-900 p-6">
               <CardTitle className="text-2xl mb-2">DeployLite Balance</CardTitle>
               <CardDescription>Available funds for your account</CardDescription>
-              <p className="text-5xl font-bold mt-4 text-green-600 dark:text-green-400">${balance.toFixed(2)}</p>
+              <p className="text-5xl font-bold mt-4 text-green-600 dark:text-green-400">₹{wallet.balance}</p>
             </div>
             <CardFooter className="flex justify-between mt-4">
               <Button className="bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 text-white">
                 <DollarSignIcon className="mr-2 h-4 w-4" /> Add Funds
               </Button>
-              <Button className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white">
+              <Button className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white" onClick={()=>{
+                router.push("/settings")
+              }}>
                 <SettingsIcon className="mr-2 h-4 w-4" /> Manage Account
               </Button>
             </CardFooter>
@@ -93,7 +102,7 @@ export default function ImprovedPlatformWallet() {
                   onChange={(e) => setAddFundsAmount(e.target.value)}
                   className="bg-gray-100 text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                 />
-                <Button onClick={handleAddFunds} className="bg-green-600 hover:bg-green-700 text-white">
+                <Button  className="bg-green-600 hover:bg-green-700 text-white">
                   <CreditCardIcon className="mr-2 h-4 w-4" /> Add Funds
                 </Button>
               </div>
@@ -108,15 +117,15 @@ export default function ImprovedPlatformWallet() {
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span>Total Spent This Month:</span>
-                  <span className="font-bold">$523.45</span>
+                  <span className="font-bold">₹0</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Remaining Budget:</span>
-                  <span className="font-bold">$1476.55</span>
+                  <span className="font-bold">₹{wallet.balance}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Next Billing Date:</span>
-                  <span className="font-bold">Oct 1, 2023</span>
+                  <span className="font-bold">{date}</span>
                 </div>
               </div>
             </CardContent>
