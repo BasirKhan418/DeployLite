@@ -60,7 +60,7 @@ export default function Settings({tabname,name,visible}:{tabname:string,name:str
                 {["profile", "account", "integrations", "aws", "notifications", "billing"].map((tab) => (
                   <TabsTrigger key={tab} value={tab} className="flex items-center">
                     <TabIcon tab={tab} />
-                    <span className="capitalize">{tab}</span>
+                    <span className="capitalize">{tab=="aws"?"Customization":tab}</span>
                   </TabsTrigger>
                 ))}
               </TabsList>)}

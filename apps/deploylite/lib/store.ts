@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { userSlice } from './features/user/User'
 import { walletSlice } from './features/wallet/Wallet'
+import { AwsSlice } from './features/aws/aws'
 export const makeStore = () => {
   return configureStore({
     reducer: {
        user:userSlice.reducer,
-       wallet:walletSlice.reducer
+       wallet:walletSlice.reducer,
+       aws:AwsSlice.reducer
     }
   })
 }

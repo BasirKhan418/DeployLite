@@ -11,7 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { useAppSelector } from '@/lib/hook'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { MenuIcon, HomeIcon, RocketIcon, LayersIcon, SettingsIcon, PlusIcon, ChevronDownIcon, UserIcon, WalletIcon, LogOutIcon, CreditCardIcon, BellIcon, SunIcon, MoonIcon, CodeIcon, ServerIcon, GlobeIcon, DatabaseIcon, Router,Rocket } from 'lucide-react'
+import { MenuIcon, HomeIcon, RocketIcon, LayersIcon, SettingsIcon, PlusIcon, ChevronDownIcon, UserIcon, WalletIcon, LogOutIcon, CreditCardIcon, BellIcon, SunIcon, MoonIcon, CodeIcon, ServerIcon, GlobeIcon, DatabaseIcon, Router,Rocket,CloudLightning } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import LogoutModal from '../modals/LogoutModal'
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -78,6 +78,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </Button>
         </CollapsibleContent>
       </Collapsible>
+      
+      <Link href="/customization" passHref>
+        <Button variant="ghost" className="w-full justify-start">
+          <CloudLightning className="mr-2 h-4 w-4" />
+            Cloud Customization
+        </Button>
+      </Link>
       <Link href="/settings" passHref>
         <Button variant="ghost" className="w-full justify-start">
           <SettingsIcon className="mr-2 h-4 w-4" />
