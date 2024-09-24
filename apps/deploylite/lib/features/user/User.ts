@@ -12,7 +12,8 @@ export interface UserState {
         isverified: boolean,
         is0auth: boolean,
         bio: string,
-        phone: string
+        phone: string,
+        twofactor?:boolean
     };
 }
 
@@ -28,7 +29,8 @@ const initialState: UserState = {
         isverified:false,
         is0auth:false,
         bio:"",
-        phone:""
+        phone:"",
+        twofactor:false
     },
 };
 

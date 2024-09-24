@@ -15,12 +15,13 @@ import { Toaster,toast } from 'sonner'
 import LoginLoader from '@/utils/Loaders/LoginLoader'
 import { useAppDispatch } from '@/lib/hook'
 import { add } from '@/lib/features/user/User'
-import { set } from 'mongoose'
+import { useRouter } from 'next/navigation'
 const Profile = () => {
     const { theme, setTheme } = useTheme()
     const user = useAppSelector(state => state.user.user)
     const dispatch = useAppDispatch()
     const [loading, setLoading] = useState(false)
+    const router = useRouter()
     //theme onchange
     const themeChange = (e:any) => {
         setTheme(theme=='dark'?'light':'dark')
@@ -79,6 +80,12 @@ const Profile = () => {
         }
         else{
             toast.error(result.message)
+            console.log(result)
+            if(result.login&&!result.login){
+             setTimeout(()=>{
+                router.push('/login')
+             },1000)
+            }
         }
 
     }

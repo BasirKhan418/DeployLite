@@ -12,6 +12,7 @@ isverified:{type:Boolean,default:false},
 is0auth:{type:Boolean,default:false},
 bio:{type:String,default:""},
 phone:{type:String,default:""},
+twofactor:{type:Boolean,default:false},
 },{timestamps:true})
 mongoose.models = {}
 export default mongoose.model.User||mongoose.model('User',UserSchema);

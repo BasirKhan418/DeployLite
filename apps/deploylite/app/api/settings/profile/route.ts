@@ -11,10 +11,12 @@ export const POST = async (req: NextRequest,res:NextResponse) => {
 
      // If user is not authenticated redirect to login page
      if(!result.result){
-         return NextResponse.redirect(`${process.env.NEXT_URL}/login`);
+        //make sure to redirect to get 
+        console.log(`${process.env.NEXT_URL}/login`)
+         return NextResponse.json({message:"You are not authenticated. Please login to continue",success:false,login:false})
      }
      //sanitize or validate the userinput
-     
+
      const pdata = Profilezod.safeParse(data);
      if(!pdata.success){
          return NextResponse.json({message:"Invalid input. Please try again with correct input",success:false})

@@ -1,23 +1,27 @@
 "use client";
-import React, { useState } from "react";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
+import React, { useEffect, useState } from "react";
+import {Label }from '../../../components/ui/label'
+import { Input } from '../../../components/ui/input'
 import { cn } from "@/lib/utils";
 import { Toaster,toast } from "sonner";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import LoginLoader from "@/utils/Loaders/LoginLoader";
+import { Suspense } from "react";
 import {
   IconBrandGithub,
   IconBrandGoogle,
   IconBrandOnlyfans,
 } from "@tabler/icons-react";
-import { useRouter } from "next/navigation";
-export default function Login() {
-  const [form,setForm] = useState({
-    email:"",
-    password:""
-  })
+import { useSearchParams } from "next/navigation";
+ function ResetComponent() {
+const searchurl = useSearchParams()
   const router = useRouter()
+  //all aplication states
+  const [form,setForm] = useState({
+   otp:"",
+  })
+  //useEffect for checkingn if user is authenticated or not
+
   const [loading,setLoading] = useState(false)
   //handle changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,28 +33,25 @@ export default function Login() {
   const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true)
-    const res = await fetch('/api/auth/login',{
+    if(form.otp==""){
+      toast.error('Please enter the otp sent to your email.')
+      setLoading(false)
+      return
+    }
+    const res = await fetch('/api/auth/otp',{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(form)  
+      body: JSON.stringify({otp:form.otp,token:searchurl.get('token')})  
     })
     const result = await res.json()
     setLoading(false)
     if(result.success){
-      if(result.otp){
-        toast.success(result.message)
-        setTimeout(()=>{
-          router.push(`/otp?token=${result.token}`)
-        },2000)
-      }
-      else{
-        toast.success(result.message)
-        setTimeout(()=>{
-         window.open("/","_self");
-        },2000)
-      }
+      toast.success(result.message)
+      setTimeout(()=>{
+       window.open("/","_self")
+      },2000)
     }
     else{
       toast.error(result.message)
@@ -58,29 +59,25 @@ export default function Login() {
 
   };
   return (
+    <div className="flex justify-center items-center h-[100vh]">
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
       <Toaster position="top-right"/>
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
-        Welcome to DeployLite
+        Enter your otp (one time password)
       </h2>
       <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
-        Login to your account to get started with DeployLite and start deploying your application.
+        Two factor authentication is enabled on your account. Please enter the otp sent to your email. For accessing your account.
       </p>
 
       <form className="my-8" onSubmit={handleSubmit}>
-        <LabelInputContainer className="mb-4">
-          <Label htmlFor="email">Email Address</Label>
-          <Input id="email" placeholder="basir@deploylite.tech" type="email" onChange={handleChange} value={form.email}/>
-        </LabelInputContainer>
-        <div className="flex justify-end absolute right-10 mb-8">
-          <Link href="/forgot" className="text-sm text-neutral-700 dark:text-neutral-300 hover:underline">Forgot password?</Link>
-        </div>
+       
         <LabelInputContainer className="mb-4 ">
         
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="otp">OTP</Label>
           
-          <Input id="password" placeholder="••••••••" type="password" onChange={handleChange} value={form.password}/>
+          <Input id="otp" placeholder="XXXX" type="number" onChange={handleChange} value={form.otp}/>
         </LabelInputContainer>
+        
         
       
 
@@ -91,33 +88,15 @@ export default function Login() {
          {loading ? <LoginLoader/> : <ButtonText/>}
           <BottomGradient />
         </button>
-        <div className="flex justify-center items-center mt-4">
-          <span className="text-sm text-neutral-700 dark:text-neutral-300 ">Don’t have an account? <Link href="/signup" className="underline text-green-500 mx-1">Create an account</Link>
-        </span>
-        </div>
 
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 
         <div className="flex flex-col space-y-4">
         
-        <button
-            className=" g-signin2 relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
-              data-onsuccess="onSignIn"
-              type="button"
-              onClick={()=>{
-              let url  = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI}&scope=${process.env.NEXT_PUBLIC_GOOGLE_SCOPE}&response_type=${"code"}&access_type=${"offline"}`
-              window.open(url,"_self");
-
-              }}
-          >
-            <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-            <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-              Google
-            </span>
-            <BottomGradient />
-          </button>
+      
         </div>
       </form>
+    </div>
     </div>
   );
 }
@@ -144,9 +123,15 @@ const LabelInputContainer = ({
     </div>
   );
 };
-
+export default function Page() {
+    return (
+      <Suspense fallback={<div>Loading...</div>}>
+        <ResetComponent />
+      </Suspense>
+    );
+  }
 const ButtonText = ()=>{
   return (
-    <>Login &rarr;</>
+    <>Login Now&rarr;</>
   )
 }
