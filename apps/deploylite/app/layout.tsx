@@ -47,7 +47,7 @@ export default function RootLayout({
   zIndex={1600}
   showAtBottom={false}
 />
-{(pathname !== '/login' && pathname !== '/signup' &&pathname!='/autherror'&&pathname!='/authsuccess'&&pathname!='/forgot'&&pathname!='/reset'&&pathname!='/verifyemail'&&pathname!='/otp') ? <Sidebar>
+{(pathname !== '/login' && pathname !== '/signup' &&pathname!='/autherror'&&pathname!='/authsuccess'&&pathname!='/forgot'&&pathname!='/reset'&&pathname!='/verifyemail'&&pathname!='/otp'&&pathname!='/githubauth'&&pathname!='/githuberr') ? <Sidebar>
   
   {children}</Sidebar> : children}
 </ThemeProvider>

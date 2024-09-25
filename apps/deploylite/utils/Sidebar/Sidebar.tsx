@@ -31,7 +31,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const NavItems = () => (
     <>
-      <Link href="/dashboard" passHref>
+      <Link href="/" passHref>
         <Button variant="ghost" className="w-full justify-start">
           <HomeIcon className="mr-2 h-4 w-4" />
           Dashboard

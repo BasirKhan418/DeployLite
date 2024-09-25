@@ -13,7 +13,8 @@ export interface UserState {
         is0auth: boolean,
         bio: string,
         phone: string,
-        twofactor?:boolean
+        twofactor?:boolean,
+        connectgithub?:boolean
     };
 }
 
@@ -30,7 +31,8 @@ const initialState: UserState = {
         is0auth:false,
         bio:"",
         phone:"",
-        twofactor:false
+        twofactor:false,
+        connectgithub:false
     },
 };
 

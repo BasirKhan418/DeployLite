@@ -46,9 +46,9 @@ export default function Settings({tabname,name,visible}:{tabname:string,name:str
     <div className="container mx-auto p-4 space-y-8 max-w-5xl">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">{name||"Settings"}</h1>
-        <Avatar className="h-10 w-32">
+        <Avatar className="h-12 w-12">
           <AvatarImage src={user.img||""} alt="User" />
-          <AvatarFallback>{user.username}</AvatarFallback>
+          <AvatarFallback>{user.username[0]}</AvatarFallback>
         </Avatar>
       </div>
 
