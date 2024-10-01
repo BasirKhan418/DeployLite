@@ -60,6 +60,6 @@ let token = CryptoJS.AES.encrypt(data.access_token,process.env.SECRET_KEY||"").t
 return NextResponse.redirect(`${process.env.NEXT_URL||""}/githubauth`);
     }
     catch(err){
-        console.log(err);
+        return NextResponse.redirect(`${process.env.NEXT_URL||""}/githuberr`);
     }
 }
