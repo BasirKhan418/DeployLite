@@ -30,7 +30,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, [])
 
   const NavItems = () => (
-    <>
+    <div>
       <Link href="/" passHref>
         <Button variant="ghost" className="w-full justify-start">
           <HomeIcon className="mr-2 h-4 w-4" />
@@ -49,33 +49,46 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         className="w-full"
       >
         <CollapsibleTrigger asChild>
+      
+        
           <Button variant="ghost" className="w-full justify-start">
             <LayersIcon className="mr-2 h-4 w-4" />
             Projects
             <ChevronDownIcon className={`ml-auto h-4 w-4 transition-transform duration-200 ${isProjectsOpen ? 'transform rotate-180' : ''}`} />
           </Button>
+         
         </CollapsibleTrigger>
         <CollapsibleContent className="space-y-2 px-4 py-2">
+        <Link href={"/project/frontend"}>
           <Button variant="ghost" className="w-full justify-start pl-6">
             <CodeIcon className="mr-2 h-4 w-4" />
             Frontend
           </Button>
+          </Link>
+          <Link href={"/project/backend"}>
           <Button variant="ghost" className="w-full justify-start pl-6">
             <ServerIcon className="mr-2 h-4 w-4" />
             Backend
           </Button>
+          </Link>
+          <Link href={"/project/fullstack"}>
           <Button variant="ghost" className="w-full justify-start pl-6">
             <GlobeIcon className="mr-2 h-4 w-4" />
             Fullstack
           </Button>
+          </Link>
+          <Link href={"/project/webbuilder"}>
           <Button variant="ghost" className="w-full justify-start pl-6">
             <LayersIcon className="mr-2 h-4 w-4" />
             Web Builder
           </Button>
+          </Link>
+          <Link href={"/project/database"}>
           <Button variant="ghost" className="w-full justify-start pl-6">
             <DatabaseIcon className="mr-2 h-4 w-4" />
             Database
           </Button>
+          </Link>
         </CollapsibleContent>
       </Collapsible>
       
@@ -91,7 +104,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           Settings
         </Button>
       </Link>
-    </>
+    </div>
   )
 
   const markAllAsRead = () => {

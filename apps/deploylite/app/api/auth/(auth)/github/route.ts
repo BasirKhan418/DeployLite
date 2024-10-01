@@ -2,6 +2,7 @@ import { NextRequest,NextResponse } from "next/server";
 import CheckAuth from "@/actions/CheckAuth";
 import User from "../../../../../../models/User";
 import ConnectDb from "../../../../../../middleware/connectdb";
+import CryptoJS from "crypto-js";
 export const GET = async (req: NextRequest,res:NextResponse) => {
     
     try{
@@ -48,8 +49,10 @@ export const GET = async (req: NextRequest,res:NextResponse) => {
     });
     const githubuser = await getuser.json();
     console.log(githubuser);
-
- let updateuser = await User.findOneAndUpdate({email:res.email},{connectgithub:true,githubid:githubuser.login,githubtoken:data.access_token,img:githubuser. avatar_url},{new:true});
+//encrypting the github token for security reasons
+let token = CryptoJS.AES.encrypt(data.access_token,process.env.SECRET_KEY||"").toString();
+ let updateuser = await User.findOneAndUpdate({email:res.email},{connectgithub:true,githubid:githubuser.login,githubtoken:token,img:githubuser. avatar_url},{new:true});
+ //HANDLING THE ERROR
  if(updateuser==null){
         return NextResponse.redirect(`${process.env.NEXT_URL||""}/githuberr`);
  }

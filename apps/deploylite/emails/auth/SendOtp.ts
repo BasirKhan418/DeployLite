@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer';
 const SendOtp = async(email: string, token: string,name:string,otpcode:number) => {
 try{
     const transporter = await nodemailer.createTransport({
-        host: "smtp-relay.brevo.com",
+        host: "smtp.gmail.com",
         port: 587,
         secure: false,
         auth: {
