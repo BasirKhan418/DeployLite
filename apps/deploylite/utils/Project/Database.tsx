@@ -11,7 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { AlertCircle, Database, MoreVertical, Plus, Server, Settings, Trash2 } from 'lucide-react'
 import { Progress } from "@/components/ui/progress"
-
+import CreateDatabase from '../modals/CreateDatabase'
 // Constants
 const DATABASE_TYPES = {
   POSTGRESQL: 'PostgreSQL',
@@ -39,7 +39,7 @@ export default function DatabaseComp() {
   const [newDbName, setNewDbName] = useState('')
   const [newDbType, setNewDbType] = useState('')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-
+  const [open,setOpen] = useState(false)
   const addNewDatabase = () => {
     if (newDbName && newDbType) {
       const newDb = {
@@ -65,58 +65,18 @@ export default function DatabaseComp() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
+      <CreateDatabase open={open} setOpen={setOpen}/>
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Database Management</h1>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
+          
+              <Button onClick={()=>{
+                setOpen(true)
+              }}>
                 <Plus className="w-4 h-4 mr-2" />
                 Add Database
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Database</DialogTitle>
-                <DialogDescription>
-                  Enter the details for your new database.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Name
-                  </Label>
-                  <Input
-                    id="name"
-                    value={newDbName}
-                    onChange={(e) => setNewDbName(e.target.value)}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="type" className="text-right">
-                    Type
-                  </Label>
-                  <Select onValueChange={setNewDbType}>
-                    <SelectTrigger className="col-span-3">
-                      <SelectValue placeholder="Select database type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.values(DATABASE_TYPES).map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button onClick={addNewDatabase}>Add Database</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+           
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {databases.map((db) => (

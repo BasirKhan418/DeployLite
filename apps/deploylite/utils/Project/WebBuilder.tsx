@@ -12,8 +12,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { PlusCircle, Search, MoreHorizontal, Globe, ExternalLink, Layers, Cpu, Eye, BarChart2, Edit, Trash2, Play, Pause, RefreshCw, Settings } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import Image from 'next/image'
-
+import CreateWebBuilder from '../modals/CreateWebBuiler';
 export default function WebBuilder() {
+  const [open,setOpen] = useState(false)
   const [sites, setSites] = useState([
     { id: 1, name: 'My Portfolio', url: 'myportfolio.com', lastUpdated: '2 hours ago', template: 'Custom', status: 'Live', visitors: 152, logo: '/placeholder.svg?height=40&width=40' },
     { id: 2, name: 'Coffee Shop', url: 'bestcoffee.com', lastUpdated: '1 day ago', template: 'E-commerce', status: 'Updating', visitors: 1089, logo: '/placeholder.svg?height=40&width=40' },
@@ -25,7 +26,7 @@ export default function WebBuilder() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-background via-background to-background/90">
-     
+     <CreateWebBuilder open={open} setOpen={setOpen}/>
       <main className="flex-1 py-6 px-4 md:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row justify-between items-center mb-8 space-y-4 sm:space-y-0">
@@ -39,7 +40,9 @@ export default function WebBuilder() {
                   className="w-full sm:w-[300px] pl-8 pr-4 py-2 bg-background"
                 />
               </form>
-              <Button>
+              <Button onClick={()=>{
+                setOpen(true)
+              }}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 New Site
               </Button>
