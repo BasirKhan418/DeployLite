@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { PlusCircle, Search, MoreHorizontal, GitBranch, ExternalLink, Rocket, Cpu, HardDrive, Eye, BarChart2, Edit, Trash2, Play, Pause, RefreshCw ,Globe,Server,Database} from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import Image from 'next/image'
-import CreateProjectModal from '../modals/CreateProjectModal';
+import { useRouter } from 'next/navigation'
 const Projecthome=({name}:{name:string})=> {
   const [projects, setProjects] = useState([
     { id: 1, name: 'My Blog', url: 'myblog.com', lastDeployment: '2 hours ago', branch: 'main', status: 'Live', cpu: 15, memory: 30, logo: '/placeholder.svg?height=40&width=40' },
@@ -21,10 +21,11 @@ const Projecthome=({name}:{name:string})=> {
     { id: 6, name: 'Internal Dashboard', url: 'dashboard.internal.com', lastDeployment: '12 hours ago', branch: 'staging', status: 'Live', cpu: 25, memory: 40, logo: '/placeholder.svg?height=40&width=40' },
   ])
   const [open,setOpen] = useState(false)
+  const router = useRouter()
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-background via-background to-background/90">
-      <CreateProjectModal open={open} setOpen={setOpen} type={name}/>
+    
       <main className="flex-1 py-6 px-4 md:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row justify-between items-center mb-8 space-y-4 sm:space-y-0">
@@ -40,7 +41,7 @@ const Projecthome=({name}:{name:string})=> {
             <div className="flex items-center space-x-4">
                
               <Button className="hidden sm:flex" onClick={()=>{
-                setOpen(true)
+                router.push(`/project/createproject/${name}`)
               }}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Create Project

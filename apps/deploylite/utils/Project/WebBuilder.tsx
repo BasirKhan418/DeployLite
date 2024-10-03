@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { PlusCircle, Search, MoreHorizontal, Globe, ExternalLink, Layers, Cpu, Eye, BarChart2, Edit, Trash2, Play, Pause, RefreshCw, Settings } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import Image from 'next/image'
-import CreateWebBuilder from '../modals/CreateWebBuiler';
+import { useRouter } from 'next/navigation';
 export default function WebBuilder() {
   const [open,setOpen] = useState(false)
   const [sites, setSites] = useState([
@@ -23,10 +23,11 @@ export default function WebBuilder() {
     { id: 5, name: 'Art Gallery', url: 'modernart.com', lastUpdated: '3 days ago', template: 'Portfolio', status: 'Maintenance', visitors: 0, logo: '/placeholder.svg?height=40&width=40' },
     { id: 6, name: 'Local Restaurant', url: 'tasteofitaly.com', lastUpdated: '12 hours ago', template: 'Restaurant', status: 'Live', visitors: 789, logo: '/placeholder.svg?height=40&width=40' },
   ])
+  const router = useRouter()
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-background via-background to-background/90">
-     <CreateWebBuilder open={open} setOpen={setOpen}/>
+     
       <main className="flex-1 py-6 px-4 md:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row justify-between items-center mb-8 space-y-4 sm:space-y-0">
@@ -41,7 +42,7 @@ export default function WebBuilder() {
                 />
               </form>
               <Button onClick={()=>{
-                setOpen(true)
+                router.push(`/project/createproject/webbuilder`)
               }}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 New Site
