@@ -6,6 +6,7 @@ import Wallet from "../../../../../models/Wallet";
 import Crypto from "crypto-js";
 import { cookies } from "next/headers";
 export const GET = async(req:NextRequest,res:NextResponse)=>{
+    console.log("entering to home auth")
     const cook =cookies()
     try{
         await ConnectDb();
@@ -16,15 +17,22 @@ export const GET = async(req:NextRequest,res:NextResponse)=>{
         console.log(cook.get('token'))
     }
     let user = await User.findOne({ email: result.email }).select('-password');
+    console.log(result.email)
     //decrypting the github token
-    let decrypttoken = Crypto.AES.decrypt(user.githubtoken,process.env.SECRET_KEY||"").toString(Crypto.enc.Utf8);
+    let decrypttoken = null;
+    if(user.githubtoken!=null){
+    decrypttoken = Crypto.AES.decrypt(user.githubtoken,process.env.SECRET_KEY||"").toString(Crypto.enc.Utf8);
     //modifying the user object
+    }
     let data = {...user._doc,githubtoken:decrypttoken};
     
+    
     let wallet = await Wallet.findOne({userid:user._id});
+    console.log("data is ",data,"wallet is ",wallet)
     return NextResponse.json({status: 'success',user:data,wallet,success:true})
 }
 catch(err){
+    console.log(err)
     return NextResponse.json({
         success:false,
         message:"Something went wrong please try again after some time "

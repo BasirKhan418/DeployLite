@@ -1,17 +1,20 @@
 "use client"
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { FaWordpress } from "react-icons/fa";
 import { AiOutlineCloudServer } from "react-icons/ai";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { PlusCircle, Search, MoreHorizontal, GitBranch, ExternalLink, Rocket, Cpu, HardDrive, Eye, BarChart2, Edit, Trash2, Play, Pause, RefreshCw ,Globe,Server,Database} from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import Connect from './Connect'
+import { useAppSelector } from '@/lib/hook'
+import NoProject from './NoProject'
 const Projecthome=({name}:{name:string})=> {
+  //getting user
+  const user = useAppSelector((state)=>state.user.user)
+  console.log(user)
   const [projects, setProjects] = useState([
     { id: 1, name: 'My Blog', url: 'myblog.com', lastDeployment: '2 hours ago', branch: 'main', status: 'Live', cpu: 15, memory: 30, logo: '/placeholder.svg?height=40&width=40' },
     { id: 2, name: 'E-commerce Site', url: 'myshop.com', lastDeployment: '1 day ago', branch: 'production', status: 'Building', cpu: 45, memory: 60, logo: '/placeholder.svg?height=40&width=40' },
@@ -22,10 +25,13 @@ const Projecthome=({name}:{name:string})=> {
   ])
   const [open,setOpen] = useState(false)
   const router = useRouter()
+  //change it to dynamic
+  const haveproject =true;
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-background via-background to-background/90">
-    
+    <>
+    {!user.connectgithub?<Connect/>:<div className="flex flex-col min-h-screen bg-gradient-to-br from-background via-background to-background/90">
+    {!haveproject?<NoProject name={name}/>:<div>
       <main className="flex-1 py-6 px-4 md:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row justify-between items-center mb-8 space-y-4 sm:space-y-0">
@@ -141,8 +147,9 @@ const Projecthome=({name}:{name:string})=> {
           </div>
         </div>
       </main>
-     
-    </div>
+      </div>}
+    </div>}
+    </>
   )
 }
 export default Projecthome
