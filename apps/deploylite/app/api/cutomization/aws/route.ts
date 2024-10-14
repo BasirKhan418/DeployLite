@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import ConnectDb from "../../../../../middleware/connectdb";
-import Aws from "../../../../../models/aws";
+import Aws from "../../../../../models/Aws";
 import CheckAuth from "@/actions/CheckAuth";
 import User from "../../../../../models/User";
 import CryptoJS from "crypto-js";
