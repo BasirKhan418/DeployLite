@@ -5,10 +5,10 @@ const page = ({params}:any) => {
     console.log(params)
   return (
     <div>
-      {params.type=="frontend"&&<CreateProject/>}
-        {params.type=="backend"&&<CreateProject/>}
-        {params.type=="fullstack"&&<CreateProject/>}
-        {params.type=="webbuilder"&&<CreateWebbuilder/>}
+      {params.type=="frontend"&&<CreateProject name={params.type}/>}
+        {params.type=="backend"&&<CreateProject name={params.type}/>}
+        {params.type=="fullstack"&&<CreateProject name={params.type}/>}
+        {params.type=="webbuilder"&&<CreateWebbuilder />}
     </div>
   )
 }
