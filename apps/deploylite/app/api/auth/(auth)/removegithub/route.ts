@@ -36,7 +36,7 @@ const octokit = new Octokit({
       clientSecret: process.env.GIT_HUB_CLIENT_SECRET,
     }
   })
-  
+
   let gitres = await octokit.request('DELETE /applications/{client_id}/grant', {
     client_id: process.env.NEXT_PUBLIC_GIT_HUB_CLIENT_ID||"",
     access_token: user.githubtoken,

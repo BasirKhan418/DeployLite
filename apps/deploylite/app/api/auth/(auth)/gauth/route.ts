@@ -97,4 +97,4 @@ export const GET = async(req:NextRequest,res:NextResponse)=>{
     cook.set("msg","Error during token exchange or user info retrieval",{path:"/",expires:new Date(Date.now() + 1000*60*60*24*1)});
     return NextResponse.redirect(`${process.env.NEXT_URL||""}/autherror`);
   }
-}
+} 
