@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { AlertCircle, Database, MoreVertical, Plus, Server, Settings, Trash2 } from 'lucide-react'
+import { AlertCircle,  MoreVertical, Plus, Server, Settings, Trash2 ,Database} from 'lucide-react'
 import { Progress } from "@/components/ui/progress"
 import CreateDatabase from '../modals/CreateDatabase'
 // Constants
@@ -68,7 +68,7 @@ export default function DatabaseComp() {
       <CreateDatabase open={open} setOpen={setOpen}/>
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Database Management</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex"> <Database className="h-8 w-8 text-blue-500 mx-2"/>Database Management</h1>
           
               <Button onClick={()=>{
                 setOpen(true)

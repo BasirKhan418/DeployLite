@@ -11,7 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { useAppSelector } from '@/lib/hook'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { MenuIcon, HomeIcon, RocketIcon, LayersIcon, SettingsIcon, PlusIcon, ChevronDownIcon, UserIcon, WalletIcon, LogOutIcon, CreditCardIcon, BellIcon, SunIcon, MoonIcon, CodeIcon, ServerIcon, GlobeIcon, DatabaseIcon, Router,Rocket,CloudLightning } from 'lucide-react'
+import { MenuIcon, HomeIcon, RocketIcon, LayersIcon, SettingsIcon, PlusIcon, ChevronDownIcon, UserIcon, WalletIcon, LogOutIcon, CreditCardIcon, BellIcon, SunIcon, MoonIcon, CodeIcon, ServerIcon, GlobeIcon, DatabaseIcon, Router,Rocket,CloudLightning ,HardDrive} from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import LogoutModal from '../modals/LogoutModal'
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -59,22 +59,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
          
         </CollapsibleTrigger>
         <CollapsibleContent className="space-y-2 px-4 py-2">
-        <Link href={"/project/frontend"}>
+        <Link href={"/project/app-platform"}>
           <Button variant="ghost" className="w-full justify-start pl-6">
             <CodeIcon className="mr-2 h-4 w-4" />
-            Frontend
-          </Button>
-          </Link>
-          <Link href={"/project/backend"}>
-          <Button variant="ghost" className="w-full justify-start pl-6">
-            <ServerIcon className="mr-2 h-4 w-4" />
-            Backend
-          </Button>
-          </Link>
-          <Link href={"/project/fullstack"}>
-          <Button variant="ghost" className="w-full justify-start pl-6">
-            <GlobeIcon className="mr-2 h-4 w-4" />
-            Fullstack
+            App Platform
           </Button>
           </Link>
           <Link href={"/project/webbuilder"}>
@@ -87,6 +75,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Button variant="ghost" className="w-full justify-start pl-6">
             <DatabaseIcon className="mr-2 h-4 w-4" />
             Database
+          </Button>
+          </Link>
+          <Link href={"/project/storage"}>
+          <Button variant="ghost" className="w-full justify-start pl-6">
+            <HardDrive className="mr-2 h-4 w-4" />
+            Storage
           </Button>
           </Link>
         </CollapsibleContent>
@@ -188,6 +182,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <DropdownMenuContent className="w-56">
                 <DropdownMenuLabel>Create New Project</DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <Link href="/project/app-platform">
                 <DropdownMenuItem>
                   <CodeIcon className="mr-2 h-4 w-4" />
                   <div className="flex flex-col">
@@ -195,6 +190,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     <span className="text-xs text-muted-foreground">React, Vue, Angular</span>
                   </div>
                 </DropdownMenuItem>
+                </Link>
+                <Link href="/project/app-platform">
                 <DropdownMenuItem>
                   <ServerIcon className="mr-2 h-4 w-4" />
                   <div className="flex flex-col">
@@ -202,6 +199,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     <span className="text-xs text-muted-foreground">Node.js, Python, Java</span>
                   </div>
                 </DropdownMenuItem>
+                </Link>
+                <Link href="/project/app-platform">
                 <DropdownMenuItem>
                   <GlobeIcon className="mr-2 h-4 w-4" />
                   <div className="flex flex-col">
@@ -209,6 +208,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     <span className="text-xs text-muted-foreground">Next.js, MERN, MEAN</span>
                   </div>
                 </DropdownMenuItem>
+                </Link>
+                <Link href="/project/webbuilder">
                 <DropdownMenuItem>
                   <LayersIcon className="mr-2 h-4 w-4" />
                   <div className="flex flex-col">
@@ -216,6 +217,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     <span className="text-xs text-muted-foreground">No-code solution</span>
                   </div>
                 </DropdownMenuItem>
+                </Link>
+                <Link href="/project/database">
                 <DropdownMenuItem>
                   <DatabaseIcon className="mr-2 h-4 w-4" />
                   <div className="flex flex-col">
@@ -223,6 +226,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     <span className="text-xs text-muted-foreground">SQL, NoSQL</span>
                   </div>
                 </DropdownMenuItem>
+                </Link>
+                <Link href="/project/storage">
+                <DropdownMenuItem>
+                  <HardDrive className="mr-2 h-4 w-4" />
+                  <div className="flex flex-col">
+                    <span>Cloud Studio</span>
+                    <span className="text-xs text-muted-foreground">Storage, Buckets, Object Store</span>
+                  </div>
+                </DropdownMenuItem>
+                </Link>
               </DropdownMenuContent>
             </DropdownMenu>
 

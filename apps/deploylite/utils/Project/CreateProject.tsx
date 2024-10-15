@@ -11,12 +11,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { GitBranch, GitFork, Rocket, Server, Cloud, Zap, Shield, Users, Code, Globe, ChevronRight, Terminal, Layout, Check, AlertTriangle, Coffee, DollarSign, X } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
-
+import { FaReact } from "react-icons/fa";
+import { RiNextjsFill } from "react-icons/ri";
+import { FaAngular } from "react-icons/fa";
+import { SiFlask } from "react-icons/si";
+import { DiDjango } from "react-icons/di";
+import { SiSpringboot } from "react-icons/si";
+import { FaJava } from "react-icons/fa";
+import { FaHtml5 } from "react-icons/fa";
+import { FaCss3 } from "react-icons/fa";
+import { FaJs } from "react-icons/fa";
+import { FaNodeJs } from "react-icons/fa";
+import { FaVuejs } from "react-icons/fa";
+import { SiVite } from "react-icons/si";
 export default function CreateProject({name}:{name:string}) {
+
+
+  
   const [stage, setStage] = useState(1)
   const [projectDetails, setProjectDetails] = useState({
     name: '',
     repo: '',
+    tech:'',
     buildCommand: '',
     envVariables: ''
   })
@@ -39,10 +55,10 @@ export default function CreateProject({name}:{name:string}) {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl dark:text-white">
-            Create Your <span className="text-blue-600">{name.slice(0,1).toUpperCase()+name.slice(1)} Project</span>
+            Create Your <span className="text-blue-600"> App</span>
           </h1>
           <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl dark:text-gray-300">
-            Deploy your web projects with ease. Start building the future of the web today.
+            Deploy your code with ease. Start building the future of the technology today.
           </p>
         </div>
 
@@ -70,6 +86,19 @@ export default function CreateProject({name}:{name:string}) {
                       placeholder="My Awesome Project"
                       className="mt-1"
                     />
+                  </div>
+                  <div>
+                    <Label htmlFor="github-repo">Framework Preset </Label>
+                    <Select name="tech" onValueChange={(value) => setProjectDetails({ ...projectDetails, tech: value })}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Choose a Framework" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="repo1">user/repo1</SelectItem>
+                        <SelectItem value="repo2">user/repo2</SelectItem>
+                        <SelectItem value="repo3">user/repo3</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <Label htmlFor="github-repo">GitHub Repository</Label>

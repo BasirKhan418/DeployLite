@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { FaWordpress } from "react-icons/fa";
 import { AiOutlineCloudServer } from "react-icons/ai";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
-import { PlusCircle, Search, MoreHorizontal, GitBranch, ExternalLink, Rocket, Cpu, HardDrive, Eye, BarChart2, Edit, Trash2, Play, Pause, RefreshCw ,Globe,Server,Database} from 'lucide-react'
+import { PlusCircle, Search, MoreHorizontal, GitBranch, ExternalLink, Rocket, Cpu, HardDrive, Eye, BarChart2, Edit, Trash2, Play, Pause, RefreshCw ,Globe,Server,Database,CloudUpload} from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import { useRouter } from 'next/navigation'
 import Connect from './Connect'
@@ -36,12 +36,9 @@ const Projecthome=({name}:{name:string})=> {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row justify-between items-center mb-8 space-y-4 sm:space-y-0">
             <div className="flex items-center">
-               {name=="frontend"&&<Globe className="h-8 w-8 text-blue-500"/>}
-               {name=="backend"&&<Server className="h-8 w-8 text-blue-500"/>}
-                {name=="database"&&<Database className="h-8 w-8 text-blue-500"/>}
-                {name=="webbuilder"&&<FaWordpress className="h-8 w-8 text-blue-500"/>}
-                {name=="fullstack"&&<AiOutlineCloudServer className="h-10 w-10 text-blue-500"/>}
-              <h1 className="text-3xl font-bold tracking-tight mx-2">{name&&name.slice(0,1).toUpperCase()+name.slice(1)}</h1>
+               <CloudUpload className="h-8 w-8 text-blue-500"/>
+               
+              <h1 className="text-3xl font-bold tracking-tight mx-2">App Platform</h1>
           
             </div>
             <div className="flex items-center space-x-4">

@@ -9,7 +9,7 @@ import { FaDrupal } from "react-icons/fa";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { PlusCircle, Search, MoreHorizontal, Globe, ExternalLink, Layers, Cpu, Eye, BarChart2, Edit, Trash2, Play, Pause, RefreshCw, Settings } from 'lucide-react'
+import { PlusCircle, Search, MoreHorizontal ,ExternalLink, Layers, Cpu, Eye, BarChart2, Edit, Trash2, Play, Pause, RefreshCw, Settings,Globe } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import Image from 'next/image'
 import { useRouter } from 'next/navigation';
@@ -29,9 +29,11 @@ export default function WebBuilder() {
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-background via-background to-background/90">
      
       <main className="flex-1 py-6 px-4 md:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto ">
+        
           <div className="flex flex-col sm:flex-row justify-between items-center mb-8 space-y-4 sm:space-y-0">
-            <h1 className="text-3xl font-bold tracking-tight">Deployed Sites</h1>
+          
+            <h1 className="text-3xl font-bold tracking-tight flex"><Globe className="h-8 w-8 text-blue-500 mx-2"/> Web Builder</h1>
             <div className="flex items-center space-x-4">
               <form className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />

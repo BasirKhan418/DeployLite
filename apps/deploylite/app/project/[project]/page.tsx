@@ -6,10 +6,9 @@ const page = ({params}:any) => {
   return (
     <div>
         {params.project=="database"&&<DatabaseComp/>}
-        {params.project=="frontend"&&<Projecthome name={params.project}/>}
-        {params.project=="backend"&&<Projecthome name={params.project}/>}
-        {params.project=="fullstack"&&<Projecthome name={params.project} />}
+        {params.project=="app-platform"&&<Projecthome name={params.project} />}
         {params.project=="webbuilder"&&<WebBuilder/>}
+        {params.project=="storage"&&<WebBuilder/>}
     </div>
   )
 }
