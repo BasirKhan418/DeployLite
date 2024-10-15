@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +9,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
+} from "@/components/ui/accordion";
 
 import {
   Select,
@@ -64,13 +64,19 @@ import { FaVuejs } from "react-icons/fa";
 import { SiVite } from "react-icons/si";
 import { Switch } from "@/components/ui/switch";
 import { IoHelpCircleOutline } from "react-icons/io5";
+import { FaGithub } from "react-icons/fa6";
+import { IoIosGitBranch } from "react-icons/io";
+import { useAppSelector } from "@/lib/hook";
+import { FiLock,FiUnlock } from "react-icons/fi";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
+} from "@/components/ui/tooltip";
 export default function CreateProject({ name }: { name: string }) {
+  const user = useAppSelector((state)=>state.user.user)
+
   const [stage, setStage] = useState(1);
   const [projectDetails, setProjectDetails] = useState({
     name: "",
@@ -82,6 +88,8 @@ export default function CreateProject({ name }: { name: string }) {
     outputDirectory: "/dist",
     install: "npm install",
     start: "npm run start",
+    branchurl:"",
+    cloneurl:""
   });
   const [isoverridebuid, setisoverridebuid] = useState(true);
   const [isrootdir, setisrootdir] = useState(true);
@@ -89,11 +97,27 @@ export default function CreateProject({ name }: { name: string }) {
   const [isoutputdir, setisoutputdir] = useState(true);
   const [isstart, setisstart] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState("hobby");
+  const [reposdata,setreposdata] =useState(null)
 
   const handleProjectDetailsChange = (e: any) => {
     setProjectDetails({ ...projectDetails, [e.target.name]: e.target.value });
   };
-
+//fetch all users repo public and private
+const fetchAllRepo =async()=>{
+  const repodata = await fetch("https://api.github.com/user/repos",{
+    headers:{
+      'Authorization': `token ${user.githubtoken}`
+    }
+  })
+  const res = await repodata.json();
+  setreposdata(res)
+  
+}
+//useEffect for fetch all repo
+useEffect(()=>{
+  fetchAllRepo();
+},[])
+//handle submit started from here
   const handleSubmit = (e: any) => {
     e.preventDefault();
     // Handle form submission here
@@ -162,22 +186,109 @@ export default function CreateProject({ name }: { name: string }) {
                       className="mt-1"
                     />
                   </div>
+                 
                   <div>
-                    <Label htmlFor="github-repo" className="flex  items-center">Framework Preset 
-                    <TooltipProvider>
-  <Tooltip>
-    <TooltipTrigger>
-      <IoHelpCircleOutline className="text-xl text-gray-500 mx-2" />
-    </TooltipTrigger>
-    <TooltipContent className="bg-gray-800 text-white text-sm rounded-md p-4 shadow-lg w-96 relative">
-      <p>Select the technology and framework used in your application. This helps us optimize the deployment process based on the specific requirements of your chosen tech stack. Available options include popular frameworks like React, Next.js, Angular, Vue.js, Node.js, Python (Django, Flask), Ruby on Rails, and more. If unsure, refer to your project's documentation to confirm the framework.</p>
-      
-    </TooltipContent>
-  </Tooltip>
-</TooltipProvider>
+                    <Label htmlFor="github-repo">GitHub Repository</Label>
+                    <Select
+                      name="repo"
+                      onValueChange={(value:any) =>{
+                        console.log(value)
+                        setProjectDetails({ ...projectDetails, repo: value.full_name,branchurl:value.branches_url
+                          ,cloneurl:value.clone_url })
+                        console.log(value.branches_url,value.clone_url,value.full_name)
+                        const url = `https://api.github.com/repos/${value.owner.login}/${value.name}/contents/package.json`;
+// Helper function to check if a specific package is present in dependencies or devDependencies
+function hasDependency(depName:any,dependencies:any,devDependencies:any) {
+  return dependencies[depName] || devDependencies[depName];
+}
+async function getPackageJson() {
+  try{
+  const response = await fetch(url,{
+    headers:{
+      'Authorization': `token ${user.githubtoken}`
+    }
+  });
+  const data = await response.json();
+  const content = Buffer.from(data.content, 'base64').toString('utf-8');
+  const packageJson = JSON.parse(content);
 
+  console.log('Frameworks in package.json:', packageJson.dependencies);
+  console.log('Scripts in package.json:', packageJson.scripts);
+
+  const dependencies = packageJson.dependencies || {};
+  const devDependencies = packageJson.devDependencies || {};
+
+  
+
+  // Detect frameworks
+ 
+ if (hasDependency('react',dependencies,devDependencies) && hasDependency('vite'
+  ,dependencies,devDependencies)) {
+    console.log('The project is using Next.js');
+  }
+  else if (hasDependency('react',dependencies,devDependencies) && hasDependency('next',dependencies,devDependencies)) {
+    console.log('The project is using Next.js');
+  } 
+  else if (hasDependency('react',dependencies,devDependencies)) {
+    console.log('The project is using React.js');
+  } else if (hasDependency('vue',dependencies,devDependencies) && hasDependency('nuxt',dependencies,devDependencies)) {
+    console.log('The project is using Nuxt.js (Vue.js with Nuxt)');
+  } else if (hasDependency('vue',dependencies,devDependencies)) {
+    console.log('The project is using Vue.js');
+  } else if (hasDependency('@angular/core',dependencies,devDependencies)) {
+    console.log('The project is using Angular');
+  } else if (hasDependency('express',dependencies,devDependencies)) {
+    console.log('The project is using Express (Node.js backend)');
+  } else {
+    console.log('No recognized framework detected');
+  }
+}
+catch(err){
+  console.log(err)
+}
+}
+
+getPackageJson();
+                        }
+                      }
+                    >
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Select a repository" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {/* @ts-ignore */}
+                       {reposdata&&reposdata.map((item:any)=>(<SelectItem value={item} className="w-full"><div className="flex justify-center items-center">
+                          <div className="flex"><FaGithub className="text-xl mx-2"/>{item.full_name}</div>
+                          <div className="flex">{item.private&&<FiLock className="text-gray-500 mx-2"/>}</div>
+                          </div></SelectItem>))}
+                        
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="github-repo" className="flex  items-center">
+                      Framework Preset
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <IoHelpCircleOutline className="text-xl text-gray-500 mx-2" />
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-gray-800 text-white text-sm rounded-md p-4 shadow-lg w-96 relative">
+                            <p>
+                              Select the technology and framework used in your
+                              application. This helps us optimize the deployment
+                              process based on the specific requirements of your
+                              chosen tech stack. Available options include
+                              popular frameworks like React, Next.js, Angular,
+                              Vue.js, Node.js, Python (Django, Flask), Ruby on
+                              Rails, and more. If unsure, refer to your
+                              project's documentation to confirm the framework.
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </Label>
-             
+
                     <Select
                       name="tech"
                       onValueChange={(value) =>
@@ -248,39 +359,30 @@ export default function CreateProject({ name }: { name: string }) {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div>
-                    <Label htmlFor="github-repo">GitHub Repository</Label>
-                    <Select
-                      name="repo"
-                      onValueChange={(value) =>
-                        setProjectDetails({ ...projectDetails, repo: value })
-                      }
-                    >
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select a repository" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="repo1">user/repo1</SelectItem>
-                        <SelectItem value="repo2">user/repo2</SelectItem>
-                        <SelectItem value="repo3">user/repo3</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
                   <div className="relative">
-                    <Label htmlFor="build-command" className="flex  items-center">Root Directory
-
-                    <TooltipProvider>
-  <Tooltip>
-    <TooltipTrigger>
-      <IoHelpCircleOutline className="text-xl text-gray-500 mx-2" />
-    </TooltipTrigger>
-    <TooltipContent className="bg-gray-800 text-white text-sm rounded-md p-4 shadow-lg w-96 relative">
-    <p>The root directory is the top-level directory of your project where key files such as configuration files, the main application code, and package management files are stored. This is the starting point for your application's folder structure. Ensure that all critical files are correctly placed in the root to avoid deployment issues.</p>
-      
-    </TooltipContent>
-  </Tooltip>
-</TooltipProvider>
-
+                    <Label
+                      htmlFor="build-command"
+                      className="flex  items-center"
+                    >
+                      Root Directory
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <IoHelpCircleOutline className="text-xl text-gray-500 mx-2" />
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-gray-800 text-white text-sm rounded-md p-4 shadow-lg w-96 relative">
+                            <p>
+                              The root directory is the top-level directory of
+                              your project where key files such as configuration
+                              files, the main application code, and package
+                              management files are stored. This is the starting
+                              point for your application's folder structure.
+                              Ensure that all critical files are correctly
+                              placed in the root to avoid deployment issues.
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </Label>
                     <Input
                       id="rootDirectory"
@@ -302,22 +404,28 @@ export default function CreateProject({ name }: { name: string }) {
                   </div>
                   <div></div>
                   {/* install command */}
-                  
-                  <div className="relative">
-                    <Label htmlFor="build-command" className="flex items-center">Install Command
 
-                      
-                    <TooltipProvider>
-  <Tooltip>
-    <TooltipTrigger>
-      <IoHelpCircleOutline className="text-xl text-gray-500 mx-2" />
-    </TooltipTrigger>
-    <TooltipContent className="bg-gray-800 text-white text-sm rounded-md p-4 shadow-lg w-96 relative">
-    <p>The command that is used to install your Project's software dependencies. If you don't need to install dependencies, override this field and leave it empty.</p>
-      
-    </TooltipContent>
-  </Tooltip>
-</TooltipProvider>
+                  <div className="relative">
+                    <Label
+                      htmlFor="build-command"
+                      className="flex items-center"
+                    >
+                      Install Command
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <IoHelpCircleOutline className="text-xl text-gray-500 mx-2" />
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-gray-800 text-white text-sm rounded-md p-4 shadow-lg w-96 relative">
+                            <p>
+                              The command that is used to install your Project's
+                              software dependencies. If you don't need to
+                              install dependencies, override this field and
+                              leave it empty.
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </Label>
                     <Input
                       id="install"
@@ -339,19 +447,24 @@ export default function CreateProject({ name }: { name: string }) {
                   </div>
                   {/* build command */}
                   <div className="relative">
-                    <Label htmlFor="build-command" className="flex items-center">Build Command
-
-                    <TooltipProvider>
-  <Tooltip>
-    <TooltipTrigger>
-      <IoHelpCircleOutline className="text-xl text-gray-500 mx-2" />
-    </TooltipTrigger>
-    <TooltipContent className="bg-gray-800 text-white text-sm rounded-md p-4 shadow-lg w-96 relative">
-    <p>The command your frontend framework provides for compiling your code.</p>
-      
-    </TooltipContent>
-  </Tooltip>
-</TooltipProvider>
+                    <Label
+                      htmlFor="build-command"
+                      className="flex items-center"
+                    >
+                      Build Command
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <IoHelpCircleOutline className="text-xl text-gray-500 mx-2" />
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-gray-800 text-white text-sm rounded-md p-4 shadow-lg w-96 relative">
+                            <p>
+                              The command your frontend framework provides for
+                              compiling your code.
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </Label>
                     <Input
                       id="build-command"
@@ -373,18 +486,24 @@ export default function CreateProject({ name }: { name: string }) {
                   </div>
                   {/* out put directory */}
                   <div className="relative">
-                    <Label htmlFor="build-command" className="flex items-center">Output Directory
-                    <TooltipProvider>
-  <Tooltip>
-    <TooltipTrigger>
-      <IoHelpCircleOutline className="text-xl text-gray-500 mx-2" />
-    </TooltipTrigger>
-    <TooltipContent className="bg-gray-800 text-white text-sm rounded-md p-4 shadow-lg w-96 relative">
-    <p>The directory in which your compiled frontend/backend will be located.</p>
-      
-    </TooltipContent>
-  </Tooltip>
-</TooltipProvider>
+                    <Label
+                      htmlFor="build-command"
+                      className="flex items-center"
+                    >
+                      Output Directory
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <IoHelpCircleOutline className="text-xl text-gray-500 mx-2" />
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-gray-800 text-white text-sm rounded-md p-4 shadow-lg w-96 relative">
+                            <p>
+                              The directory in which your compiled
+                              frontend/backend will be located.
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </Label>
                     <Input
                       id="outputDirectory"
