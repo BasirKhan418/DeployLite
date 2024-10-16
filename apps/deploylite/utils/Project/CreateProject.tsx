@@ -67,15 +67,20 @@ import { IoHelpCircleOutline } from "react-icons/io5";
 import { FaGithub } from "react-icons/fa6";
 import { IoIosGitBranch } from "react-icons/io";
 import { useAppSelector } from "@/lib/hook";
-import { FiLock,FiUnlock } from "react-icons/fi";
+import { FiLock, FiUnlock } from "react-icons/fi";
+import { SiNuxtdotjs } from "react-icons/si";
+import { FaPhp } from "react-icons/fa6";
+import { VscWorkspaceUnknown } from "react-icons/vsc";
+import RepoSkeleton from "../skeleton/RepoSkeleton";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { set } from "mongoose";
 export default function CreateProject({ name }: { name: string }) {
-  const user = useAppSelector((state)=>state.user.user)
+  const user = useAppSelector((state) => state.user.user);
 
   const [stage, setStage] = useState(1);
   const [projectDetails, setProjectDetails] = useState({
@@ -88,8 +93,8 @@ export default function CreateProject({ name }: { name: string }) {
     outputDirectory: "/dist",
     install: "npm install",
     start: "npm run start",
-    branchurl:"",
-    cloneurl:""
+    branchurl: "",
+    cloneurl: "",
   });
   const [isoverridebuid, setisoverridebuid] = useState(true);
   const [isrootdir, setisrootdir] = useState(true);
@@ -97,27 +102,32 @@ export default function CreateProject({ name }: { name: string }) {
   const [isoutputdir, setisoutputdir] = useState(true);
   const [isstart, setisstart] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState("hobby");
-  const [reposdata,setreposdata] =useState(null)
-
+  const [repoLoading, setRepoLoading] = useState(true);
+  const [reposdata, setreposdata] = useState([{
+    full_name:"Repos are fetching ....",
+    private:true
+  }]);
   const handleProjectDetailsChange = (e: any) => {
     setProjectDetails({ ...projectDetails, [e.target.name]: e.target.value });
   };
-//fetch all users repo public and private
-const fetchAllRepo =async()=>{
-  const repodata = await fetch("https://api.github.com/user/repos",{
-    headers:{
-      'Authorization': `token ${user.githubtoken}`
-    }
-  })
-  const res = await repodata.json();
-  setreposdata(res)
-  
-}
-//useEffect for fetch all repo
-useEffect(()=>{
-  fetchAllRepo();
-},[])
-//handle submit started from here
+  //fetch all users repo public and private
+  const fetchAllRepo = async () => {
+    setRepoLoading(true);
+    const repodata = await fetch("https://api.github.com/user/repos?per_page=500", {
+      headers: {
+        Authorization: `token ${user.githubtoken}`,
+      },
+    });
+    const res = await repodata.json();
+    setRepoLoading(false);
+    console.log(res,res.length)
+    setreposdata(res);
+  };
+  //useEffect for fetch all repo
+  useEffect(() => {
+    fetchAllRepo();
+  }, []);
+  //handle submit started from here
   const handleSubmit = (e: any) => {
     e.preventDefault();
     // Handle form submission here
@@ -186,82 +196,203 @@ useEffect(()=>{
                       className="mt-1"
                     />
                   </div>
-                 
+
                   <div>
                     <Label htmlFor="github-repo">GitHub Repository</Label>
                     <Select
                       name="repo"
-                      onValueChange={(value:any) =>{
-                        console.log(value)
-                        setProjectDetails({ ...projectDetails, repo: value.full_name,branchurl:value.branches_url
-                          ,cloneurl:value.clone_url })
-                        console.log(value.branches_url,value.clone_url,value.full_name)
+                      onValueChange={(value: any) => {
+                        console.log(value);
+                        setProjectDetails({
+                          ...projectDetails,
+                          repo: value.full_name,
+                          branchurl: value.branches_url,
+                          cloneurl: value.clone_url,
+                        });
+                        console.log(
+                          value.branches_url,
+                          value.clone_url,
+                          value.full_name
+                        );
                         const url = `https://api.github.com/repos/${value.owner.login}/${value.name}/contents/package.json`;
-// Helper function to check if a specific package is present in dependencies or devDependencies
-function hasDependency(depName:any,dependencies:any,devDependencies:any) {
-  return dependencies[depName] || devDependencies[depName];
-}
-async function getPackageJson() {
-  try{
-  const response = await fetch(url,{
-    headers:{
-      'Authorization': `token ${user.githubtoken}`
-    }
-  });
-  const data = await response.json();
-  const content = Buffer.from(data.content, 'base64').toString('utf-8');
-  const packageJson = JSON.parse(content);
-
-  console.log('Frameworks in package.json:', packageJson.dependencies);
-  console.log('Scripts in package.json:', packageJson.scripts);
-
-  const dependencies = packageJson.dependencies || {};
-  const devDependencies = packageJson.devDependencies || {};
-
-  
-
-  // Detect frameworks
- 
- if (hasDependency('react',dependencies,devDependencies) && hasDependency('vite'
-  ,dependencies,devDependencies)) {
-    console.log('The project is using Next.js');
-  }
-  else if (hasDependency('react',dependencies,devDependencies) && hasDependency('next',dependencies,devDependencies)) {
-    console.log('The project is using Next.js');
-  } 
-  else if (hasDependency('react',dependencies,devDependencies)) {
-    console.log('The project is using React.js');
-  } else if (hasDependency('vue',dependencies,devDependencies) && hasDependency('nuxt',dependencies,devDependencies)) {
-    console.log('The project is using Nuxt.js (Vue.js with Nuxt)');
-  } else if (hasDependency('vue',dependencies,devDependencies)) {
-    console.log('The project is using Vue.js');
-  } else if (hasDependency('@angular/core',dependencies,devDependencies)) {
-    console.log('The project is using Angular');
-  } else if (hasDependency('express',dependencies,devDependencies)) {
-    console.log('The project is using Express (Node.js backend)');
-  } else {
-    console.log('No recognized framework detected');
-  }
-}
-catch(err){
-  console.log(err)
-}
-}
-
-getPackageJson();
+                        // Helper function to check if a specific package is present in dependencies or devDependencies
+                        function hasDependency(
+                          depName: any,
+                          dependencies: any,
+                          devDependencies: any
+                        ) {
+                          return (
+                            dependencies[depName] || devDependencies[depName]
+                          );
                         }
-                      }
+                        async function getPackageJson() {
+                          try {
+                            setRepoLoading(true)
+                            const response = await fetch(url, {
+                              headers: {
+                                Authorization: `token ${user.githubtoken}`,
+                              },
+                            });
+                            const data = await response.json();
+
+                            const content = Buffer.from(
+                              data.content,
+                              "base64"
+                            ).toString("utf-8");
+                            const packageJson = JSON.parse(content);
+
+                            console.log(
+                              "Frameworks in package.json:",
+                              packageJson.dependencies
+                            );
+                            console.log(
+                              "Scripts in package.json:",
+                              packageJson.scripts
+                            );
+
+                            const dependencies = packageJson.dependencies || {};
+                            const devDependencies =
+                              packageJson.devDependencies || {};
+
+                            // Detect frameworks
+
+                            if (
+                              hasDependency(
+                                "vite",
+                                dependencies,
+                                devDependencies
+                              ) &&
+                              hasDependency(
+                                "react",
+                                dependencies,
+                                devDependencies
+                              )
+                            ) {
+                              setProjectDetails({...projectDetails,tech:"Vite"})
+                            } else if (
+                              hasDependency(
+                                "react",
+                                dependencies,
+                                devDependencies
+                              ) &&
+                              hasDependency(
+                                "next",
+                                dependencies,
+                                devDependencies
+                              )
+                            ) {
+                              setProjectDetails({...projectDetails,tech:"Next.js"});
+                            } else if (
+                              hasDependency(
+                                "react",
+                                dependencies,
+                                devDependencies
+                              )
+                            ) {
+                              setProjectDetails({...projectDetails,tech:"React"});
+                            } else if (
+                              hasDependency(
+                                "vue",
+                                dependencies,
+                                devDependencies
+                              ) &&
+                              hasDependency(
+                                "nuxt",
+                                dependencies,
+                                devDependencies
+                              )
+                            ) {
+                              console.log(
+                                setProjectDetails({...projectDetails,tech:"Nuxt.js"})
+                              );
+                            } else if (
+                              hasDependency(
+                                "vue",
+                                dependencies,
+                                devDependencies
+                              )
+                            ) {
+                              setProjectDetails({...projectDetails,tech:"Vue.js"})
+                            } else if (
+                              hasDependency(
+                                "@angular/core",
+                                dependencies,
+                                devDependencies
+                              )
+                            ) {
+                              setProjectDetails({...projectDetails,tech:"Angular"})
+                            } else if (
+                              hasDependency(
+                                "express",
+                                dependencies,
+                                devDependencies
+                              )
+                            ) {
+                              console.log(
+                                setProjectDetails({...projectDetails,tech:"Node.js"})
+                              );
+                            } else {
+                              setProjectDetails({...projectDetails,tech:"Other"})
+                            }
+                            setRepoLoading(false)
+                          } catch (err) {
+                           try{
+                            setRepoLoading(true)
+                            const url = `https://api.github.com/repos/${value.owner.login}/${value.name}/languages`;
+                            const response = await fetch(url, {
+                              headers: {
+                                Authorization: `token ${user.githubtoken}`,
+                              },
+                            });
+                            const datai = await response.json();
+                            console.log(datai);
+                            if(datai.hasOwnProperty("PHP")){
+                              setProjectDetails({...projectDetails,tech:"PHP"})
+                           }
+                           else if(datai.hasOwnProperty("HTML")){
+                            setProjectDetails({...projectDetails,tech:"HTML,CSS,JS"})
+                           }
+                           else if(datai.hasOwnProperty("PYTHON")){
+                           //api call to check 
+                           }
+                           else if(datai.hasOwnProperty("JAVASCRIPT")){
+                            setProjectDetails({...projectDetails,tech:"Node.js"})
+                            }
+                           else{
+                              setProjectDetails({...projectDetails,tech:"Other"})
+                           }
+                           setRepoLoading(false)
+                          }
+                           catch(err){
+                            console.log(err)
+                           }
+                          }
+                        }
+
+                        getPackageJson();
+                      }}
                     >
                       <SelectTrigger className="mt-1">
                         <SelectValue placeholder="Select a repository" />
                       </SelectTrigger>
                       <SelectContent>
                         {/* @ts-ignore */}
-                       {reposdata&&reposdata.map((item:any)=>(<SelectItem value={item} className="w-full"><div className="flex justify-center items-center">
-                          <div className="flex"><FaGithub className="text-xl mx-2"/>{item.full_name}</div>
-                          <div className="flex">{item.private&&<FiLock className="text-gray-500 mx-2"/>}</div>
-                          </div></SelectItem>))}
-                        
+                        {reposdata &&
+                          reposdata.map((item: any) => (
+                            <SelectItem value={item} className="w-full">
+                              <div className="flex justify-center items-center">
+                                <div className="flex">
+                                  <FaGithub className="text-xl mx-2" />
+                                  {item.full_name}
+                                </div>
+                                <div className="flex">
+                                  {item.private && (
+                                    <FiLock className="text-gray-500 mx-2" />
+                                  )}
+                                </div>
+                              </div>
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -289,11 +420,12 @@ getPackageJson();
                       </TooltipProvider>
                     </Label>
 
-                    <Select
+                   { repoLoading?<RepoSkeleton/>:<Select
                       name="tech"
                       onValueChange={(value) =>
                         setProjectDetails({ ...projectDetails, tech: value })
                       }
+                      value={projectDetails.tech}
                     >
                       <SelectTrigger className="mt-1">
                         <SelectValue placeholder="Choose a Framework" />
@@ -356,8 +488,23 @@ getPackageJson();
                             <FaJs className="mx-1 text-xl" /> HTML ,CSS, JS
                           </div>
                         </SelectItem>
+                        <SelectItem value="Nuxt.js">
+                          <div className="flex justify-center items-center">
+                            <SiNuxtdotjs className="mx-1 text-xl" />Nuxt.js
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="PHP">
+                          <div className="flex justify-center items-center">
+                            <FaPhp className="mx-1 text-xl" />PHP
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="Other">
+                          <div className="flex justify-center items-center">
+                            <VscWorkspaceUnknown className="mx-1 text-xl" />Other
+                          </div>
+                        </SelectItem>
                       </SelectContent>
-                    </Select>
+                    </Select>}
                   </div>
                   <div className="relative">
                     <Label
