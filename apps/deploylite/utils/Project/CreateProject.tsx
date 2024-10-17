@@ -73,6 +73,7 @@ import { SiNuxtdotjs } from "react-icons/si";
 import { FaPhp } from "react-icons/fa6";
 import { VscWorkspaceUnknown } from "react-icons/vsc";
 import RepoSkeleton from "../skeleton/RepoSkeleton";
+import { Toaster,toast } from "sonner";
 import {
   Tooltip,
   TooltipContent,
@@ -111,6 +112,7 @@ export default function CreateProject({ name }: { name: string }) {
       private: true,
     },
   ]);
+  const [pricingplans,setPricingPlans] = useState([]);
   const handleProjectDetailsChange = (e: any) => {
     setProjectDetails({ ...projectDetails, [e.target.name]: e.target.value });
   };
@@ -358,9 +360,25 @@ export default function CreateProject({ name }: { name: string }) {
   useEffect(() => {
     onRepoChanges(repovalue);
   }, [projectDetails.rootDirectory]);
-
+//fetching all pricing plans
+const fetchPricingPlans = async () => {
+  const res = await fetch(`/api/project/getplans`);
+  const data = await res.json();
+  console.log(data);
+  if(data.success){
+    setPricingPlans(data.data);
+  }
+  else{
+    toast.error(data.message);
+  }
+}
+//useeffect for fetching all pricing plans
+useEffect(()=>{
+  fetchPricingPlans();
+},[])
   return (
     <div className="min-h-screen  py-12 px-4 sm:px-6 lg:px-8">
+    <Toaster position="top-right" />
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl dark:text-white">
