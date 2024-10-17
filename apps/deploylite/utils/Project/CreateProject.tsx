@@ -11,7 +11,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-
+import { FiCpu } from "react-icons/fi";
 import {
   Select,
   SelectContent,
@@ -48,6 +48,12 @@ import {
   Coffee,
   DollarSign,
   X,
+  PrinterCheck,
+  MemoryStick,
+  Cpu,
+  HardDrive,
+  Gauge,
+  SquareChevronRight
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { FaReact } from "react-icons/fa";
@@ -87,7 +93,6 @@ export default function CreateProject({ name }: { name: string }) {
   const [stage, setStage] = useState(1);
   const [projectDetails, setProjectDetails] = useState({
     name: "",
-    repo: "",
     tech: "",
     buildCommand: "npm run build",
     envVariables: "",
@@ -95,15 +100,24 @@ export default function CreateProject({ name }: { name: string }) {
     outputDirectory: "/dist",
     install: "npm install",
     start: "npm run start",
-    branchurl: "",
-    cloneurl: "",
   });
+  const [repoDetails,setRepoDetails] = useState({
+    reponame:"",
+    cloneurl:"",
+    branchesurl:"",
+  })
   const [isoverridebuid, setisoverridebuid] = useState(true);
   const [isrootdir, setisrootdir] = useState(true);
   const [isinstall, setisinstall] = useState(true);
   const [isoutputdir, setisoutputdir] = useState(true);
   const [isstart, setisstart] = useState(true);
-  const [selectedPlan, setSelectedPlan] = useState("hobby");
+  const [selectedPlan, setSelectedPlan] = useState({
+    name:"",
+    id:"",
+    pricephour:"",
+    pricepmonth:"",
+    features:[],
+  });
   const [repoLoading, setRepoLoading] = useState(true);
   const [repovalue,setrepoValue] = useState(null);
   const [reposdata, setreposdata] = useState([
@@ -113,6 +127,10 @@ export default function CreateProject({ name }: { name: string }) {
     },
   ]);
   const [pricingplans,setPricingPlans] = useState([]);
+  const [displayPricing,setDisplayPricing] = useState([]);
+  const [detectedbranch,setDetectedBranch] = useState([]);
+  const[branch,setBranch] = useState("");
+  const [count,setCount] = useState(1);
   const handleProjectDetailsChange = (e: any) => {
     setProjectDetails({ ...projectDetails, [e.target.name]: e.target.value });
   };
@@ -139,10 +157,11 @@ export default function CreateProject({ name }: { name: string }) {
   //handle submit started from here
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log("Project Details:", projectDetails);
-    console.log("Selected Plan:", selectedPlan);
-    alert("Project created successfully!");
+    console.log(projectDetails);
+    console.log(selectedPlan);
+    console.log(repoDetails);
+    console.log(branch);
+
   };
   //useffect if tech changes according to that we have to change all build commands and all
   useEffect(() => {
@@ -157,13 +176,36 @@ export default function CreateProject({ name }: { name: string }) {
           outputDirectory: item.outdir,
         });
       }
+      
     });
+    if(projectDetails.tech=="React"||projectDetails.tech=="HTML,CSS,JS"||projectDetails.tech=="Vue.js"||projectDetails.tech=="Angular"||projectDetails.tech=="Vite"){
+    let frontend = pricingplans.filter((item:any)=>item.pcategory=="frontend");
+    setDisplayPricing(frontend);
+    }
+    else{
+      let backend = pricingplans.filter((item:any)=>item.pcategory=="backend");
+      setDisplayPricing(backend);
+    }
   }, [projectDetails.tech]);
+  //detecting branch
+const detectedbranchfunc = async (url:string) => {
+  const newurl = url.replace("{/branch}","");
+  const fetchbranch = await fetch(newurl, {
+    headers:{
+      Authorization: `token ${user.githubtoken}`,
+    }
+  });
+  const data = await fetchbranch.json();
+  setDetectedBranch(data);
+  setBranch(data[0].name);
+
+  }
   //onrepo changes
   const onRepoChanges = (value: any) => {
     if(value==null){
       return;
     }
+  detectedbranchfunc(value.branches_url);
     var url:string;
     if(projectDetails.rootDirectory=="/"){
       url = `https://api.github.com/repos/${value.owner.login}/${value.name}/contents/package.json`;
@@ -376,6 +418,7 @@ const fetchPricingPlans = async () => {
 useEffect(()=>{
   fetchPricingPlans();
 },[])
+
   return (
     <div className="min-h-screen  py-12 px-4 sm:px-6 lg:px-8">
     <Toaster position="top-right" />
@@ -439,19 +482,13 @@ useEffect(()=>{
                   </div>
 
                   <div>
-                    <Label htmlFor="github-repo">GitHub Repository</Label>
+                    <Label htmlFor="repo">GitHub Repository</Label>
                     <Select
                       name="repo"
                       onValueChange={(value: any) => {
-                        console.log(value);
-                        setProjectDetails({
-                          ...projectDetails,
-                          repo: value.full_name,
-                          branchurl: value.branches_url,
-                          cloneurl: value.clone_url,
-                        });
                         onRepoChanges(value);
                         setrepoValue(value);
+                       setRepoDetails({reponame:value.full_name,cloneurl:value.clone_url,branchesurl:value.branches_url,branch:""})
                       }}
                     >
                       <SelectTrigger className="mt-1">
@@ -479,7 +516,7 @@ useEffect(()=>{
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="github-repo" className="flex  items-center">
+                    <Label htmlFor="tech" className="flex  items-center">
                       Framework Preset
                       <TooltipProvider>
                         <Tooltip>
@@ -507,8 +544,8 @@ useEffect(()=>{
                     ) : (
                       <Select
                         name="tech"
-                        onValueChange={(value) =>
-                          setProjectDetails({ ...projectDetails, tech: value })
+                        onValueChange={(valui) =>
+                          setProjectDetails({ ...projectDetails, tech: valui })
                         }
                         value={projectDetails.tech}
                       >
@@ -773,7 +810,16 @@ useEffect(()=>{
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={() => setStage(2)} className="w-full">
+                  <Button onClick={() => {
+                    console.log(projectDetails);
+                    console.log(repoDetails);
+                    if(repoDetails.reponame==""||projectDetails.name==""||projectDetails.tech==""){
+                      toast.error("Please fill all the fields");
+                    }
+                    else{
+                      setStage(2);
+                    }
+                  }} className="w-full">
                     Next: Select Plan <ChevronRight className="ml-2 h-4 w-4" />
                   </Button>
                 </div>
@@ -781,108 +827,56 @@ useEffect(()=>{
               <TabsContent value="stage-2">
                 <div className="space-y-6 mt-6">
                   <RadioGroup
-                    value={selectedPlan}
-                    onValueChange={setSelectedPlan}
+                    value={selectedPlan.name}
                   >
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                      <div
-                        className={`relative flex flex-col p-6 bg-white border border-gray-200 dark:bg-black dark:border-gray-700  rounded-lg shadow-sm ${selectedPlan === "hobby" ? "border-blue-500 ring-2 ring-blue-500" : ""}`}
+                      {displayPricing&&displayPricing.map((item:any,index)=>(<div
+                        className={`relative flex flex-col p-6 bg-white border border-gray-200 dark:bg-black dark:border-gray-700  rounded-lg shadow-sm ${selectedPlan.name === item.name ? "border-blue-500 ring-2 ring-blue-500" : ""}`}
+                        key={index}
+                        onClick={() => setSelectedPlan({name:item.name,id:item._id,pricephour:item.pricephour,pricepmonth:item.pricepmonth,features:item.features})}
                       >
                         <RadioGroupItem
-                          value="hobby"
-                          id="hobby"
+                          value={item.name}
+                          id={item.name}
                           className="sr-only"
                         />
                         <Label
-                          htmlFor="hobby"
+                          htmlFor={item.name}
                           className="font-semibold flex items-center"
                         >
-                          <Cloud className="h-5 w-5 mr-2 text-blue-500" />
-                          Hobby
+                          
+                          {item.name}
                         </Label>
                         <p className="mt-1 text-sm text-gray-500">
-                          Perfect for side projects
+                          {item.name=="Starter Plan"&&"Perfect for side projects"}
+                          {item.name=="Pro Plan"&&"Ideal for startups & growing businesses"}
+                          {item.name=="Enterprise Plan"&&"For large-scale applications"}
                         </p>
-                        <p className="mt-4 text-sm font-semibold">$0/month</p>
+                        <div className="mt-4 text-sm font-semibold flex justify-between w-full"><div className="flex ">
+                        <Cpu className="h-5 w-5 text-indigo-600 mx-2"/>{item.cpu}
+                          </div>
+                          <div className="flex">
+                        <MemoryStick className="h-5 w-5 text-green-600 mx-2"/>{item.ram}
+                          </div>
+                          </div>
+                          <div className="mt-4 text-sm font-semibold flex justify-between w-full"><div className="flex ">
+                        <HardDrive className="h-5 w-5 text-blue-600 mx-2"/>{item.storage}
+                          </div>
+                          <div className="flex">
+                        <Gauge className="h-5 w-5 text-yellow-600 mx-2"/>{item.bandwidth}
+                          </div>
+                          </div>
+                          <Separator className="my-2" />
+                        <p className="mt-4 text-sm font-semibold">₹ {item.pricephour}/ hour</p>
                         <ul className="mt-4 space-y-2 text-sm text-gray-500">
-                          <li className="flex items-center">
-                            <Zap className="h-4 w-4 mr-2 text-green-500" /> 1
-                            concurrent build
-                          </li>
-                          <li className="flex items-center">
-                            <Globe className="h-4 w-4 mr-2 text-green-500" />{" "}
-                            Automatic HTTPS
-                          </li>
+                          {item.features.map((item:any,index:number)=>(<li className="flex items-center" key={index}>
+                            <Check className="h-4 w-4 mr-2 text-green-500" /> 1
+                            {item}
+                          </li>))}
+                          
                         </ul>
-                      </div>
-                      <div
-                        className={`relative flex flex-col p-6 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm ${selectedPlan === "pro" ? "border-blue-500 ring-2 ring-blue-500" : ""}`}
-                      >
-                        <RadioGroupItem
-                          value="pro"
-                          id="pro"
-                          className="sr-only"
-                        />
-                        <Label
-                          htmlFor="pro"
-                          className="font-semibold flex items-center"
-                        >
-                          <Rocket className="h-5 w-5 mr-2 text-blue-500" />
-                          Pro
-                        </Label>
-                        <p className="mt-1 text-sm text-gray-500">
-                          For growing businesses
-                        </p>
-                        <p className="mt-4 text-sm font-semibold">$20/month</p>
-                        <ul className="mt-4 space-y-2 text-sm text-gray-500">
-                          <li className="flex items-center">
-                            <Zap className="h-4 w-4 mr-2 text-green-500" /> 5
-                            concurrent builds
-                          </li>
-                          <li className="flex items-center">
-                            <Shield className="h-4 w-4 mr-2 text-green-500" />{" "}
-                            Advanced security
-                          </li>
-                          <li className="flex items-center">
-                            <Users className="h-4 w-4 mr-2 text-green-500" />{" "}
-                            Team collaboration
-                          </li>
-                        </ul>
-                      </div>
-                      <div
-                        className={`relative flex flex-col p-6 bg-white dark:bg-black dark:border-gray-700 border border-gray-200 rounded-lg shadow-sm ${selectedPlan === "enterprise" ? "border-blue-500 ring-2 ring-blue-500" : ""}`}
-                      >
-                        <RadioGroupItem
-                          value="enterprise"
-                          id="enterprise"
-                          className="sr-only"
-                        />
-                        <Label
-                          htmlFor="enterprise"
-                          className="font-semibold flex items-center"
-                        >
-                          <Server className="h-5 w-5 mr-2 text-blue-500" />
-                          Enterprise
-                        </Label>
-                        <p className="mt-1 text-sm text-gray-500">
-                          For large-scale applications
-                        </p>
-                        <p className="mt-4 text-sm font-semibold">Contact us</p>
-                        <ul className="mt-4 space-y-2 text-sm text-gray-500">
-                          <li className="flex items-center">
-                            <Zap className="h-4 w-4 mr-2 text-green-500" />{" "}
-                            Unlimited builds
-                          </li>
-                          <li className="flex items-center">
-                            <Shield className="h-4 w-4 mr-2 text-green-500" />{" "}
-                            Advanced security
-                          </li>
-                          <li className="flex items-center">
-                            <Code className="h-4 w-4 mr-2 text-green-500" />{" "}
-                            Custom integrations
-                          </li>
-                        </ul>
-                      </div>
+                      </div>))}
+                     
                     </div>
                   </RadioGroup>
                   <div className="flex justify-between">
@@ -919,8 +913,8 @@ useEffect(()=>{
                             variant="outline"
                             className="text-blue-500 border-blue-500"
                           >
-                            {selectedPlan.charAt(0).toUpperCase() +
-                              selectedPlan.slice(1)}
+                            {selectedPlan.name.charAt(0).toUpperCase() +
+                              selectedPlan.name.slice(1)}
                           </Badge>
                         </div>
                       </div>
@@ -935,7 +929,7 @@ useEffect(()=>{
                             <div className="flex items-center">
                               <GitFork className="h-5 w-5 text-gray-400 mr-2" />
                               <p className="text-sm font-semibold text-gray-900 dark:text-gray-300">
-                                {projectDetails.repo || "Not specified"}
+                                {repoDetails.reponame || "Not specified"}
                               </p>
                             </div>
                           </CardContent>
@@ -958,6 +952,8 @@ useEffect(()=>{
                           </CardContent>
                         </Card>
                       </div>
+                      {/* // */}
+                      
                       <div className="col-span-2">
                         <Card>
                           <CardHeader className="pb-4">
@@ -975,23 +971,57 @@ useEffect(()=>{
                           </CardContent>
                         </Card>
                       </div>
-                      <div className="col-span-2">
+                      <div>
                         <Card>
                           <CardHeader className="pb-4">
                             <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                              Web Builder
+                              Branch
                             </CardTitle>
                           </CardHeader>
                           <CardContent>
                             <div className="flex items-center">
-                              <Layout className="h-5 w-5 text-gray-400 mr-2" />
-                              <p className="text-sm font-semibold text-gray-900 dark:text-gray-300">
-                                Not selected
+                              <GitBranch className="h-5 w-5 text-gray-400 mr-2" />
+                              <p className="text-sm font-semibold text-gray-900 dark:text-gray-300 flex justify-between w-full items-center">
+                                {branch || "Not specified"}
+                                {detectedbranch&&detectedbranch.length>1&&<Button  className="ml-2" onClick={()=>{
+                                  let maxcount = detectedbranch.length;
+                                  
+                                  if(count<maxcount){                                  
+                                    //@ts-ignore
+                                    setBranch(detectedbranch[count].name);
+                                    setCount((prev)=>prev+1);
+                                    
+                                  }
+                                  else{
+                                    setCount(0);
+                                    //@ts-ignore
+                                    setBranch(detectedbranch[0].name);
+                                  }
+                                 
+                                }}>Change</Button>}
                               </p>
                             </div>
                           </CardContent>
                         </Card>
                       </div>
+                      <div>
+                        <Card>
+                          <CardHeader className="pb-4">
+                            <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 ">
+                              Start Command
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="flex items-center">
+                              <SquareChevronRight className="h-5 w-5 text-gray-400 mr-2" />
+                              <p className="text-sm font-semibold text-gray-900 dark:text-gray-300">
+                                {projectDetails.start || "Default"}
+                              </p>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                     
                     </div>
 
                     <Separator className="my-6" />
@@ -999,38 +1029,19 @@ useEffect(()=>{
                     <div>
                       <h4 className="text-lg font-semibold text-gray-900 mb-4">
                         Plan Details:{" "}
-                        {selectedPlan.charAt(0).toUpperCase() +
-                          selectedPlan.slice(1)}
+                        {selectedPlan.name.charAt(0).toUpperCase() +
+                          selectedPlan.name.slice(1)}
                       </h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="flex items-center">
+                        {selectedPlan.features.map((item:any,index:number)=>(<div className="flex items-center" key={index}>
                           <Check className="h-5 w-5 text-green-500 mr-2" />
                           <span className="text-sm text-gray-600 dark:text-gray-300">
-                            Automatic HTTPS
+                            {item}
                           </span>
-                        </div>
-                        <div className="flex items-center">
-                          <Check className="h-5 w-5 text-green-500 mr-2" />
-                          <span className="text-sm text-gray-600 dark:text-gray-300">
-                            Unlimited Websites
-                          </span>
-                        </div>
-                        <div className="flex items-center">
-                          <Check className="h-5 w-5 text-green-500 mr-2" />
-                          <span className="text-sm text-gray-600 dark:text-gray-300">
-                            Continuous Deployment
-                          </span>
-                        </div>
-                        <div className="flex items-center">
-                          {selectedPlan === "hobby" ? (
-                            <X className="h-5 w-5 text-red-500 mr-2" />
-                          ) : (
-                            <Check className="h-5 w-5 text-green-500 mr-2" />
-                          )}
-                          <span className="text-sm text-gray-600 dark:text-gray-300">
-                            Custom Domains
-                          </span>
-                        </div>
+                        </div>))}
+                        
+                        
+                        
                       </div>
                     </div>
 
@@ -1057,20 +1068,20 @@ useEffect(()=>{
                       <Coffee className="h-6 w-6 text-gray-400 dark:text-gray-300 mr-2" />
                       <p className="text-sm text-gray-600 dark:text-gray-300">
                         Estimated build time:{" "}
-                        <span className="font-semibold">2-3 minutes</span>
+                        <span className="font-semibold">3-4 minutes</span>
                       </p>
                     </div>
                     <div className="flex items-center">
                       <DollarSign className="h-6 w-6 text-gray-400 mr-2 dark:text-gray-300" />
                       <p className="text-sm text-gray-600 dark:text-gray-300">
                         Estimated monthly cost:{" "}
-                        <span className="font-semibold">$0.00</span>
+                        <span className="font-semibold">₹{selectedPlan.pricepmonth}</span>
                       </p>
                     </div>
                   </div>
 
                   <div className="flex justify-between">
-                    <Button variant="outline" onClick={() => setStage(3)}>
+                    <Button variant="outline" onClick={() => setStage(2)}>
                       <ChevronRight className="h-4 w-4 mr-2 rotate-180" />
                       Back to Plans
                     </Button>
