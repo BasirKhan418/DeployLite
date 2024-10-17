@@ -883,7 +883,14 @@ useEffect(()=>{
                     <Button variant="outline" onClick={() => setStage(1)}>
                       Back
                     </Button>
-                    <Button onClick={() => setStage(3)}>
+                    <Button onClick={() => {
+                      if(selectedPlan.name==""){
+                        toast.error("Please select a plan");
+                      }
+                      else{
+                        setStage(3);
+                      }
+                    }}>
                       Next: Review <ChevronRight className="ml-2 h-4 w-4" />
                     </Button>
                   </div>
