@@ -488,7 +488,7 @@ useEffect(()=>{
                       onValueChange={(value: any) => {
                         onRepoChanges(value);
                         setrepoValue(value);
-                       setRepoDetails({reponame:value.full_name,cloneurl:value.clone_url,branchesurl:value.branches_url,branch:""})
+                       setRepoDetails({reponame:value.full_name,cloneurl:value.clone_url,branchesurl:value.branches_url})
                       }}
                     >
                       <SelectTrigger className="mt-1">
