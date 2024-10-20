@@ -80,6 +80,7 @@ import { FaPhp } from "react-icons/fa6";
 import { VscWorkspaceUnknown } from "react-icons/vsc";
 import RepoSkeleton from "../skeleton/RepoSkeleton";
 import { Toaster,toast } from "sonner";
+import LoginLoader from "../Loaders/LoginLoader";
 import {
   Tooltip,
   TooltipContent,
@@ -111,6 +112,8 @@ export default function CreateProject({ name }: { name: string }) {
   const [isinstall, setisinstall] = useState(true);
   const [isoutputdir, setisoutputdir] = useState(true);
   const [isstart, setisstart] = useState(true);
+  const[type,setType] = useState("");
+  const[loading,setLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState({
     name:"",
     id:"",
@@ -132,10 +135,15 @@ export default function CreateProject({ name }: { name: string }) {
   const[branch,setBranch] = useState("");
   const [count,setCount] = useState(1);
   const handleProjectDetailsChange = (e: any) => {
+    setProjecterror(false);
     setProjectDetails({ ...projectDetails, [e.target.name]: e.target.value });
   };
+  const [isError,setIserror] =useState(false);
+  const[isprojecterror,setProjecterror]=useState(false)
+  const[errormsg,setErrormsg] = useState("");
   //fetch all users repo public and private
   const fetchAllRepo = async () => {
+    try{
     setRepoLoading(true);
     const repodata = await fetch(
       "https://api.github.com/user/repos?per_page=500",
@@ -146,23 +154,31 @@ export default function CreateProject({ name }: { name: string }) {
       }
     );
     const res = await repodata.json();
+    if(res.status=="401"){
+      toast.error(res.message);
+setreposdata([{
+  full_name:res.message,
+  private:true
+}]);
+     
+    }
+    else{
+      setreposdata(res);
+      console.log(res, res.length);
+    }
+    console.log(res);
     setRepoLoading(false);
-    console.log(res, res.length);
-    setreposdata(res);
+  }
+  catch(err:any){
+    toast.error(err.message)
+  }
+  
   };
   //useEffect for fetch all repo
   useEffect(() => {
     fetchAllRepo();
   }, []);
-  //handle submit started from here
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    console.log(projectDetails);
-    console.log(selectedPlan);
-    console.log(repoDetails);
-    console.log(branch);
-
-  };
+ 
   //useffect if tech changes according to that we have to change all build commands and all
   useEffect(() => {
     console.log("hook is running");
@@ -180,11 +196,13 @@ export default function CreateProject({ name }: { name: string }) {
     });
     if(projectDetails.tech=="React"||projectDetails.tech=="HTML,CSS,JS"||projectDetails.tech=="Vue.js"||projectDetails.tech=="Angular"||projectDetails.tech=="Vite"){
     let frontend = pricingplans.filter((item:any)=>item.pcategory=="frontend");
+    setType("frontend");  
     setDisplayPricing(frontend);
     }
     else{
       let backend = pricingplans.filter((item:any)=>item.pcategory=="backend");
       setDisplayPricing(backend);
+      setType("backend")
     }
   }, [projectDetails.tech]);
   //detecting branch
@@ -418,7 +436,39 @@ const fetchPricingPlans = async () => {
 useEffect(()=>{
   fetchPricingPlans();
 },[])
-
+//handle submit data
+ //handle submit started from here
+ const handleSubmit = async(e: any) => {
+  e.preventDefault();
+  setLoading(true)
+  try{
+    const data = {name:projectDetails.name,type:type,repourl:repoDetails.cloneurl,repobranch:branch,techused:projectDetails.tech,buildcommand:projectDetails.buildCommand,rootfolder:projectDetails.rootDirectory,outputfolder:projectDetails.outputDirectory,startcommand:projectDetails.start,installcommand:projectDetails.install,env:projectDetails.envVariables,planid:selectedPlan.id};
+const createproject = await fetch("/api/project/crud",{
+  headers:{
+    "Content-Type":"application/json",
+  },
+  method:"POST",
+  body: JSON.stringify({...data})
+})
+const res = await createproject.json();
+setLoading(false);
+if(res.success){
+  toast.success(res.message);
+}
+else{
+  if(res.projectname=="exists"){
+    setStage(1);
+    setProjecterror(true);
+    setErrormsg(res.message);
+    toast.error(res.message);
+  }
+}
+  }
+  catch(err:any){
+    console.log(err);
+    toast.error(err.message)
+  }
+};
   return (
     <div className="min-h-screen  py-12 px-4 sm:px-6 lg:px-8">
     <Toaster position="top-right" />
@@ -479,6 +529,12 @@ useEffect(()=>{
                       placeholder="My Awesome Project"
                       className="mt-1"
                     />
+                    {isprojecterror && (
+  <span className="text-red-600  text-xs md:text-base p-2 rounded font-light underline">
+    {errormsg}
+  </span>
+)}
+
                   </div>
 
                   <div>
@@ -1096,8 +1152,10 @@ useEffect(()=>{
                       onClick={handleSubmit}
                       className="bg-green-600 hover:bg-green-700"
                     >
+                     {loading?<>Creating <LoginLoader/></>: <>
                       Create Project
                       <Rocket className="ml-2 h-4 w-4" />
+                      </>}
                     </Button>
                   </div>
                 </div>

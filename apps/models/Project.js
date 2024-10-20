@@ -21,8 +21,10 @@ endbillingdate:{type:Date},
 billstatus:{type:String},
 techused:{type:String},
 buildcommand:{type:String},
+installcommand:{type:String},
 startcommand:{type:String},
 rootfolder:{type:String,default:"/"},
+outputfolder:{type:String,default:"not applicable"},
 env:{type:String},
 },{timestamps:true})
 mongoose.models = {}
