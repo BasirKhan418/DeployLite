@@ -4,7 +4,12 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@/components/ui/badge";
+import Analytics from './Analytics'
+import Activity from './Activity'
+import RuntimeLogs from './RuntimeLogs'
+import Console from './Console'
+import ProjectSettings from './ProjectSettings'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -84,13 +89,13 @@ export default function ProjectOverview() {
           </div>
 
           <Tabs defaultValue="overview" className="p-6">
-            <TabsList className="grid grid-cols-3 lg:grid-cols-6 mb-6">
+            <TabsList className="grid grid-cols-3 lg:grid-cols-6 mb-6 dark:bg-gray-900">
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="deployments">Deployments</TabsTrigger>
-              <TabsTrigger value="monitoring">Monitoring</TabsTrigger>
-              <TabsTrigger value="logs">Logs</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsTrigger value="activity">Activity</TabsTrigger>
+              <TabsTrigger value="runtimelogs">Runtime Logs</TabsTrigger>
+              <TabsTrigger value="console">Console</TabsTrigger>
               <TabsTrigger value="settings">Settings</TabsTrigger>
-              <TabsTrigger value="billing">Billing</TabsTrigger>
             </TabsList>
             <TabsContent value="overview">
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -221,9 +226,25 @@ export default function ProjectOverview() {
                 </Card>
               </div>
             </TabsContent>
+            <TabsContent value="analytics">
+          <Analytics /> 
+        </TabsContent>
+        <TabsContent value="activity">
+          <Activity/> 
+        </TabsContent>
+        <TabsContent value="runtimelogs">
+          <RuntimeLogs/> 
+        </TabsContent>
+        <TabsContent value="console">
+          <Console/> 
+        </TabsContent>
+        <TabsContent value="settings">
+          <ProjectSettings/> 
+        </TabsContent>
+        
           </Tabs>
         </div>
-
+     
         <div className="mt-8 bg-gradient-to-r from-pink-500 to-purple-500 rounded-lg shadow-lg p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
