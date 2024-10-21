@@ -5,7 +5,6 @@ import Project from "../../../../../models/Project"
 import { CreateprojectSchema } from "@/zod/project/CreateprojectZod"
 import PricingPlan from "../../../../../models/PricingPlan"
 import User from "../../../../../models/User"
-import { start } from "repl"
 export const GET = () => {
     return NextResponse.json({
         messsgae: "all crud is up and running"
@@ -72,6 +71,18 @@ export const POST = async (req: NextRequest) => {
 
         //if every thing is ok then continue
         console.log("creating project")
+        //setting date
+        const startbilingdate = new Date(); // Today's date and current time
+        const endbilingdate = new Date(startbilingdate); // Clone startbilingdate to preserve the date
+        
+        // Set endbilingdate to midnight (12:00 AM) of the next day
+        endbilingdate.setDate(startbilingdate.getDate() + 1); // Move to the next day
+        endbilingdate.setHours(0, 0, 0, 0); // Set time to 12:00 AM (start of the day)
+        
+        console.log('Start Billing Date (Today, local time):', startbilingdate.toLocaleString());
+        console.log('End Billing Date (Next day, 12:00 AM local time):', endbilingdate.toLocaleString());
+        
+        //creating project
         let project = new Project({
             name: name,
             type: data.type,
@@ -87,6 +98,9 @@ export const POST = async (req: NextRequest) => {
             userid: user._id,
             startdate: new Date(),
             projectstatus: "creating",
+            billstatus:"pending",
+            startbilingdate: startbilingdate,
+            endbilingdate: endbilingdate,
         });
         await project.save();
         //fire the deployment 
