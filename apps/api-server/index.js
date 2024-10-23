@@ -4,21 +4,21 @@ import mongoose from 'mongoose';
 import User from '../models/User.js';
 import 'dotenv/config'
 import deploy from './routes/deploy.js';
+import createDeployment from './routes/createDeployment.js';
 import ConnectDb from '../middleware/connectdb.js';
+import createDeploymentMiddleware from './applogics/middleware/Checkauth.js';
+import webhook from './routes/webhook.js';
 const app = express();
 app.use(express.json());
 app.use(cors({
     origin:'*'
 }));
-app.use('/deploy',deploy.router);
+app.use('/deploy',createDeploymentMiddleware,deploy.router);
+app.use('/webhook',webhook.router);
+app.use('/createdeployment',createDeploymentMiddleware,createDeployment.router);
 app.get('/',async(req,res)=>{
     
-    const user = new User({
-        name:"John Doe",
-        email:"ab@gmail.com"
-    })
-    let data = await user.save();
-    console.log(data);
+
 
    
     res.send("API Server");

@@ -26,6 +26,7 @@ startcommand:{type:String},
 rootfolder:{type:String,default:"/"},
 outputfolder:{type:String,default:"not applicable"},
 env:{type:String},
+hookid:{type:String},
 },{timestamps:true})
 mongoose.models = {}
 export default mongoose.model.Project||mongoose.model('Project',ProjectSchema);

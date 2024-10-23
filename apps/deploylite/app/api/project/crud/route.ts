@@ -5,6 +5,9 @@ import Project from "../../../../../models/Project"
 import { CreateprojectSchema } from "@/zod/project/CreateprojectZod"
 import PricingPlan from "../../../../../models/PricingPlan"
 import User from "../../../../../models/User"
+import Deployment from "../../../../../models/Deployment"
+import { cookies } from "next/headers"
+import CryptoJS from "crypto-js"
 export const GET = () => {
     return NextResponse.json({
         messsgae: "all crud is up and running"
@@ -12,6 +15,7 @@ export const GET = () => {
 }
 //for creating a new project.
 export const POST = async (req: NextRequest) => {
+    const getcookie = cookies();
     try {
         await ConnectDb();
         let data = await req.json()
@@ -103,14 +107,48 @@ export const POST = async (req: NextRequest) => {
             endbilingdate: endbilingdate,
         });
         await project.save();
-        //fire the deployment 
+        //create a deployment schema
+        let Deploymentdata = new Deployment({
+            userid:user._id,
+            projectid:project._id,
+            status:"creating",
+            deploymentdate:new Date(),
+        })
+        await Deploymentdata.save();
+        let decryptgithubauth = CryptoJS.AES.decrypt(user.githubtoken, process.env.SECRET_KEY||"").toString(CryptoJS.enc.Utf8);
+        //firing some api toi better handle the deployment
+        const createdep = await fetch(`${process.env.DEPLOYMENT_API}/createdeployment`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': getcookie.get("token")?.value || '',
+            },
+            body: JSON.stringify({
+                projectid: project._id,
+                userid: user._id,
+                repourl: data.repourl,
+                repobranch: data.repobranch,
+                techused: data.techused,
+                buildcommand: data.buildcommand,
+                startcommand: data.startcommand,
+                rootfolder: data.rootfolder,
+                outputfolder: data.outputfolder,
+                installcommand: data.installcommand,
+                name: name,
+                authtoken:decryptgithubauth,
+            })
+        });
+        const result = await createdep.json();
+        console.log(result);
+        
         return NextResponse.json({
-            message: "Project Created",
+            message: "Project Created & Deployment Started",
             success: true,
             project: project});
 
     }
     catch (err) {
+        console.log("error occured while creating project")
         console.log(err)
         return NextResponse.json({
             message: "error occured while creating project",
