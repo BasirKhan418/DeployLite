@@ -8,10 +8,40 @@ import User from "../../../../../models/User"
 import Deployment from "../../../../../models/Deployment"
 import { cookies } from "next/headers"
 import CryptoJS from "crypto-js"
-export const GET = () => {
-    return NextResponse.json({
-        messsgae: "all crud is up and running"
+export const GET = async(req:NextRequest,res:NextResponse) => {
+    const { searchParams } = new URL(req.url);
+    try{
+     await ConnectDb();
+     let checkres = CheckAuth();
+     //checking for proper authentication
+     if(!checkres.result){
+        return NextResponse.json({
+            success:false,
+            message:"Authentication failed please try again later!"
+        })
+     }
+     //check the entry and return it;
+     let projectdata = await Project.findOne({_id:searchParams.get("id")}).populate("planid");
+     let deployment = await Deployment.find({projectid:searchParams.get("id")});
+     if(projectdata==null){
+        return NextResponse.json({
+            success:false,
+            message:"We cant fetched your data right now. Try again after sometime."
+        })
+     }
+     return NextResponse.json({
+        success:true,
+        projectdata,
+        deployment,
+        message:"Successfully fetched"
     })
+    }
+    catch(err){
+        return NextResponse.json({
+            success:false,
+            message:"Some thing went wrong please try again later!"
+        })
+    }
 }
 //for creating a new project.
 export const POST = async (req: NextRequest) => {
@@ -141,10 +171,18 @@ export const POST = async (req: NextRequest) => {
         const result = await createdep.json();
         console.log(result);
         
-        return NextResponse.json({
-            message: "Project Created & Deployment Started",
-            success: true,
-            project: project});
+        if(result.success){
+            return NextResponse.json({
+                message: "Project Created & Deployment Started",
+                success: true,
+                project: project});
+        }
+        else{
+            return NextResponse.json({
+                message: `Project creation failed: Reason-`+result.message,
+                success: false,
+                project: project});
+        }
 
     }
     catch (err) {

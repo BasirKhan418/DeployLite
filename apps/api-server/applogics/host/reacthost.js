@@ -62,7 +62,11 @@ const reactHost = async (req, res) => {
   try {
     const data = await client.send(cmd);
     console.log(data);
-    return res.send(data);
+    return res.status(200).json({
+      success:true,
+      data:data,
+      message:"Deployment started"
+    })
   } catch (err) {
     console.log(err);
     res.status(500).send("Something went wrong");

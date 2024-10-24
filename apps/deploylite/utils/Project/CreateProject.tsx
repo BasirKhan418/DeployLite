@@ -461,7 +461,9 @@ else{
     setProjecterror(true);
     setErrormsg(res.message);
     toast.error(res.message);
+    return;
   }
+  toast.error(res.message);
 }
   }
   catch(err:any){

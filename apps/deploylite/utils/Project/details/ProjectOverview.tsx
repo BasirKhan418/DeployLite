@@ -1,5 +1,7 @@
 import React from 'react'
-import { BarChart, Settings, MoreVertical, CheckCircle, XCircle, Zap, Cloud, Server, Clock, DollarSign, Bell, Rocket, GitBranch, Terminal, Shield, Database, Loader2 } from 'lucide-react'
+import { BarChart, Settings, MoreVertical, CheckCircle, XCircle, Zap, Cloud, Server, Clock, DollarSign, Bell, Rocket, GitBranch, Terminal, Shield, Database, Loader2,Globe
+
+ } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -19,13 +21,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-export default function ProjectOverview() {
-  const projectName = "My Awesome Project"
-  const projectUrl = "https://my-awesome-project.example.com"
+export default function ProjectOverview({projectdata,deploymentdata}:any) {
+  const projectName = projectdata.name&&projectdata.name.toUpperCase()
+  const projectUrl = projectdata.projecturl?"":`http://${projectdata.name}.localhost:8000`
   const isHealthy = true
-  const cpuUtilization = 65
-  const memoryUtilization = 48
-  const estimatedCost = "$12.50"
+  const cpuUtilization = projectdata.cpuusage
+  const memoryUtilization = projectdata.memoryusage
+
+  const estimatedCost = projectdata.planid&&projectdata.planid.pricepmonth;
 
   const recentActivities = [
     { id: 1, type: 'deployment', status: 'success', timestamp: '2023-05-15 14:30', user: 'Alice' },
@@ -98,7 +101,7 @@ export default function ProjectOverview() {
               <TabsTrigger value="settings">Settings</TabsTrigger>
             </TabsList>
             <TabsContent value="overview">
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {projectdata&&projectdata.type=="backend"&&<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 border-green-200 dark:border-green-700">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium text-green-800 dark:text-green-100">App Health</CardTitle>
@@ -139,7 +142,45 @@ export default function ProjectOverview() {
                     <p className="text-xs text-purple-700 dark:text-purple-300 mt-1">2 GB total memory</p>
                   </CardContent>
                 </Card>
+              </div>}
+              {
+                projectdata&&projectdata.type=="frontend"&&<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 border-green-200 dark:border-green-700">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium text-green-800 dark:text-green-100">App Health</CardTitle>
+                    {isHealthy ? (
+                      <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    ) : (
+                      <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                    )}
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-green-900 dark:text-green-100">{isHealthy ? 'Healthy' : 'Unhealthy'}</div>
+                    <p className="text-xs text-green-700 dark:text-green-300 mt-1">Last checked: 5 minutes ago</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 border-blue-200 dark:border-blue-700">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium text-blue-800 dark:text-blue-100">Page Views (24h)</CardTitle>
+                    <Globe className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">{50}</div>
+                    <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">+5.2% from yesterday</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900 dark:to-purple-800 border-purple-200 dark:border-purple-700">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium text-purple-800 dark:text-purple-100">Avg. Load Time</CardTitle>
+                    <Zap className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">{5}s</div>
+                    <p className="text-xs text-purple-700 dark:text-purple-300 mt-1">-0.1s from last week</p>
+                  </CardContent>
+                </Card>
               </div>
+              }
 
               <div className="grid gap-6 md:grid-cols-2 mt-6">
                 <Card>
@@ -178,20 +219,20 @@ export default function ProjectOverview() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-4xl font-bold text-yellow-900 dark:text-yellow-100">{estimatedCost}</div>
+                    <div className="text-4xl font-bold text-yellow-900 dark:text-yellow-100">₹{estimatedCost}</div>
                     <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-2">per month</p>
                     <div className="mt-4">
                       <div className="flex justify-between text-sm text-yellow-800 dark:text-yellow-200 mb-1">
                         <span>Compute</span>
-                        <span>$8.50</span>
+                        <span>₹{estimatedCost/3}</span>
                       </div>
                       <div className="flex justify-between text-sm text-yellow-800 dark:text-yellow-200 mb-1">
                         <span>Storage</span>
-                        <span>$2.00</span>
+                        <span>₹{estimatedCost/3}</span>
                       </div>
                       <div className="flex justify-between text-sm text-yellow-800 dark:text-yellow-200 mb-1">
                         <span>Network</span>
-                        <span>$2.00</span>
+                        <span>₹{estimatedCost/3}</span>
                       </div>
                     </div>
                   </CardContent>
