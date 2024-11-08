@@ -46,7 +46,7 @@ export default function ProjectOverview({projectdata,deploymentdata}:any) {
                 <Cloud className="w-8 h-8 mr-3" />
                 <div>
                   <h1 className="text-3xl font-bold">{projectName}</h1>
-                  <a href={projectUrl} className="text-blue-200 hover:underline">{projectUrl}</a>
+                  <a href={projectUrl} className="text-blue-200 hover:underline" target='_blank'>{projectUrl}</a>
                 </div>
               </div>
               <div className="flex mt-4 sm:mt-0">

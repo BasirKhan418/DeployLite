@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
+import { LiaDocker } from "react-icons/lia";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -90,6 +91,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <Button variant="ghost" className="w-full justify-start">
           <CloudLightning className="mr-2 h-4 w-4" />
             Cloud Customization
+        </Button>
+      </Link>
+      <Link href="https://dockergen.deploylite.tech" target="_blank">
+        <Button variant="ghost" className="w-full justify-start">
+          <LiaDocker className="mr-2 h-4 w-4" />
+            DockerGen
         </Button>
       </Link>
       <Link href="/settings" passHref>
