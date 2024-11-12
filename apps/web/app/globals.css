@@ -76,3 +76,6 @@
 .animate-infinite-scroll {
   animation: infinite-scroll 20s linear infinite;
 }
+*{
+  scroll-behavior: smooth;
+}

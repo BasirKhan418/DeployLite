@@ -37,7 +37,9 @@ export const Hero = () => {
       Launch, scale, and manage your apps with ease — all in one place.</p>
       </div>
       <div className="flex justify-center mt-8">
-      <motion.button className='bg-white text-black py-3 px-5 rounded-lg font-medium' whileHover={{scale:1.1}} whileTap={{scale:0.5}} transition={{ease:"easeInOut",duration:0.2}}>Get for free</motion.button>
+      <motion.button className='bg-white text-black py-3 px-5 rounded-lg font-medium' whileHover={{scale:1.1}} whileTap={{scale:0.5}} transition={{ease:"easeInOut",duration:0.2}} onClick={()=>{
+        window.location.href="https://app.deploylite.tech/signup"
+      }}>Get for free</motion.button>
       </div>
 
 
