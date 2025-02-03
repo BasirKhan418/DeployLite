@@ -11,7 +11,7 @@ import { Pricing } from 'components/Pricingdemo'
 import { CallToAction } from 'components/Calltoaction'
 const page = () => {
   return (
-    <div className='bg-black'>
+    <div className='bg-black overflow-hidden'>
      
       <Hero />
       
