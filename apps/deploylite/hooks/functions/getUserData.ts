@@ -2,11 +2,11 @@ const getUserData = async()=>{
     try{
         const fetchdata= await fetch(`${process.env.NEXT_PUBLIC_URL}/api/get/home`);
         let res = fetchdata.json();
-        console.log(res)
+        console.log("res is ",res)
         return res;
     }
     catch(err){
-        console.log(err)
+        console.log("error is ",err)
         return {success:false,message:"Something went wrong"}
     }
     

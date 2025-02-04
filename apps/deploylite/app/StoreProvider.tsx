@@ -1,4 +1,4 @@
-'use client'
+"use client"
 import { useRef } from 'react'
 import { Provider } from 'react-redux'
 import { makeStore, AppStore } from '../lib/store'
@@ -20,6 +20,7 @@ export default function StoreProvider({
     //loading intial data
     let minfunc = async()=>{
       let data = await getUserData()
+      console.log("data is")
       if(data.success){
         storeRef.current?.dispatch(added(data.wallet));
        storeRef.current?.dispatch(add(data.user))

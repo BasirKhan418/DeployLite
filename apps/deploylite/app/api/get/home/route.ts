@@ -32,7 +32,7 @@ export const GET = async(req:NextRequest,res:NextResponse)=>{
     return NextResponse.json({status: 'success',user:data,wallet,success:true})
 }
 catch(err){
-    console.log(err)
+    console.log("error is ",err)
     return NextResponse.json({
         success:false,
         message:"Something went wrong please try again after some time "
