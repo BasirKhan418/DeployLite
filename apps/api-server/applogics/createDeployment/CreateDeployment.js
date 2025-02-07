@@ -97,6 +97,9 @@ const CreateDeployment = async (req, res) => {
       } else if (techused == "Django") {
         //start deployment for django
       } else if (techused == "HTML,CSS,JS") {
+        console.log("html css js deployment started")
+        return res.status(201).json({
+       success:true,message:"done html css deployment" })
         //START DEPLOYMENT FROM HERE
       } else if (techused == "Springboot") {
         //start deployment for springboot
