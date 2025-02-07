@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { LiaDocker } from "react-icons/lia";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -41,9 +42,8 @@ import {
   ServerIcon,
   GlobeIcon,
   DatabaseIcon,
-  Rocket,
-  CloudLightning,
   HardDrive,
+  CloudLightning,
   ChevronLeftIcon,
   ChevronRightIcon,
   X as XIcon,
@@ -52,8 +52,15 @@ import { useRouter } from "next/navigation";
 import LogoutModal from "../modals/LogoutModal";
 import LottieAnimation from "@/components/ui/LottieAnimation";
 
+// A small helper for conditionally combining classes
+function cn(...classes: (string | boolean | undefined)[]) {
+  return classes.filter(Boolean).join(" ");
+}
+
 export default function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname(); // <-- Hook to get the current route
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // For mobile
   const [unreadNotifications, setUnreadNotifications] = useState(3);
   const [isProjectsOpen, setIsProjectsOpen] = useState(false);
@@ -79,77 +86,185 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     setUnreadNotifications(0);
   };
 
+  // Helper to check if a route is "active" (for pink text)
+  function isActiveRoute(route: string) {
+    return pathname === route;
+  }
+
+  // Helper to check if a route is part of a collapsible sub-route
+  function isActiveSubRoute(route: string) {
+    // e.g. /project/app-platform starts with /project
+    return pathname.startsWith(route);
+  }
+
   const NavItems = () => (
-    <div className="space-y-2">
+    <div className="space-y-3">
+      {/* Dashboard */}
       <Link href="/" passHref>
-        <Button variant="ghost" className="w-full justify-start">
+        <Button
+          variant="ghost"
+          className={cn(
+            "w-full justify-start rounded-md transition-colors",
+            "text-gray-700 dark:text-gray-300",
+            // Hover states for text/icon only
+            "hover:text-pink-600 dark:hover:text-pink-400",
+            // Active route => pink text/icon
+            isActiveRoute("/") && "text-pink-600 dark:text-pink-400"
+          )}
+        >
           <HomeIcon className="mr-2 h-4 w-4" />
           {!isSidebarCollapsed && "Dashboard"}
         </Button>
       </Link>
+
+      {/* Deployments */}
       <Link href="/deployments" passHref>
-        <Button variant="ghost" className="w-full justify-start">
+        <Button
+          variant="ghost"
+          className={cn(
+            "w-full justify-start rounded-md transition-colors",
+            "text-black dark:text-gray-300",
+            "hover:text-pink-600 dark:hover:text-pink-400",
+            isActiveRoute("/deployments") && "text-pink-600 dark:text-pink-400"
+          )}
+        >
           <RocketIcon className="mr-2 h-4 w-4" />
           {!isSidebarCollapsed && "Deployments"}
         </Button>
       </Link>
+
+      {/* Projects (Collapsible) */}
       <Collapsible
         open={isProjectsOpen}
         onOpenChange={setIsProjectsOpen}
         className="w-full"
       >
         <CollapsibleTrigger asChild>
-          <Button variant="ghost" className="w-full justify-start">
+          <Button
+            variant="ghost"
+            className={cn(
+              "w-full justify-start rounded-md transition-colors",
+              "text-black dark:text-gray-300",
+              "hover:text-pink-600 dark:hover:text-pink-400"
+            )}
+          >
             <LayersIcon className="mr-2 h-4 w-4" />
             {!isSidebarCollapsed && "Projects"}
             <ChevronDownIcon
-              className={`ml-auto h-4 w-4 transition-transform duration-200 ${
-                isProjectsOpen ? "transform rotate-180" : ""
-              }`}
+              className={cn(
+                "ml-auto h-4 w-4 transition-transform duration-200",
+                isProjectsOpen && "rotate-180"
+              )}
             />
           </Button>
         </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-2 px-4 py-2">
+        <CollapsibleContent className="space-y-2 px-2 py-2">
           <Link href={"/project/app-platform"}>
-            <Button variant="ghost" className="w-full justify-start pl-6">
+            <Button
+              variant="ghost"
+              className={cn(
+                "w-full justify-start pl-6 rounded-md transition-colors",
+                "text-gray-700 dark:text-gray-300",
+                "hover:text-pink-600 dark:hover:text-pink-400",
+                isActiveSubRoute("/project/app-platform") &&
+                  "text-pink-600 dark:text-pink-400"
+              )}
+            >
               <CodeIcon className="mr-2 h-4 w-4" />
               {!isSidebarCollapsed && "App Platform"}
             </Button>
           </Link>
           <Link href={"/project/webbuilder"}>
-            <Button variant="ghost" className="w-full justify-start pl-6">
+            <Button
+              variant="ghost"
+              className={cn(
+                "w-full justify-start pl-6 rounded-md transition-colors",
+                "text-gray-700 dark:text-gray-300",
+                "hover:text-pink-600 dark:hover:text-pink-400",
+                isActiveSubRoute("/project/webbuilder") &&
+                  "text-pink-600 dark:text-pink-400"
+              )}
+            >
               <LayersIcon className="mr-2 h-4 w-4" />
               {!isSidebarCollapsed && "Web Builder"}
             </Button>
           </Link>
           <Link href={"/project/database"}>
-            <Button variant="ghost" className="w-full justify-start pl-6">
+            <Button
+              variant="ghost"
+              className={cn(
+                "w-full justify-start pl-6 rounded-md transition-colors",
+                "text-gray-700 dark:text-gray-300",
+                "hover:text-pink-600 dark:hover:text-pink-400",
+                isActiveSubRoute("/project/database") &&
+                  "text-pink-600 dark:text-pink-400"
+              )}
+            >
               <DatabaseIcon className="mr-2 h-4 w-4" />
               {!isSidebarCollapsed && "Database"}
             </Button>
           </Link>
           <Link href={"/project/storage"}>
-            <Button variant="ghost" className="w-full justify-start pl-6">
+            <Button
+              variant="ghost"
+              className={cn(
+                "w-full justify-start pl-6 rounded-md transition-colors",
+                "text-gray-700 dark:text-gray-300",
+                "hover:text-pink-600 dark:hover:text-pink-400",
+                isActiveSubRoute("/project/storage") &&
+                  "text-pink-600 dark:text-pink-400"
+              )}
+            >
               <HardDrive className="mr-2 h-4 w-4" />
               {!isSidebarCollapsed && "Storage"}
             </Button>
           </Link>
         </CollapsibleContent>
       </Collapsible>
+
+      {/* Cloud Customization */}
       <Link href="/customization" passHref>
-        <Button variant="ghost" className="w-full justify-start">
+        <Button
+          variant="ghost"
+          className={cn(
+            "w-full justify-start rounded-md transition-colors",
+            "text-gray-700 dark:text-gray-300",
+            "hover:text-pink-600 dark:hover:text-pink-400",
+            isActiveRoute("/customization") &&
+              "text-pink-600 dark:text-pink-400"
+          )}
+        >
           <CloudLightning className="mr-2 h-4 w-4" />
           {!isSidebarCollapsed && "Cloud Customization"}
         </Button>
       </Link>
+
+      {/* DockerGen (external link) */}
       <Link href="https://dockergen.deploylite.tech" target="_blank">
-        <Button variant="ghost" className="w-full justify-start">
+        <Button
+          variant="ghost"
+          className={cn(
+            "w-full justify-start rounded-md transition-colors",
+            "text-gray-700 dark:text-gray-300",
+            "hover:text-pink-600 dark:hover:text-pink-400"
+          )}
+        >
           <LiaDocker className="mr-2 h-4 w-4" />
           {!isSidebarCollapsed && "DockerGen"}
         </Button>
       </Link>
+
+      {/* Settings */}
       <Link href="/settings" passHref>
-        <Button variant="ghost" className="w-full justify-start">
+        <Button
+          variant="ghost"
+          className={cn(
+            "w-full justify-start rounded-md transition-colors",
+            "text-gray-700 dark:text-gray-300",
+            "hover:text-pink-600 dark:hover:text-pink-400",
+            isActiveRoute("/settings") && "text-pink-600 dark:text-pink-400"
+          )}
+        >
           <SettingsIcon className="mr-2 h-4 w-4" />
           {!isSidebarCollapsed && "Settings"}
         </Button>
@@ -165,15 +280,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div className="flex h-screen">
       {/* Desktop Sidebar */}
       <aside
-        className={`hidden md:flex flex-col border-r transition-width duration-200 ${
-          isSidebarCollapsed ? "w-24" : "w-64"
-        } ${theme === "light" ? "bg-white border-gray-200" : "bg-neutral-900 border-neutral-700"}`}
+        className={cn(
+          "hidden md:flex flex-col border-pink-600 transition-width duration-200",
+          isSidebarCollapsed ? "w-24" : "w-64",
+          theme === "light"
+            ? "bg-white border-gray-200"
+            : "bg-black border-pink-600"
+        )}
       >
         <div className="p-4 flex items-center justify-between">
           <div className="flex items-center">
             <LottieAnimation width={40} height={40} />
             {!isSidebarCollapsed && (
-              <span className="text-2xl font-bold text-gray-900 dark:text-white">
+              <span className="text-2xl font-bold text-gray-900 dark:text-white ml-2">
                 DeployLite
               </span>
             )}
@@ -192,7 +311,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </Button>
         </div>
         <ScrollArea className="flex-grow">
-          <nav className="space-y-2 p-4">
+          <nav className="p-4">
             <NavItems />
           </nav>
         </ScrollArea>
@@ -212,9 +331,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </SheetTrigger>
               <SheetContent
                 side="left"
-                className={`w-64 p-0 transition-colors duration-200 ${
+                className={cn(
+                  "w-64 p-0 transition-colors duration-200",
                   theme === "light" ? "bg-white" : "bg-neutral-900"
-                }`}
+                )}
               >
                 {/* Close Button for Mobile Sidebar */}
                 <div className="flex justify-end p-2">
@@ -229,7 +349,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <div className="p-4">
                   <h2 className="text-2xl font-bold">DeployLite</h2>
                 </div>
-                <nav className="space-y-2 p-4">
+                <nav className="p-4">
                   <NavItems />
                 </nav>
               </SheetContent>
@@ -473,7 +593,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </DropdownMenu>
           </div>
         </header>
+
         <LogoutModal isOpen={isOpen} setIsOpen={setIsOpen} />
+
         {/* Main content */}
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
