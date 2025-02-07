@@ -366,6 +366,7 @@ const Aws = () => {
         </Card>
       )}
 
+<<<<<<< HEAD
       {/* alertopenstartsfromhere */}
       <AlertDialog open={alertopen}>
         <AlertDialogContent>
@@ -394,6 +395,29 @@ const Aws = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+=======
+              {/* alertopenstartsfromhere */}
+              <AlertDialog open={alertopen} onOpenChange={setAlertOpen}>
+
+<AlertDialogContent>
+  <AlertDialogHeader>
+    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+    <AlertDialogDescription>
+      This action cannot be undone. This will permanently disconnect your AWS account from deploylite.
+    </AlertDialogDescription>
+  </AlertDialogHeader>
+  <AlertDialogFooter>
+    <AlertDialogCancel onClick={()=>{
+    
+   setAlertOpen(false)
+    }}>Cancel</AlertDialogCancel>
+    <AlertDialogAction onClick={()=>{
+disconnectAws()
+    }}>Continue</AlertDialogAction>
+  </AlertDialogFooter>
+</AlertDialogContent>
+</AlertDialog>
+>>>>>>> d4cf8f380d9c64282ff8a6b813b44e87d7334aa9
     </div>
   );
 };
