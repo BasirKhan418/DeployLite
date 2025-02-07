@@ -18,7 +18,7 @@ function ResetComponent() {
   const [loading, setLoading] = useState(false);
 
   // Timer state
-  const [timer, setTimer] = useState(60);
+  const [timer, setTimer] = useState(30);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
   // Start timer when component mounts
@@ -70,7 +70,7 @@ function ResetComponent() {
 
   // Reset and start the timer when Resend OTP or WhatsApp button is clicked
   const resetTimer = () => {
-    setTimer(60);
+    setTimer(30);
     setIsButtonDisabled(true);
   };
   const handleResend = async () => {
