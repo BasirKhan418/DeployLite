@@ -53,7 +53,7 @@ await wallet.save();
  //creating token
  let token = jwt.sign({email:user.email,username:user.username},process.env.SECRET_KEY||"")
  //sending token with payload
- await SendVeriyEmail(user.email,token,user.name)
+ SendVeriyEmail(user.email,token,user.name)
 return NextResponse.json({status: 'success',message: 'User created successfully. Please Verify your account to continue',success: true,token:token})
 }
 catch(err:any){
