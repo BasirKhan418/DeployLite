@@ -46,8 +46,6 @@ import NoProject from "./NoProject";
 const Projecthome = ({ name }: { name: string }) => {
   // Getting user from Redux
   const user = useAppSelector((state) => state.user.user);
-
-<<<<<<< HEAD
   const getDetails = async()=>{
     console.log('fetching data')
     try{
@@ -74,9 +72,6 @@ const Projecthome = ({ name }: { name: string }) => {
   },[]) 
 
   // Sample data
-=======
-  // Sample data (try emptying this array to see the "No Projects Found" banner)
->>>>>>> 360d9d8784b521a8001f5832f9bbe1afff00c28e
   const [projects] = useState([
     {
       id: 1,
