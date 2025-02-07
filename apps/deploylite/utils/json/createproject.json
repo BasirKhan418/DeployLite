@@ -1,0 +1,107 @@
+[
+    {
+      "framework": "React",
+      "root_dir": "/",
+      "outdir": "build",
+      "install_command": "npm install",
+      "build_command": "npm run build",
+      "start_command": "npm start"
+    },
+    {
+      "framework": "Next.js",
+      "root_dir": "/",
+      "outdir": ".next",
+      "install_command": "npm install",
+      "build_command": "npm run build",
+      "start_command": "npm run start"
+    },
+    {
+      "framework": "Angular",
+      "root_dir": "/",
+      "outdir": "dist",
+      "install_command": "npm install",
+      "build_command": "ng build",
+      "start_command": "ng serve"
+    },
+    {
+      "framework": "Flask",
+      "root_dir": "/",
+      "outdir": "not applicable",
+      "install_command": "pip install -r requirements.txt",
+      "build_command": "not applicable",
+      "start_command": "flask run"
+    },
+    {
+      "framework": "Django",
+      "root_dir": "/",
+      "outdir": "not applicable",
+      "install_command": "pip install -r requirements.txt",
+      "build_command": "not applicable",
+      "start_command": "python manage.py runserver"
+    },
+    {
+      "framework": "Springboot",
+      "root_dir": "/",
+      "outdir": "target",
+      "install_command": "mvn install",
+      "build_command": "mvn package",
+      "start_command": "mvn spring-boot:run"
+    },
+    {
+      "framework": "Java Servlet",
+      "root_dir": "/",
+      "outdir": "WEB-INF/classes",
+      "install_command": "not applicable",
+      "build_command": "javac -d WEB-INF/classes src/*.java",
+      "start_command": "not applicable"
+    },
+    {
+      "framework": "Vue.js",
+      "root_dir": "/",
+      "outdir": "dist",
+      "install_command": "npm install",
+      "build_command": "npm run build",
+      "start_command": "npm run serve"
+    },
+    {
+      "framework": "Node.js",
+      "root_dir": "/",
+      "outdir": "not applicable",
+      "install_command": "npm install",
+      "build_command": "not applicable",
+      "start_command": "node index.js"
+    },
+    {
+      "framework": "Vite",
+      "root_dir": "/",
+      "outdir": "dist",
+      "install_command": "npm install",
+      "build_command": "npm run build",
+      "start_command": "npm run start"
+    },
+    {
+      "framework": "HTML,CSS,JS",
+      "root_dir": "/",
+      "outdir": "not applicable",
+      "install_command": "not applicable",
+      "build_command": "not applicable",
+      "start_command": "open index.html in browser"
+    },
+    {
+      "framework": "Nuxt.js",
+      "root_dir": "/",
+      "outdir": ".nuxt",
+      "install_command": "npm install",
+      "build_command": "npm run build",
+      "start_command": "npm run start"
+    },
+    {
+      "framework": "PHP",
+      "root_dir": "/",
+      "outdir": "not applicable",
+      "install_command": "not applicable",
+      "build_command": "not applicable",
+      "start_command": "php -S localhost:8000"
+    }
+  ]
+  
