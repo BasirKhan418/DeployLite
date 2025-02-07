@@ -7,6 +7,9 @@ import { usePathname } from "next/navigation";
 import { ThemeProvider } from 'next-themes';
 import Sidebar from "@/utils/Sidebar/Sidebar";
 import StoreProvider from "./StoreProvider";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { get } from "http";
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -25,6 +28,29 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
+  const router = useRouter();
+  const getCookieObject = () => {
+    return document.cookie.split('; ').reduce((acc: Record<string, string>, cookie) => {
+      const [key, value] = cookie.split('=');
+      acc[key] = value;
+      return acc;
+    }, {});
+  };
+  //check login or not
+  const checkAuth = async()=>{
+    const fetchResult = await fetch("/api/get/home");
+    const result = await fetchResult.json();
+    if(!result.success){
+      if(pathname!=='/login' && pathname!=='/signup' && pathname!=='/autherror' && pathname!=='/authsuccess' && pathname!=='/forgot' && pathname!=='/reset' && pathname!=='/verifyemail' && pathname!=='/otp' && pathname!=='/githubauth' && pathname!=='/githuberr'){
+        router.push('/login');
+      }
+      
+    }
+  }
+  useEffect(() => {
+    console.log("hello agar login nahi ho toh bhag jao...")
+    checkAuth();
+  },[])
   return (
     <html lang="en">
       
