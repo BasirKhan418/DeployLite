@@ -21,18 +21,16 @@ export const GET = async(req:NextRequest,res:NextResponse) => {
         })
      }
      //check the entry and return it;
-     let projectdata = await Project.findOne({_id:searchParams.get("id")}).populate("planid");
-     let deployment = await Deployment.find({projectid:searchParams.get("id")});
+     let projectdata = await Project.find({userid:searchParams.get("id")}).populate("userid");
      if(projectdata==null){
         return NextResponse.json({
             success:false,
-            message:"We cant fetched your data right now. Try again after sometime."
+            message:"No Projects found."
         })
      }
      return NextResponse.json({
         success:true,
-        projectdata,
-        deployment,
+        projectdata:projectdata,
         message:"Successfully fetched"
     })
     }
@@ -193,5 +191,36 @@ export const POST = async (req: NextRequest) => {
             error: err,
             success: false,
         })
+    }
+}
+//delete project data
+
+export const DELETE = async(req:NextRequest,res:NextResponse) => {
+    try{
+    let data = await req.json();
+    await ConnectDb();
+    const auth = await CheckAuth();
+        //checking if user is authenticated or not.
+        if (!auth.result) {
+            return NextResponse.json({
+                message: "User is not authenticated",
+                success: false,
+                autherror: true
+            })
+        }
+        let projectdelete = await Project.findOneAndDelete({_id:data.id});
+        if(projectdelete==null){
+            return NextResponse.json({
+                success:false,
+                message:"Project not found"
+            })
+        }
+        return NextResponse.json({
+            success:true,
+            message:"Project Deleted Successfully"
+        });
+    }
+    catch(err){
+        return NextResponse.json({success:false,message:"Some thing went wrong please try again later!"})
     }
 }

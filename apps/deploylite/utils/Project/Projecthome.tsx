@@ -46,33 +46,7 @@ import NoProject from "./NoProject";
 const Projecthome = ({ name }: { name: string }) => {
   // Getting user from Redux
   const user = useAppSelector((state) => state.user.user);
-  const getDetails = async()=>{
-    console.log('fetching data')
-    try{
-     setLoading(true)
-     let result = await fetch('/api/project/crud');
-     const data = await result.json();
-      setLoading(false)
-      console.log("result is ",data)
-     if(data.success){
-       console.log("data is ",data)
-     }
-     else{
-      toast.error(data.message)
-     }
-    }
-    catch(err){
-      console.log(err)
-      toast.error('Error while fetching data');
-     
-    }
-  }
-  useEffect(()=>{
-    getDetails()
-  },[]) 
-
-  // Sample data
-  const [projects] = useState([
+  const [projects,setProjects] = useState([
     {
       id: 1,
       name: "My Blog",
@@ -96,6 +70,36 @@ const Projecthome = ({ name }: { name: string }) => {
       logo: "/placeholder.svg?height=40&width=40",
     },
   ]);
+  const getDetails = async()=>{
+    setLoading(true)
+    console.log('fetching data')
+    try{
+     setLoading(true)
+     let result = await fetch(`/api/project/crud?id=${user._id}`);
+     const data = await result.json();
+     setLoading(false)
+      setLoading(false)
+      console.log("result is ",data)
+     if(data.success){
+        setProjects(data.projectdata)
+       console.log("data is ",data)
+     }
+     else{
+      toast.error(data.message)
+     }
+    }
+    catch(err){
+      console.log(err)
+      toast.error('Error while fetching data');
+     
+    }
+  }
+  useEffect(()=>{
+    getDetails()
+  },[user]) 
+
+  // Sample data
+
 
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -117,6 +121,35 @@ const Projecthome = ({ name }: { name: string }) => {
     await router.push(`/project/createproject/${name}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const handleDeleteProject = async (id: number) => {
+    try{
+      let confirm = window.confirm('Are you sure you want to delete this project?');
+      if(!confirm){
+        return;
+      }
+      setLoading(true);
+     let deleteproject = await fetch(`/api/project/crud`,{
+        method:'DELETE',
+        headers:{
+          'Content-Type':'application/json'
+        },
+        body:JSON.stringify({id})
+     });
+      const result = await deleteproject.json();
+      setLoading(false);
+      if(result.success){
+        toast.success(result.message);
+        getDetails()
+      }
+      else{
+        toast.error(result.message);
+      }
+    }
+    catch(err){
+      toast.error('Error while deleting project');
+    }
+  }
 
   return (
     <>
@@ -160,7 +193,7 @@ const Projecthome = ({ name }: { name: string }) => {
                   </div>
 
                   {/* Projects Grid */}
-                  <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                 {!loading&& <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {projects.map((project) => (
                       <Card
                         key={project.id}
@@ -217,7 +250,7 @@ const Projecthome = ({ name }: { name: string }) => {
                                   <span>Restart</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-red-600">
+                                <DropdownMenuItem className="text-red-600" onClick={()=>handleDeleteProject(project._id)}>
                                   <Trash2 className="mr-2 h-4 w-4" />
                                   <span>Delete project</span>
                                 </DropdownMenuItem>
@@ -226,55 +259,55 @@ const Projecthome = ({ name }: { name: string }) => {
                           </div>
                         </CardHeader>
                         <CardContent>
-                          <CardDescription className="flex items-center text-sm mb-4">
+                          <CardDescription className="flex items-center text-sm mb-4" onClick={() => window.open(`https://${project.name}.cloud.deploylite.tech`)}>
                             <ExternalLink className="mr-1 h-4 w-4" />
-                            {project.url}
+                            {`${project.name}.cloud.deploylite.tech`}
                           </CardDescription>
                           <div className="space-y-4">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center space-x-2 text-sm">
                                 <GitBranch className="h-4 w-4" />
-                                <span>{project.branch}</span>
+                                <span>{project.repobranch}</span>
                               </div>
                               <Badge
                                 variant={
-                                  project.status === "Live"
+                                  project.projectstatus === "live"
                                     ? "default"
-                                    : project.status === "Building"
+                                    : project.status === "creating"
                                       ? "secondary"
                                       : "destructive"
                                 }
                                 className={
-                                  project.status === "Live"
+                                  project.projectstatus === "live"
                                     ? "bg-green-500 text-white"
                                     : ""
                                 }
                               >
-                                {project.status}
+                                {project.projectstatus}
                               </Badge>
                             </div>
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
                               <div className="flex items-center space-x-2">
                                 <Cpu className="h-4 w-4 text-pink-600" />
                                 <span className="text-sm">
-                                  CPU: {project.cpu}%
+                                  CPU: {15}%
                                 </span>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <HardDrive className="h-4 w-4 text-green-500" />
                                 <span className="text-sm">
-                                  Memory: {project.memory}%
+                                  Memory: {25}%
                                 </span>
                               </div>
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              Last deploy: {project.lastDeployment}
+                              Last deploy: {new Date(project.updatedAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
                             </div>
                           </div>
                         </CardContent>
                       </Card>
                     ))}
-                  </div>
+                  </div>}
 
                   
                   {projects.length === 2 && (
