@@ -1,18 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import {
-  Bell,
-  CreditCard,
-  Github,
-  Globe,
-  Key,
-  User,
-  Zap,
-  Shield,
-  ChevronDown,
-  Cloud,
-  Wallet,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -210,7 +197,12 @@ const Aws = () => {
           {isconnected && (
             <div className="space-y-2">
               <Label htmlFor="awsRegion">AWS Region</Label>
-              <Select defaultValue={aws.region}>
+              <Select
+                value={aws.region}
+                onValueChange={(value) =>
+                  updateConfiguration({ region: value })
+                }
+              >
                 <SelectTrigger id="awsRegion">
                   <SelectValue placeholder="Select AWS Region" />
                 </SelectTrigger>
@@ -366,9 +358,7 @@ const Aws = () => {
         </Card>
       )}
 
-<<<<<<< HEAD
-      {/* alertopenstartsfromhere */}
-      <AlertDialog open={alertopen}>
+      <AlertDialog open={alertopen} onOpenChange={setAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -395,29 +385,6 @@ const Aws = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-=======
-              {/* alertopenstartsfromhere */}
-              <AlertDialog open={alertopen} onOpenChange={setAlertOpen}>
-
-<AlertDialogContent>
-  <AlertDialogHeader>
-    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-    <AlertDialogDescription>
-      This action cannot be undone. This will permanently disconnect your AWS account from deploylite.
-    </AlertDialogDescription>
-  </AlertDialogHeader>
-  <AlertDialogFooter>
-    <AlertDialogCancel onClick={()=>{
-    
-   setAlertOpen(false)
-    }}>Cancel</AlertDialogCancel>
-    <AlertDialogAction onClick={()=>{
-disconnectAws()
-    }}>Continue</AlertDialogAction>
-  </AlertDialogFooter>
-</AlertDialogContent>
-</AlertDialog>
->>>>>>> d4cf8f380d9c64282ff8a6b813b44e87d7334aa9
     </div>
   );
 };
