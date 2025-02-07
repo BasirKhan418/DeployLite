@@ -250,7 +250,7 @@ const Aws = () => {
               </Card>}
 
               {/* alertopenstartsfromhere */}
-              <AlertDialog open={alertopen}>
+              <AlertDialog open={alertopen} onOpenChange={setAlertOpen}>
 
 <AlertDialogContent>
   <AlertDialogHeader>
