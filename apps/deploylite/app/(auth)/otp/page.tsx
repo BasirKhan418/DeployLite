@@ -7,14 +7,7 @@ import { Toaster, toast } from "sonner";
 import { useRouter } from "next/navigation";
 import LoginLoader from "@/utils/Loaders/LoginLoader";
 import { Suspense } from "react";
-import {
-  IconBrandGithub,
-  IconBrandGoogle,
-  IconBrandOnlyfans,
-} from "@tabler/icons-react";
 import { useSearchParams } from "next/navigation";
-
-
 
 function ResetComponent() {
   const searchurl = useSearchParams();
@@ -82,52 +75,48 @@ function ResetComponent() {
   };
   const handleResend = async () => {
     resetTimer();
-    let data =  {token: searchurl.get("token"),status:"resend"}
-    try{
-  let fetchresult = await fetch('/api/auth/resend',{
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  })
-  let result = await fetchresult.json()
-  if(result.success){
-    toast.success(result.message)
-  }
-  else{
-    toast.error(result.message)
-  }
+    let data = { token: searchurl.get("token"), status: "resend" };
+    try {
+      let fetchresult = await fetch("/api/auth/resend", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      let result = await fetchresult.json();
+      if (result.success) {
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
+    } catch (err) {
+      toast.error("Resend endpoint error");
     }
-    catch(err){
-      toast.error("Resend endpoint error")
-    }
-  }
+  };
 
   //sendusing whatsappp
   const handleWhatsApp = async () => {
     resetTimer();
-    let data =  {token: searchurl.get("token")}
-    try{
-  let fetchresult = await fetch('/api/auth/resend',{
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  })
-  let result = await fetchresult.json()
-  if(result.success){
-    toast.success(result.message)
-  }
-  else{
-    toast.error(result.message)
-  }
-}
-catch(err){
-  toast.error("Resend endpoint error")
-}
+    let data = { token: searchurl.get("token") };
+    try {
+      let fetchresult = await fetch("/api/auth/resend", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      let result = await fetchresult.json();
+      if (result.success) {
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
+    } catch (err) {
+      toast.error("Resend endpoint error");
     }
+  };
   return (
     <div className="flex justify-center items-center h-[100vh]">
       <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
