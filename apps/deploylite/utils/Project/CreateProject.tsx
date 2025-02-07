@@ -6,13 +6,6 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import json from "../json/createproject.json";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { FiCpu } from "react-icons/fi";
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -53,7 +46,7 @@ import {
   Cpu,
   HardDrive,
   Gauge,
-  SquareChevronRight
+  SquareChevronRight,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { FaReact } from "react-icons/fa";
@@ -79,7 +72,7 @@ import { SiNuxtdotjs } from "react-icons/si";
 import { FaPhp } from "react-icons/fa6";
 import { VscWorkspaceUnknown } from "react-icons/vsc";
 import RepoSkeleton from "../skeleton/RepoSkeleton";
-import { Toaster,toast } from "sonner";
+import { Toaster, toast } from "sonner";
 import LoginLoader from "../Loaders/LoginLoader";
 import {
   Tooltip,
@@ -102,83 +95,81 @@ export default function CreateProject({ name }: { name: string }) {
     install: "npm install",
     start: "npm run start",
   });
-  const [repoDetails,setRepoDetails] = useState({
-    reponame:"",
-    cloneurl:"",
-    branchesurl:"",
-  })
+  const [repoDetails, setRepoDetails] = useState({
+    reponame: "",
+    cloneurl: "",
+    branchesurl: "",
+  });
   const [isoverridebuid, setisoverridebuid] = useState(true);
   const [isrootdir, setisrootdir] = useState(true);
   const [isinstall, setisinstall] = useState(true);
   const [isoutputdir, setisoutputdir] = useState(true);
   const [isstart, setisstart] = useState(true);
-  const[type,setType] = useState("");
-  const[loading,setLoading] = useState(false);
+  const [type, setType] = useState("");
+  const [loading, setLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState({
-    name:"",
-    id:"",
-    pricephour:"",
-    pricepmonth:"",
-    features:[],
+    name: "",
+    id: "",
+    pricephour: "",
+    pricepmonth: "",
+    features: [],
   });
   const [repoLoading, setRepoLoading] = useState(true);
-  const [repovalue,setrepoValue] = useState(null);
+  const [repovalue, setrepoValue] = useState(null);
   const [reposdata, setreposdata] = useState([
     {
       full_name: "Repos are fetching ....",
       private: true,
     },
   ]);
-  const [pricingplans,setPricingPlans] = useState([]);
-  const [displayPricing,setDisplayPricing] = useState([]);
-  const [detectedbranch,setDetectedBranch] = useState([]);
-  const[branch,setBranch] = useState("");
-  const [count,setCount] = useState(1);
+  const [pricingplans, setPricingPlans] = useState([]);
+  const [displayPricing, setDisplayPricing] = useState([]);
+  const [detectedbranch, setDetectedBranch] = useState([]);
+  const [branch, setBranch] = useState("");
+  const [count, setCount] = useState(1);
   const handleProjectDetailsChange = (e: any) => {
     setProjecterror(false);
     setProjectDetails({ ...projectDetails, [e.target.name]: e.target.value });
   };
-  const [isError,setIserror] =useState(false);
-  const[isprojecterror,setProjecterror]=useState(false)
-  const[errormsg,setErrormsg] = useState("");
+  const [isError, setIserror] = useState(false);
+  const [isprojecterror, setProjecterror] = useState(false);
+  const [errormsg, setErrormsg] = useState("");
   //fetch all users repo public and private
   const fetchAllRepo = async () => {
-    try{
-    setRepoLoading(true);
-    const repodata = await fetch(
-      "https://api.github.com/user/repos?per_page=500",
-      {
-        headers: {
-          Authorization: `token ${user.githubtoken}`,
-        },
+    try {
+      setRepoLoading(true);
+      const repodata = await fetch(
+        "https://api.github.com/user/repos?per_page=500",
+        {
+          headers: {
+            Authorization: `token ${user.githubtoken}`,
+          },
+        }
+      );
+      const res = await repodata.json();
+      if (res.status == "401") {
+        toast.error(res.message);
+        setreposdata([
+          {
+            full_name: res.message,
+            private: true,
+          },
+        ]);
+      } else {
+        setreposdata(res);
+        console.log(res, res.length);
       }
-    );
-    const res = await repodata.json();
-    if(res.status=="401"){
-      toast.error(res.message);
-setreposdata([{
-  full_name:res.message,
-  private:true
-}]);
-     
+      console.log(res);
+      setRepoLoading(false);
+    } catch (err: any) {
+      toast.error(err.message);
     }
-    else{
-      setreposdata(res);
-      console.log(res, res.length);
-    }
-    console.log(res);
-    setRepoLoading(false);
-  }
-  catch(err:any){
-    toast.error(err.message)
-  }
-  
   };
   //useEffect for fetch all repo
   useEffect(() => {
     fetchAllRepo();
   }, []);
- 
+
   //useffect if tech changes according to that we have to change all build commands and all
   useEffect(() => {
     console.log("hook is running");
@@ -192,51 +183,56 @@ setreposdata([{
           outputDirectory: item.outdir,
         });
       }
-      
     });
-    if(projectDetails.tech=="React"||projectDetails.tech=="HTML,CSS,JS"||projectDetails.tech=="Vue.js"||projectDetails.tech=="Angular"||projectDetails.tech=="Vite"){
-    let frontend = pricingplans.filter((item:any)=>item.pcategory=="frontend");
-    setType("frontend");  
-    setDisplayPricing(frontend);
-    }
-    else{
-      let backend = pricingplans.filter((item:any)=>item.pcategory=="backend");
+    if (
+      projectDetails.tech == "React" ||
+      projectDetails.tech == "HTML,CSS,JS" ||
+      projectDetails.tech == "Vue.js" ||
+      projectDetails.tech == "Angular" ||
+      projectDetails.tech == "Vite"
+    ) {
+      let frontend = pricingplans.filter(
+        (item: any) => item.pcategory == "frontend"
+      );
+      setType("frontend");
+      setDisplayPricing(frontend);
+    } else {
+      let backend = pricingplans.filter(
+        (item: any) => item.pcategory == "backend"
+      );
       setDisplayPricing(backend);
-      setType("backend")
+      setType("backend");
     }
   }, [projectDetails.tech]);
   //detecting branch
-const detectedbranchfunc = async (url:string) => {
-  const newurl = url.replace("{/branch}","");
-  const fetchbranch = await fetch(newurl, {
-    headers:{
-      Authorization: `token ${user.githubtoken}`,
-    }
-  });
-  const data = await fetchbranch.json();
-  setDetectedBranch(data);
-  setBranch(data[0].name);
-
-  }
+  const detectedbranchfunc = async (url: string) => {
+    const newurl = url.replace("{/branch}", "");
+    const fetchbranch = await fetch(newurl, {
+      headers: {
+        Authorization: `token ${user.githubtoken}`,
+      },
+    });
+    const data = await fetchbranch.json();
+    setDetectedBranch(data);
+    setBranch(data[0].name);
+  };
   //onrepo changes
   const onRepoChanges = (value: any) => {
-    if(value==null){
+    if (value == null) {
       return;
     }
-  detectedbranchfunc(value.branches_url);
-    var url:string;
-    if(projectDetails.rootDirectory=="/"){
+    detectedbranchfunc(value.branches_url);
+    var url: string;
+    if (projectDetails.rootDirectory == "/") {
       url = `https://api.github.com/repos/${value.owner.login}/${value.name}/contents/package.json`;
-    }
-    else{
-      if(projectDetails.rootDirectory.startsWith("/")){
+    } else {
+      if (projectDetails.rootDirectory.startsWith("/")) {
         url = `https://api.github.com/repos/${value.owner.login}/${value.name}/contents${projectDetails.rootDirectory}/package.json`;
-      }
-      else{
+      } else {
         url = `https://api.github.com/repos/${value.owner.login}/${value.name}/contents/${projectDetails.rootDirectory}/package.json`;
       }
     }
-    
+
     // Helper function to check if a specific package is present in dependencies or devDependencies
     function hasDependency(
       depName: any,
@@ -303,7 +299,7 @@ const detectedbranchfunc = async (url:string) => {
         try {
           setRepoLoading(true);
           const url = `https://api.github.com/repos/${value.owner.login}/${value.name}/languages`;
-          
+
           const response = await fetch(url, {
             headers: {
               Authorization: `token ${user.githubtoken}`,
@@ -315,15 +311,13 @@ const detectedbranchfunc = async (url:string) => {
             setProjectDetails({ ...projectDetails, tech: "PHP" });
           } else if (datai.hasOwnProperty("Python")) {
             try {
-              var url1:string;
-              if(projectDetails.rootDirectory=="/"){
+              var url1: string;
+              if (projectDetails.rootDirectory == "/") {
                 url1 = `https://api.github.com/repos/${value.owner.login}/${value.name}/contents/requirements.txt`;
-              }
-              else{
-                if(projectDetails.rootDirectory.startsWith("/")){
+              } else {
+                if (projectDetails.rootDirectory.startsWith("/")) {
                   url1 = `https://api.github.com/repos/${value.owner.login}/${value.name}/contents${projectDetails.rootDirectory}/requirements.txt`;
-                }
-                else{
+                } else {
                   url1 = `https://api.github.com/repos/${value.owner.login}/${value.name}/contents/${projectDetails.rootDirectory}/requirements.txt`;
                 }
               }
@@ -354,52 +348,54 @@ const detectedbranchfunc = async (url:string) => {
             } catch (err) {
               setProjectDetails({ ...projectDetails, tech: "Flask" });
             }
-          } 
-          else if(datai.hasOwnProperty("Java")){
+          } else if (datai.hasOwnProperty("Java")) {
             //try
-            try{
-            //api call
-            var url2:string;
-            if(projectDetails.rootDirectory=="/"){
-              url2 = `https://api.github.com/repos/${value.owner.login}/${value.name}/contents/pom.xml`;
-            }
-            else{
-              if(projectDetails.rootDirectory.startsWith("/")){
-                url2 = `https://api.github.com/repos/${value.owner.login}/${value.name}/contents${projectDetails.rootDirectory}/pom.xml`;
+            try {
+              //api call
+              var url2: string;
+              if (projectDetails.rootDirectory == "/") {
+                url2 = `https://api.github.com/repos/${value.owner.login}/${value.name}/contents/pom.xml`;
+              } else {
+                if (projectDetails.rootDirectory.startsWith("/")) {
+                  url2 = `https://api.github.com/repos/${value.owner.login}/${value.name}/contents${projectDetails.rootDirectory}/pom.xml`;
+                } else {
+                  url2 = `https://api.github.com/repos/${value.owner.login}/${value.name}/contents/${projectDetails.rootDirectory}/pom.xml`;
+                }
               }
-              else{
-                url2 = `https://api.github.com/repos/${value.owner.login}/${value.name}/contents/${projectDetails.rootDirectory}/pom.xml`;
+              setRepoLoading(true);
+              const response = await fetch(url2, {
+                headers: {
+                  Authorization: `token ${user.githubtoken}`,
+                },
+              });
+              const data = await response.json();
+              console.log(data);
+
+              const content = Buffer.from(data.content, "base64").toString(
+                "utf-8"
+              );
+
+              if (
+                content.includes("spring") ||
+                content.includes("spring-boot")
+              ) {
+                setProjectDetails({ ...projectDetails, tech: "Springboot" });
+              } else if (
+                content.includes("serverlet") ||
+                content.includes("jakarta.servlet")
+              ) {
+                setProjectDetails({
+                  ...projectDetails,
+                  tech: "Java Serverlet",
+                });
+              } else {
+                setProjectDetails({ ...projectDetails, tech: "Other" });
               }
+            } catch (err) {
+              setProjectDetails({ ...projectDetails, tech: "Other" });
             }
-            setRepoLoading(true);
-            const response = await fetch(url2, {
-              headers: {
-                Authorization: `token ${user.githubtoken}`,
-              },
-            });
-            const data = await response.json();
-            console.log(data);
-
-            const content = Buffer.from(data.content, "base64").toString(
-              "utf-8"
-            );
-
-            if(content.includes("spring")||content.includes("spring-boot")){
-             setProjectDetails({...projectDetails,tech:"Springboot"})
-            }
-            else if (content.includes("serverlet")||content.includes("jakarta.servlet")){
-            setProjectDetails({...projectDetails,tech:"Java Serverlet"})
-            }
-            else{
-              setProjectDetails({...projectDetails,tech:"Other"})
-            }
-          }
-          catch(err){
-            setProjectDetails({...projectDetails,tech:"Other"})
-          }
-          //end 
-          }
-          else if (datai.hasOwnProperty("HTML")) {
+            //end
+          } else if (datai.hasOwnProperty("HTML")) {
             setProjectDetails({ ...projectDetails, tech: "HTML,CSS,JS" });
           } else if (datai.hasOwnProperty("JAVASCRIPT")) {
             setProjectDetails({ ...projectDetails, tech: "Node.js" });
@@ -420,64 +416,74 @@ const detectedbranchfunc = async (url:string) => {
   useEffect(() => {
     onRepoChanges(repovalue);
   }, [projectDetails.rootDirectory]);
-//fetching all pricing plans
-const fetchPricingPlans = async () => {
-  const res = await fetch(`/api/project/getplans`);
-  const data = await res.json();
-  console.log(data);
-  if(data.success){
-    setPricingPlans(data.data);
-  }
-  else{
-    toast.error(data.message);
-  }
-}
-//useeffect for fetching all pricing plans
-useEffect(()=>{
-  fetchPricingPlans();
-},[])
-//handle submit data
- //handle submit started from here
- const handleSubmit = async(e: any) => {
-  e.preventDefault();
-  setLoading(true)
-  try{
-    const data = {name:projectDetails.name,type:type,repourl:repoDetails.cloneurl,repobranch:branch,techused:projectDetails.tech,buildcommand:projectDetails.buildCommand,rootfolder:projectDetails.rootDirectory,outputfolder:projectDetails.outputDirectory,startcommand:projectDetails.start,installcommand:projectDetails.install,env:projectDetails.envVariables,planid:selectedPlan.id};
-const createproject = await fetch("/api/project/crud",{
-  headers:{
-    "Content-Type":"application/json",
-  },
-  method:"POST",
-  body: JSON.stringify({...data})
-})
-const res = await createproject.json();
-setLoading(false);
-if(res.success){
-  toast.success(res.message);
-}
-else{
-  if(res.projectname=="exists"){
-    setStage(1);
-    setProjecterror(true);
-    setErrormsg(res.message);
-    toast.error(res.message);
-    return;
-  }
-  toast.error(res.message);
-}
-  }
-  catch(err:any){
-    console.log(err);
-    toast.error(err.message)
-  }
-};
+  //fetching all pricing plans
+  const fetchPricingPlans = async () => {
+    const res = await fetch(`/api/project/getplans`);
+    const data = await res.json();
+    console.log(data);
+    if (data.success) {
+      setPricingPlans(data.data);
+    } else {
+      toast.error(data.message);
+    }
+  };
+  //useeffect for fetching all pricing plans
+  useEffect(() => {
+    fetchPricingPlans();
+  }, []);
+  //handle submit data
+  //handle submit started from here
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const data = {
+        name: projectDetails.name,
+        type: type,
+        repourl: repoDetails.cloneurl,
+        repobranch: branch,
+        techused: projectDetails.tech,
+        buildcommand: projectDetails.buildCommand,
+        rootfolder: projectDetails.rootDirectory,
+        outputfolder: projectDetails.outputDirectory,
+        startcommand: projectDetails.start,
+        installcommand: projectDetails.install,
+        env: projectDetails.envVariables,
+        planid: selectedPlan.id,
+      };
+      const createproject = await fetch("/api/project/crud", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({ ...data }),
+      });
+      const res = await createproject.json();
+      setLoading(false);
+      if (res.success) {
+        toast.success(res.message);
+      } else {
+        if (res.projectname == "exists") {
+          setStage(1);
+          setProjecterror(true);
+          setErrormsg(res.message);
+          toast.error(res.message);
+          return;
+        }
+        toast.error(res.message);
+      }
+    } catch (err: any) {
+      console.log(err);
+      toast.error(err.message);
+    }
+  };
   return (
     <div className="min-h-screen  py-12 px-4 sm:px-6 lg:px-8">
-    <Toaster position="top-right" />
+      <Toaster position="top-right" />
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl dark:text-white">
-            Create Your <span className="text-blue-600"> App</span>
+            Create Your <span className="text-pink-600"> App</span>
           </h1>
           <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl dark:text-gray-300">
             Deploy your code with ease. Start building the future of the
@@ -532,11 +538,10 @@ else{
                       className="mt-1"
                     />
                     {isprojecterror && (
-  <span className="text-red-600  text-xs md:text-base p-2 rounded font-light underline">
-    {errormsg}
-  </span>
-)}
-
+                      <span className="text-red-600  text-xs md:text-base p-2 rounded font-light underline">
+                        {errormsg}
+                      </span>
+                    )}
                   </div>
 
                   <div>
@@ -546,7 +551,11 @@ else{
                       onValueChange={(value: any) => {
                         onRepoChanges(value);
                         setrepoValue(value);
-                       setRepoDetails({reponame:value.full_name,cloneurl:value.clone_url,branchesurl:value.branches_url})
+                        setRepoDetails({
+                          reponame: value.full_name,
+                          cloneurl: value.clone_url,
+                          branchesurl: value.branches_url,
+                        });
                       }}
                     >
                       <SelectTrigger className="mt-1">
@@ -868,87 +877,113 @@ else{
                       className="mt-1"
                     />
                   </div>
-                  <Button onClick={() => {
-                    console.log(projectDetails);
-                    console.log(repoDetails);
-                    if(repoDetails.reponame==""||projectDetails.name==""||projectDetails.tech==""){
-                      toast.error("Please fill all the fields");
-                    }
-                    else{
-                      setStage(2);
-                    }
-                  }} className="w-full">
+                  <Button
+                    onClick={() => {
+                      console.log(projectDetails);
+                      console.log(repoDetails);
+                      if (
+                        repoDetails.reponame == "" ||
+                        projectDetails.name == "" ||
+                        projectDetails.tech == ""
+                      ) {
+                        toast.error("Please fill all the fields");
+                      } else {
+                        setStage(2);
+                      }
+                    }}
+                    className="w-full"
+                  >
                     Next: Select Plan <ChevronRight className="ml-2 h-4 w-4" />
                   </Button>
                 </div>
               </TabsContent>
               <TabsContent value="stage-2">
                 <div className="space-y-6 mt-6">
-                  <RadioGroup
-                    value={selectedPlan.name}
-                  >
+                  <RadioGroup value={selectedPlan.name}>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                      {displayPricing&&displayPricing.map((item:any,index)=>(<div
-                        className={`relative flex flex-col p-6 bg-white border border-gray-200 dark:bg-black dark:border-gray-700  rounded-lg shadow-sm ${selectedPlan.name === item.name ? "border-blue-500 ring-2 ring-blue-500" : ""}`}
-                        key={index}
-                        onClick={() => setSelectedPlan({name:item.name,id:item._id,pricephour:item.pricephour,pricepmonth:item.pricepmonth,features:item.features})}
-                      >
-                        <RadioGroupItem
-                          value={item.name}
-                          id={item.name}
-                          className="sr-only"
-                        />
-                        <Label
-                          htmlFor={item.name}
-                          className="font-semibold flex items-center"
-                        >
-                          
-                          {item.name}
-                        </Label>
-                        <p className="mt-1 text-sm text-gray-500">
-                          {item.name=="Starter Plan"&&"Perfect for side projects"}
-                          {item.name=="Pro Plan"&&"Ideal for startups & growing businesses"}
-                          {item.name=="Enterprise Plan"&&"For large-scale applications"}
-                        </p>
-                        <div className="mt-4 text-sm font-semibold flex justify-between w-full"><div className="flex ">
-                        <Cpu className="h-5 w-5 text-indigo-600 mx-2"/>{item.cpu}
+                      {displayPricing &&
+                        displayPricing.map((item: any, index) => (
+                          <div
+                            className={`relative flex flex-col p-6 bg-white border border-gray-200 dark:bg-black dark:border-gray-700  rounded-lg shadow-sm ${selectedPlan.name === item.name ? "border-blue-500 ring-2 ring-blue-500" : ""}`}
+                            key={index}
+                            onClick={() =>
+                              setSelectedPlan({
+                                name: item.name,
+                                id: item._id,
+                                pricephour: item.pricephour,
+                                pricepmonth: item.pricepmonth,
+                                features: item.features,
+                              })
+                            }
+                          >
+                            <RadioGroupItem
+                              value={item.name}
+                              id={item.name}
+                              className="sr-only"
+                            />
+                            <Label
+                              htmlFor={item.name}
+                              className="font-semibold flex items-center"
+                            >
+                              {item.name}
+                            </Label>
+                            <p className="mt-1 text-sm text-gray-500">
+                              {item.name == "Starter Plan" &&
+                                "Perfect for side projects"}
+                              {item.name == "Pro Plan" &&
+                                "Ideal for startups & growing businesses"}
+                              {item.name == "Enterprise Plan" &&
+                                "For large-scale applications"}
+                            </p>
+                            <div className="mt-4 text-sm font-semibold flex justify-between w-full">
+                              <div className="flex ">
+                                <Cpu className="h-5 w-5 text-indigo-600 mx-2" />
+                                {item.cpu}
+                              </div>
+                              <div className="flex">
+                                <MemoryStick className="h-5 w-5 text-green-600 mx-2" />
+                                {item.ram}
+                              </div>
+                            </div>
+                            <div className="mt-4 text-sm font-semibold flex justify-between w-full">
+                              <div className="flex ">
+                                <HardDrive className="h-5 w-5 text-blue-600 mx-2" />
+                                {item.storage}
+                              </div>
+                              <div className="flex">
+                                <Gauge className="h-5 w-5 text-yellow-600 mx-2" />
+                                {item.bandwidth}
+                              </div>
+                            </div>
+                            <Separator className="my-2" />
+                            <p className="mt-4 text-sm font-semibold">
+                              ₹ {item.pricephour}/ hour
+                            </p>
+                            <ul className="mt-4 space-y-2 text-sm text-gray-500">
+                              {item.features.map((item: any, index: number) => (
+                                <li className="flex items-center" key={index}>
+                                  <Check className="h-4 w-4 mr-2 text-green-500" />{" "}
+                                  1{item}
+                                </li>
+                              ))}
+                            </ul>
                           </div>
-                          <div className="flex">
-                        <MemoryStick className="h-5 w-5 text-green-600 mx-2"/>{item.ram}
-                          </div>
-                          </div>
-                          <div className="mt-4 text-sm font-semibold flex justify-between w-full"><div className="flex ">
-                        <HardDrive className="h-5 w-5 text-blue-600 mx-2"/>{item.storage}
-                          </div>
-                          <div className="flex">
-                        <Gauge className="h-5 w-5 text-yellow-600 mx-2"/>{item.bandwidth}
-                          </div>
-                          </div>
-                          <Separator className="my-2" />
-                        <p className="mt-4 text-sm font-semibold">₹ {item.pricephour}/ hour</p>
-                        <ul className="mt-4 space-y-2 text-sm text-gray-500">
-                          {item.features.map((item:any,index:number)=>(<li className="flex items-center" key={index}>
-                            <Check className="h-4 w-4 mr-2 text-green-500" /> 1
-                            {item}
-                          </li>))}
-                          
-                        </ul>
-                      </div>))}
-                     
+                        ))}
                     </div>
                   </RadioGroup>
                   <div className="flex justify-between">
                     <Button variant="outline" onClick={() => setStage(1)}>
                       Back
                     </Button>
-                    <Button onClick={() => {
-                      if(selectedPlan.name==""){
-                        toast.error("Please select a plan");
-                      }
-                      else{
-                        setStage(3);
-                      }
-                    }}>
+                    <Button
+                      onClick={() => {
+                        if (selectedPlan.name == "") {
+                          toast.error("Please select a plan");
+                        } else {
+                          setStage(3);
+                        }
+                      }}
+                    >
                       Next: Review <ChevronRight className="ml-2 h-4 w-4" />
                     </Button>
                   </div>
@@ -1018,7 +1053,7 @@ else{
                         </Card>
                       </div>
                       {/* // */}
-                      
+
                       <div className="col-span-2">
                         <Card>
                           <CardHeader className="pb-4">
@@ -1048,22 +1083,27 @@ else{
                               <GitBranch className="h-5 w-5 text-gray-400 mr-2" />
                               <p className="text-sm font-semibold text-gray-900 dark:text-gray-300 flex justify-between w-full items-center">
                                 {branch || "Not specified"}
-                                {detectedbranch&&detectedbranch.length>1&&<Button  className="ml-2" onClick={()=>{
-                                  let maxcount = detectedbranch.length;
-                                  
-                                  if(count<maxcount){                                  
-                                    //@ts-ignore
-                                    setBranch(detectedbranch[count].name);
-                                    setCount((prev)=>prev+1);
-                                    
-                                  }
-                                  else{
-                                    setCount(0);
-                                    //@ts-ignore
-                                    setBranch(detectedbranch[0].name);
-                                  }
-                                 
-                                }}>Change</Button>}
+                                {detectedbranch &&
+                                  detectedbranch.length > 1 && (
+                                    <Button
+                                      className="ml-2"
+                                      onClick={() => {
+                                        let maxcount = detectedbranch.length;
+
+                                        if (count < maxcount) {
+                                          //@ts-ignore
+                                          setBranch(detectedbranch[count].name);
+                                          setCount((prev) => prev + 1);
+                                        } else {
+                                          setCount(0);
+                                          //@ts-ignore
+                                          setBranch(detectedbranch[0].name);
+                                        }
+                                      }}
+                                    >
+                                      Change
+                                    </Button>
+                                  )}
                               </p>
                             </div>
                           </CardContent>
@@ -1086,7 +1126,6 @@ else{
                           </CardContent>
                         </Card>
                       </div>
-                     
                     </div>
 
                     <Separator className="my-6" />
@@ -1098,15 +1137,16 @@ else{
                           selectedPlan.name.slice(1)}
                       </h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {selectedPlan.features.map((item:any,index:number)=>(<div className="flex items-center" key={index}>
-                          <Check className="h-5 w-5 text-green-500 mr-2" />
-                          <span className="text-sm text-gray-600 dark:text-gray-300">
-                            {item}
-                          </span>
-                        </div>))}
-                        
-                        
-                        
+                        {selectedPlan.features.map(
+                          (item: any, index: number) => (
+                            <div className="flex items-center" key={index}>
+                              <Check className="h-5 w-5 text-green-500 mr-2" />
+                              <span className="text-sm text-gray-600 dark:text-gray-300">
+                                {item}
+                              </span>
+                            </div>
+                          )
+                        )}
                       </div>
                     </div>
 
@@ -1140,7 +1180,9 @@ else{
                       <DollarSign className="h-6 w-6 text-gray-400 mr-2 dark:text-gray-300" />
                       <p className="text-sm text-gray-600 dark:text-gray-300">
                         Estimated monthly cost:{" "}
-                        <span className="font-semibold">₹{selectedPlan.pricepmonth}</span>
+                        <span className="font-semibold">
+                          ₹{selectedPlan.pricepmonth}
+                        </span>
                       </p>
                     </div>
                   </div>
@@ -1154,10 +1196,16 @@ else{
                       onClick={handleSubmit}
                       className="bg-green-600 hover:bg-green-700"
                     >
-                     {loading?<>Creating <LoginLoader/></>: <>
-                      Create Project
-                      <Rocket className="ml-2 h-4 w-4" />
-                      </>}
+                      {loading ? (
+                        <>
+                          Creating <LoginLoader />
+                        </>
+                      ) : (
+                        <>
+                          Create Project
+                          <Rocket className="ml-2 h-4 w-4" />
+                        </>
+                      )}
                     </Button>
                   </div>
                 </div>

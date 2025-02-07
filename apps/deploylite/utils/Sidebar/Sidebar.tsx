@@ -281,14 +281,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* Desktop Sidebar */}
       <aside
         className={cn(
-          "hidden md:flex flex-col border-gray-900 transition-width duration-200",
+          "hidden md:flex flex-col border-r  transition-width duration-200",
           isSidebarCollapsed ? "w-24" : "w-64",
           theme === "light"
             ? "bg-white border-gray-200"
             : "bg-black border-pink-600"
         )}
       >
-        <div className="p-4 flex items-center justify-between">
+        <div className="p-4 flex items-center  justify-between">
           <div className="flex items-center">
             <LottieAnimation width={40} height={40} />
             {!isSidebarCollapsed && (
