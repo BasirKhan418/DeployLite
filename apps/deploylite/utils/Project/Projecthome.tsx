@@ -46,9 +46,8 @@ import NoProject from "./NoProject";
 const Projecthome = ({ name }: { name: string }) => {
   // Getting user from Redux
   const user = useAppSelector((state) => state.user.user);
-  console.log(user);
 
-  // Sample data
+  // Sample data (try emptying this array to see the "No Projects Found" banner)
   const [projects] = useState([
     {
       id: 1,
@@ -72,68 +71,27 @@ const Projecthome = ({ name }: { name: string }) => {
       memory: 60,
       logo: "/placeholder.svg?height=40&width=40",
     },
-    {
-      id: 3,
-      name: "Portfolio",
-      url: "myportfolio.com",
-      lastDeployment: "5 days ago",
-      branch: "main",
-      status: "Live",
-      cpu: 5,
-      memory: 20,
-      logo: "/placeholder.svg?height=40&width=40",
-    },
-    {
-      id: 4,
-      name: "Mobile App Landing",
-      url: "myapp.com",
-      lastDeployment: "1 week ago",
-      branch: "develop",
-      status: "Live",
-      cpu: 10,
-      memory: 25,
-      logo: "/placeholder.svg?height=40&width=40",
-    },
-    {
-      id: 5,
-      name: "API Documentation",
-      url: "api.myservice.com",
-      lastDeployment: "3 days ago",
-      branch: "main",
-      status: "Failed",
-      cpu: 0,
-      memory: 0,
-      logo: "/placeholder.svg?height=40&width=40",
-    },
-    {
-      id: 6,
-      name: "Internal Dashboard",
-      url: "dashboard.internal.com",
-      lastDeployment: "12 hours ago",
-      branch: "staging",
-      status: "Live",
-      cpu: 25,
-      memory: 40,
-      logo: "/placeholder.svg?height=40&width=40",
-    },
   ]);
 
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  // For demonstration, set this to false to see <NoProject />
   const haveproject = true;
 
-  const handleCreateProject = () => {
+  // Same loader logic for "Create Project" button
+  const handleCreateProject = async () => {
     setLoading(true);
 
-    toast.custom((id) => (
+    toast.custom(() => (
       <div className="flex items-center space-x-2">
         <Loader2 className="h-4 w-4 animate-spin text-pink-600" />
         <span className="text-pink-600">Creating your project...</span>
       </div>
     ));
 
-    router.push(`/project/createproject/${name}`);
+    await router.push(`/project/createproject/${name}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -148,6 +106,7 @@ const Projecthome = ({ name }: { name: string }) => {
             <div>
               <main className="flex-1 py-6 px-4 md:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
+                  {/* Header */}
                   <div className="flex flex-col sm:flex-row justify-between items-center mb-8 space-y-4 sm:space-y-0">
                     <div className="flex items-center">
                       <CloudUpload className="h-8 w-8 text-pink-600" />
@@ -161,11 +120,22 @@ const Projecthome = ({ name }: { name: string }) => {
                         onClick={handleCreateProject}
                         disabled={loading}
                       >
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        {loading ? "Loading..." : "Create Project"}
+                        {loading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Loading...
+                          </>
+                        ) : (
+                          <>
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            Create Project
+                          </>
+                        )}
                       </Button>
                     </div>
                   </div>
+
+                  {/* Projects Grid */}
                   <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {projects.map((project) => (
                       <Card
@@ -269,7 +239,6 @@ const Projecthome = ({ name }: { name: string }) => {
                               <div className="flex items-center space-x-2">
                                 <HardDrive className="h-4 w-4 text-green-500" />
                                 <span className="text-sm">
-                                  {" "}
                                   Memory: {project.memory}%
                                 </span>
                               </div>
@@ -282,6 +251,33 @@ const Projecthome = ({ name }: { name: string }) => {
                       </Card>
                     ))}
                   </div>
+
+                  
+                  {projects.length === 2 && (
+                    <div className="mt-8 border border-pink-600 rounded-lg p-8 text-center">
+                      <h2 className="text-xl font-bold text-pink-600 mb-2">
+                        No Projects Found
+                      </h2>
+                      <p className="text-sm text-muted-foreground">
+                        You haven&apos;t created any projects yet.
+                      </p>
+                      <Button
+                        variant="outline"
+                        onClick={handleCreateProject}
+                        disabled={loading}
+                        className="mt-4 border-pink-600 text-pink-600 hover:bg-pink-500"
+                      >
+                        {loading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Loading...
+                          </>
+                        ) : (
+                          "Create Project"
+                        )}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </main>
             </div>
