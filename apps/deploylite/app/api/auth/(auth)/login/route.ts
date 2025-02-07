@@ -50,7 +50,7 @@ if(data.score<=70){
     
      try{
       //sendemail
-      await SendOtp(finduser.email,token,finduser.name,otpcode);
+      SendOtp(finduser.email,token,finduser.name,otpcode);
       return NextResponse.json({status: 'success',message: 'Otp has been sent to your email. Suscpicious activity detected two step enabled',success: true,token: token,otp:true})
      }
      catch(err){
@@ -74,7 +74,7 @@ if(finduser.twofactor){
     
      try{
       //sendemail
-      await SendOtp(finduser.email,token,finduser.name,otpcode);
+      SendOtp(finduser.email,token,finduser.name,otpcode);
       return NextResponse.json({status: 'success',message: 'Otp has been sent to your email',success: true,token: token,otp:true})
      }
      catch(err){

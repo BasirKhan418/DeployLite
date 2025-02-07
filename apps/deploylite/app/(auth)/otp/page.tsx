@@ -7,6 +7,8 @@ import { Toaster,toast } from "sonner";
 import { useRouter } from "next/navigation";
 import LoginLoader from "@/utils/Loaders/LoginLoader";
 import { Suspense } from "react";
+import { useAppSelector } from "@/lib/hook";
+const user = useAppSelector((state) => state.user.user)
 import {
   IconBrandGithub,
   IconBrandGoogle,
@@ -58,6 +60,31 @@ const searchurl = useSearchParams()
     }
 
   };
+
+  const handleResend = async() => {
+  try{
+    setLoading(true);
+   let data = {email:user.email,status:"resend",name:user.name,phone:user.phone}
+   let res = await fetch('/api/auth/resend',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+   })
+    let result = await res.json()
+    setLoading(false);
+    if(result.success){
+      toast.success(result.message)
+    }
+    else{
+      toast.error(result.message)
+    }
+  }
+  catch(err){
+    toast.error('Error occured while resending otp');
+  }
+  }
   return (
     <div className="flex justify-center items-center h-[100vh]">
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
