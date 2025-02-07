@@ -198,6 +198,7 @@ const Projecthome = ({ name }: { name: string }) => {
                       <Card
                         key={project.id}
                         className="overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                        onClick={() => window.open(`/project/overview?id=${project._id}`)}
                       >
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                           <div className="flex items-center space-x-2">

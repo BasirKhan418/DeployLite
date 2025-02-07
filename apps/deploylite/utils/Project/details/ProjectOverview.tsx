@@ -23,7 +23,7 @@ import {
 
 export default function ProjectOverview({projectdata,deploymentdata}:any) {
   const projectName = projectdata.name&&projectdata.name.toUpperCase()
-  const projectUrl = projectdata.projecturl?"":`http://${projectdata.name}.localhost:8000`
+  const projectUrl = projectdata.projecturl?"":`https://${projectdata.name}.cloud.deploylite.tech`
   const isHealthy = true
   const cpuUtilization = projectdata.cpuusage
   const memoryUtilization = projectdata.memoryusage

@@ -18,7 +18,7 @@ const page = () => {
   const fetchdata =async(id:any)=>{
    try{
     setLoading(true)
- let data = await fetch(`/api/project/crud?id=${id}`)
+ let data = await fetch(`/api/project/details?id=${id}`)
  const result = await data.json();
  setLoading(false);
  if(result.success){
