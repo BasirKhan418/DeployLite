@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -47,6 +47,31 @@ const Projecthome = ({ name }: { name: string }) => {
   // Getting user from Redux
   const user = useAppSelector((state) => state.user.user);
   console.log(user);
+
+  const getDetails = async()=>{
+    console.log('fetching data')
+    try{
+     setLoading(true)
+     let result = await fetch('/api/project/crud');
+     const data = await result.json();
+      setLoading(false)
+      console.log("result is ",data)
+     if(data.success){
+       console.log("data is ",data)
+     }
+     else{
+      toast.error(data.message)
+     }
+    }
+    catch(err){
+      console.log(err)
+      toast.error('Error while fetching data');
+     
+    }
+  }
+  useEffect(()=>{
+    getDetails()
+  },[]) 
 
   // Sample data
   const [projects] = useState([
