@@ -96,6 +96,14 @@ const searchurl = useSearchParams()
       
         </div>
       </form>
+      <div className="m-2">
+        <p className="text-sm text-neutral-700 dark:text-neutral-300 ">Didn't get the otp? <a href="#" className="underline text-green-500 mx-1">Resend OTP</a>
+      </p>
+      </div>
+      <div className="m-2">
+        <p className="text-sm text-neutral-700 dark:text-neutral-300 ">Didn't get the otp? <a href="#" className="underline text-green-500 mx-1">Send using Whatsapp</a>
+      </p>
+      </div>
     </div>
     </div>
   );
