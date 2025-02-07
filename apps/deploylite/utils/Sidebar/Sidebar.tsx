@@ -281,7 +281,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* Desktop Sidebar */}
       <aside
         className={cn(
-          "hidden md:flex flex-col border-pink-600 transition-width duration-200",
+          "hidden md:flex flex-col border-gray-900 transition-width duration-200",
           isSidebarCollapsed ? "w-24" : "w-64",
           theme === "light"
             ? "bg-white border-gray-200"

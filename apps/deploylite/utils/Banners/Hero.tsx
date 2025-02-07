@@ -1,9 +1,8 @@
-"use client"
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { ArrowRight, Cloud, Zap, Shield, CheckCircle } from 'lucide-react'
+"use client";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { ArrowRight, Cloud, Zap, Shield, CheckCircle } from "lucide-react";
 export default function Hero() {
-
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-900 text-white min-h-screen flex items-center">
       <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
@@ -16,10 +15,14 @@ export default function Hero() {
             transition={{ duration: 0.5 }}
           >
             <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl mb-6">
-              Deploy with ease using <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">DeployLite</span>
+              Deploy with ease using{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
+                DeployLite
+              </span>
             </h1>
             <p className="mt-6 text-xl leading-8 text-gray-300">
-              Streamline your deployment process and focus on what matters most - your code. DeployLite handles the rest.
+              Streamline your deployment process and focus on what matters most
+              - your code. DeployLite handles the rest.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4">
               <a
@@ -36,14 +39,16 @@ export default function Hero() {
                 Learn more
               </a>
             </div>
-            <motion.div 
+            <motion.div
               className="mt-8 p-4 bg-gradient-to-r from-green-400 to-blue-500 rounded-lg shadow-lg"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.5 }}
             >
               <p className="font-bold text-lg">🎉 Special Offer!</p>
-              <p className="text-white">We've credited 500 Rs to your account for testing our platform.</p>
+              <p className="text-white">
+                We've credited 500 Rs to your account for testing our platform.
+              </p>
             </motion.div>
           </motion.div>
           <motion.div
@@ -63,13 +68,13 @@ export default function Hero() {
               </div>
               <ul className="space-y-6">
                 {[
-                  'One-click deployments',
-                  'Automatic scaling',
-                  'Built-in CI/CD',
-                  '24/7 monitoring',
+                  "One-click deployments",
+                  "Automatic scaling",
+                  "Built-in CI/CD",
+                  "24/7 monitoring",
                 ].map((feature, index) => (
-                  <motion.li 
-                    key={index} 
+                  <motion.li
+                    key={index}
                     className="flex items-center space-x-3"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -83,8 +88,8 @@ export default function Hero() {
             </div>
           </motion.div>
         </div>
-        
-        <motion.div 
+
+        <motion.div
           className="mt-20"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -95,24 +100,40 @@ export default function Hero() {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-center justify-items-center">
             {[
-              { name: 'Acme Inc', logo: '/placeholder.svg?height=40&width=120' },
-              { name: 'Globex', logo: '/placeholder.svg?height=40&width=120' },
-              { name: 'Hooli', logo: '/placeholder.svg?height=40&width=120' },
-              { name: 'Pied Piper', logo: '/placeholder.svg?height=40&width=120' },
-              { name: 'Umbrella', logo: '/placeholder.svg?height=40&width=120' },
+              {
+                name: "Acme Inc",
+                logo: "/placeholder.svg?height=40&width=120",
+              },
+              { name: "Globex", logo: "/placeholder.svg?height=40&width=120" },
+              { name: "Hooli", logo: "/placeholder.svg?height=40&width=120" },
+              {
+                name: "Pied Piper",
+                logo: "/placeholder.svg?height=40&width=120",
+              },
+              {
+                name: "Umbrella",
+                logo: "/placeholder.svg?height=40&width=120",
+              },
             ].map((company, index) => (
-              <motion.div 
-                key={index} 
+              <motion.div
+                key={index}
                 className="bg-white/10 backdrop-blur-sm rounded-lg p-4 w-full max-w-[150px] h-20 flex items-center justify-center"
-                whileHover={{ scale: 1.05, boxShadow: '0 0 15px rgba(255,255,255,0.2)' }}
+                whileHover={{
+                  scale: 1.05,
+                  boxShadow: "0 0 15px rgba(255,255,255,0.2)",
+                }}
               >
-                <img src={company.logo} alt={company.name} className="max-h-full max-w-full object-contain" />
+                <img
+                  src={company.logo}
+                  alt={company.name}
+                  className="max-h-full max-w-full object-contain"
+                />
               </motion.div>
             ))}
           </div>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           className="mt-20"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -123,7 +144,9 @@ export default function Hero() {
               <figure>
                 <blockquote className="mt-6 text-xl font-semibold text-white sm:text-2xl sm:leading-8">
                   <p>
-                    "DeployLite has revolutionized our deployment process. It's fast, reliable, and incredibly easy to use. Our team's productivity has skyrocketed since we started using it."
+                    "DeployLite has revolutionized our deployment process. It's
+                    fast, reliable, and incredibly easy to use. Our team's
+                    productivity has skyrocketed since we started using it."
                   </p>
                 </blockquote>
                 <figcaption className="mt-6 text-base text-gray-300">
@@ -136,5 +159,5 @@ export default function Hero() {
         </motion.div>
       </div>
     </section>
-  )
+  );
 }
