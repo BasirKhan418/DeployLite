@@ -3,11 +3,12 @@ import { Search, Download, RefreshCw } from "lucide-react"
 import { useEffect, useState } from "react"
 import { BarChart, Settings, MoreVertical, CheckCircle, XCircle, Zap, Cloud, Server, Clock, DollarSign, Bell, Rocket, GitBranch, Terminal, Shield, Database, Loader2,Globe} from "lucide-react";
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Input } from "@/components/ui/input";
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { CheckCircle2, RefreshCcw, Link } from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { io, Socket } from 'socket.io-client';
 export default function RuntimeLogs({projectdata}) {
   const [searchQuery, setSearchQuery] = useState("")
@@ -16,6 +17,7 @@ export default function RuntimeLogs({projectdata}) {
   const [loading,setLoading]=useState(false)
   const [logLevel, setLogLevel] = useState("all")
   const [messages, setMessages] = useState<string[]>([]);
+  
       const [isConnected, setIsConnected] = useState(false);
   //fetch data
   const fetchdata =async(id:any)=>{
@@ -58,13 +60,13 @@ export default function RuntimeLogs({projectdata}) {
           socket.on('message', (msg) => {
               console.log('📥 New message received:', msg);
               if(msg.includes(`{"log":"Success"}`)){
-                fetchdata(projectdata.id);
+                fetchdata(projectdata._id);
               }
               if(msg.includes(`{"log":"Failed"}`)){
-                fetchdata(projectdata.id);
+                fetchdata(projectdata._id);
               }
               if(msg.includes(`{"log":"Error"}`)){
-                fetchdata(projectdata.id);
+                fetchdata(projectdata._id);
               }
               setMessages((prev) => [...prev, msg]);
           });
@@ -89,7 +91,7 @@ export default function RuntimeLogs({projectdata}) {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-4 sm:p-6 lg:p-8">
       {/* // */}
-       {projectdata.projectstatus=="creating"&&<div className="mt-6 mb-4">
+       {projectdata2.projectstatus=="creating"&&<div className="mt-6 mb-4">
                       <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900 dark:to-indigo-800 border-indigo-200 dark:border-indigo-700">
                         <CardHeader>
                           <CardTitle className="flex items-center text-indigo-900 dark:text-indigo-100">
@@ -116,6 +118,8 @@ export default function RuntimeLogs({projectdata}) {
                         </CardContent>
                       </Card>
                     </div>}
+                    {projectdata2.projectstatus=="live"&&<SuccessCard />}
+                    {projectdata2.projectstatus=="failed"&&<FailureCard />}
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h1 className="text-2xl sm:text-3xl font-bold">Runtime Logs</h1>
@@ -188,3 +192,102 @@ export default function RuntimeLogs({projectdata}) {
     </div>
   )
 }
+
+
+const SuccessCard = () => (
+  <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900 dark:to-emerald-800 border-emerald-200 dark:border-emerald-700 relative overflow-hidden">
+    <div className="absolute inset-0 opacity-10">
+      <div className="absolute top-10 right-10">
+        <CheckCircle2 className="w-32 h-32 text-emerald-500" />
+      </div>
+      <div className="absolute bottom-10 left-10">
+        <Link className="w-24 h-24 text-emerald-500" />
+      </div>
+    </div>
+    <CardHeader>
+      <CardTitle className="flex items-center text-emerald-900 dark:text-emerald-100">
+        <Rocket className="w-5 h-5 mr-2 text-emerald-600 dark:text-emerald-400" />
+        Deployment Status
+      </CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="flex items-center space-x-4">
+        <div className="flex-shrink-0">
+          <div className="rounded-full h-10 w-10 bg-emerald-500 dark:bg-emerald-400 flex items-center justify-center">
+            <CheckCircle2 className="h-6 w-6 text-white" />
+          </div>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold text-emerald-900 dark:text-emerald-100">
+            Deployment Successful
+          </h3>
+          <p className="text-sm text-emerald-700 dark:text-emerald-300">
+            Version 2.1.0 deployed to production
+          </p>
+        </div>
+      </div>
+      <div className="mt-4 space-y-2">
+        <div className="flex items-center justify-between text-sm text-emerald-700 dark:text-emerald-300">
+          <span>Build Time</span>
+          <span>1m 45s</span>
+        </div>
+        <div className="flex items-center justify-between text-sm text-emerald-700 dark:text-emerald-300">
+          <span>Environment</span>
+          <span>Production</span>
+        </div>
+        <div className="w-full bg-emerald-200 dark:bg-emerald-700 rounded-full h-2">
+          <div className="bg-emerald-600 dark:bg-emerald-400 h-2 rounded-full w-full" />
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+);
+
+const FailureCard = () => (
+  <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900 dark:to-red-800 border-red-200 dark:border-red-700 relative overflow-hidden">
+    <div className="absolute inset-0 opacity-10">
+      <div className="absolute top-10 right-10">
+        <XCircle className="w-32 h-32 text-red-500" />
+      </div>
+      <div className="absolute bottom-10 left-10">
+        <RefreshCcw className="w-24 h-24 text-red-500" />
+      </div>
+    </div>
+    <CardHeader>
+      <CardTitle className="flex items-center text-red-900 dark:text-red-100">
+        <Rocket className="w-5 h-5 mr-2 text-red-600 dark:text-red-400" />
+        Deployment Status
+      </CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="flex items-center space-x-4">
+        <div className="flex-shrink-0">
+          <div className="rounded-full h-10 w-10 bg-red-500 dark:bg-red-400 flex items-center justify-center">
+            <XCircle className="h-6 w-6 text-white" />
+          </div>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold text-red-900 dark:text-red-100">
+            Build Failed
+          </h3>
+          <p className="text-sm text-red-700 dark:text-red-300">
+            Error during deployment of version 2.1.0
+          </p>
+        </div>
+      </div>
+      <div className="mt-4 space-y-2">
+        <div className="flex items-center justify-between text-sm text-red-700 dark:text-red-300">
+          <span>Error Type</span>
+          <span>Build Error</span>
+        </div>
+        <div className="flex items-center justify-between text-sm text-red-700 dark:text-red-300">
+          <span>Failed Step</span>
+          <span>npm build</span>
+        </div>
+        <div className="p-3 bg-red-200 dark:bg-red-800/50 rounded-md text-sm text-red-800 dark:text-red-200 font-mono">
+          Error: Check the logs for more details
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+);
