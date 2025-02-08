@@ -6,6 +6,14 @@ const mime = require('mime-types');
 const Redis = require('ioredis');
 const axios = require('axios');
 
+// Constants for log types
+const LOG_TYPES = {
+    INFO: 'info',
+    ERROR: 'error',
+    SUCCESS: 'success',
+    WARNING: 'warning'
+};
+
 const redisConfig = {
     username: 'default',
     password: 'FxvuXWrG8SprckQkqEZXU4I7fUnW6VKH',
@@ -30,10 +38,16 @@ const s3client = new S3Client({
     }
 });
 
-// Redis publisher
-const publishLog = (log) => {
-    publisher.publish(`logs:${projectid}`, JSON.stringify({ log }));
-    console.log(log);
+// Enhanced Redis publisher with log types
+const publishLog = (message, type = LOG_TYPES.INFO) => {
+    const logEntry = {
+        timestamp: new Date().toISOString(),
+        message,
+        type,
+        projectId: projectid
+    };
+    publisher.publish(`logs:${projectid}`, JSON.stringify(logEntry));
+    console.log(`[${type.toUpperCase()}] ${message}`);
 };
 
 // Function to update deployment status
@@ -45,43 +59,53 @@ const updateDeploymentStatus = async (status) => {
         }, {
             headers: { "Content-Type": "application/json" }
         });
+        publishLog(`Deployment status updated to: ${status}`, LOG_TYPES.INFO);
         return response.data;
     } catch (error) {
-        console.log(error);
-        publishLog(`Error updating deployment status: ${error.message}`);
+        publishLog(`Failed to update deployment status: ${error.message}`, LOG_TYPES.ERROR);
+        throw error;
     }
 };
 
-// Main logic
-const init = async () => {
-    console.log("Starting the build server");
-    publishLog("Build Started...");
+// Function to handle build process
+const handleBuild = async (outDirPath) => {
+    return new Promise((resolve, reject) => {
+        publishLog("Initiating build process...", LOG_TYPES.INFO);
+        const p = exec(`cd ${outDirPath} && npm install && npm run build`);
 
-    const outDirPath = path.join(__dirname, 'output');
-    console.log(outDirPath);
-    const p = exec(`cd ${outDirPath} && npm install && npm run build`);
+        p.stdout.on('data', (data) => {
+            publishLog(data.toString().trim(), LOG_TYPES.INFO);
+        });
 
-    p.stdout.on('data', (data) => {
-        publishLog(data.toString());
+        p.stderr.on('data', (data) => {
+            publishLog(data.toString().trim(), LOG_TYPES.ERROR);
+        });
+
+        p.on('close', (code) => {
+            if (code === 0) {
+                publishLog("Build completed successfully", LOG_TYPES.SUCCESS);
+                resolve();
+            } else {
+                publishLog(`Build failed with code ${code}`, LOG_TYPES.ERROR);
+                reject(new Error(`Build process exited with code ${code}`));
+            }
+        });
     });
+};
 
-    p.stderr.on('data', async (data) => {
-        publishLog(`exError: ${data.toString()}`);
-        await updateDeploymentStatus("failed");
-    });
-
-    p.on('close', async () => {
-        publishLog("Build Completed...");
-        const distFolderPATH = path.join(outDirPath, 'dist');
+// Function to handle S3 uploads
+const handleS3Upload = async (distFolderPATH) => {
+    try {
+        publishLog("Starting S3 upload process...", LOG_TYPES.INFO);
         const distFolderContents = fs.readdirSync(distFolderPATH, { recursive: true });
-        publishLog("Uploading files to S3...");
+        let uploadedFiles = 0;
+        const totalFiles = distFolderContents.length;
 
-        // Upload files to S3
         for (const file of distFolderContents) {
             const filePath = path.join(distFolderPATH, file);
             if (fs.lstatSync(filePath).isDirectory()) continue;
 
-            publishLog(`Uploading ${file}...`);
+            publishLog(`Uploading (${++uploadedFiles}/${totalFiles}): ${file}`, LOG_TYPES.INFO);
             const command = new PutObjectCommand({
                 Bucket: bucket,
                 Key: `__outputs/${projectid}/${file}`,
@@ -89,16 +113,39 @@ const init = async () => {
                 ContentType: mime.lookup(filePath) || 'application/octet-stream'
             });
             await s3client.send(command);
-            publishLog(`Uploaded ${file}`);
+            publishLog(`Successfully uploaded: ${file}`, LOG_TYPES.SUCCESS);
         }
+        publishLog("All files uploaded successfully", LOG_TYPES.SUCCESS);
+    } catch (error) {
+        publishLog(`S3 upload failed: ${error.message}`, LOG_TYPES.ERROR);
+        throw error;
+    }
+};
 
-        publishLog("Upload Completed...");
-        publishLog("Done...");
+// Main logic
+const init = async () => {
+    try {
+        publishLog("🚀 Starting deployment process", LOG_TYPES.INFO);
+        const outDirPath = path.join(__dirname, 'output');
+        const distFolderPATH = path.join(outDirPath, 'dist');
+
+        // Build Phase
+        await handleBuild(outDirPath);
+
+        // Upload Phase
+        await handleS3Upload(distFolderPATH);
+
+        // Success completion
         await updateDeploymentStatus("live");
-        publishLog("Success");
-        publishLog(`Website is up and running at https://${projectid}.cloud.deploylite.tech`);
+        publishLog("✅ Deployment completed successfully", LOG_TYPES.SUCCESS);
+        publishLog(`🌐 Website is live at https://${projectid}.cloud.deploylite.tech`, LOG_TYPES.SUCCESS);
         process.exit(0);
-    });
+
+    } catch (error) {
+        publishLog(`❌ Deployment failed: ${error.message}`, LOG_TYPES.ERROR);
+        await updateDeploymentStatus("failed");
+        process.exit(1);
+    }
 };
 
 init();
