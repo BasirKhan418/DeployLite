@@ -3,12 +3,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Send } from 'lucide-react';
 import LottieAnimation1 from '@/components/ui/LottieAnimation1';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   id: string;
   text: string;
   isUser: boolean;
   timestamp: Date;
+  isStreaming?: boolean;
+}
+
+interface ApiMessage {
+  role: 'user' | 'assistant';
+  content: string;
 }
 
 const Chatbot: React.FC = () => {
@@ -16,12 +23,13 @@ const Chatbot: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'Hello! How can I help you today?',
+      text: "👋 **Welcome to DeployBot AI!** How can I assist you today?",
       isUser: false,
       timestamp: new Date(),
     },
   ]);
   const [inputValue, setInputValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -36,8 +44,33 @@ const Chatbot: React.FC = () => {
     }
   }, [messages, isOpen]);
 
+  const formatMessagesForApi = (messages: Message[]): ApiMessage[] => {
+    return messages.map(msg => ({
+      role: msg.isUser ? 'user' : 'assistant',
+      content: msg.text
+    }));
+  };
+
+  const MessageContent: React.FC<{ content: string }> = ({ content }) => (
+    <ReactMarkdown
+      components={{
+        strong: ({ node, ...props }) => (
+          <span className="font-bold text-pink-200" {...props} />
+        ),
+        p: ({ node, ...props }) => (
+          <p className="mb-2 last:mb-0" {...props} />
+        ),
+        code: ({ node, ...props }) => (
+          <code className="bg-pink-900 bg-opacity-50 px-1 rounded" {...props} />
+        ),
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  );
+
   const handleSendMessage = async () => {
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -46,19 +79,88 @@ const Chatbot: React.FC = () => {
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages(prev => [...prev, userMessage]);
     setInputValue('');
+    setIsLoading(true);
 
-    // Simulate bot response
-    setTimeout(() => {
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: 'Thank you for your message! This is a sample response.',
-        isUser: false,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, botMessage]);
-    }, 1000);
+    const botMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      text: '',
+      isUser: false,
+      timestamp: new Date(),
+      isStreaming: true
+    };
+    setMessages(prev => [...prev, botMessage]);
+
+    try {
+      const response = await fetch('https://agent-353168299ceba8da1ed5-p7tro.ondigitalocean.app/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_DG}`
+        },
+        body: JSON.stringify({
+          messages: formatMessagesForApi([...messages, userMessage]),
+          stream: true,
+          temperature: 0.7,
+          max_tokens: 1000
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('API request failed');
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error('No reader available');
+
+      let accumulatedText = '';
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = new TextDecoder().decode(value);
+        const lines = chunk.split('\n').filter(line => line.trim() !== '');
+        
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const jsonStr = line.slice(6);
+            if (jsonStr === '[DONE]') continue;
+            
+            try {
+              const jsonData = JSON.parse(jsonStr);
+              const newContent = jsonData.choices[0]?.delta?.content || '';
+              accumulatedText += newContent;
+              
+              setMessages(prev => prev.map(msg => 
+                msg.id === botMessage.id 
+                  ? { ...msg, text: accumulatedText }
+                  : msg
+              ));
+            } catch (e) {
+              console.error('Error parsing JSON:', e);
+            }
+          }
+        }
+      }
+
+      setMessages(prev => prev.map(msg => 
+        msg.id === botMessage.id 
+          ? { ...msg, isStreaming: false }
+          : msg
+      ));
+
+    } catch (error) {
+      console.error('Error:', error);
+      setMessages(prev => prev.map(msg => 
+        msg.id === botMessage.id 
+          ? { ...msg, text: '**Error:** Unable to process your request. Please try again.', isStreaming: false }
+          : msg
+      ));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -78,15 +180,14 @@ const Chatbot: React.FC = () => {
           >
             <LottieAnimation1 width={65} height={65} />
           </button>
-          <span className="text-sm font-medium text-silver-500 -mt-4">DeployBot AI</span>
+          <span className="text-sm font-medium text-white -mt-4">DeployBot AI</span>
         </div>
       )}
 
       {isOpen && (
-        <div className="bg-black bg-opacity-60 backdrop-blur-md rounded-lg  shadow-xl w-96 sm:w-[420px] h-[650px] flex flex-col text-pink-500">
-          {/* Header */}
+        <div className="bg-black bg-opacity-60 backdrop-blur-md rounded-lg shadow-xl w-96 sm:w-[420px] h-[650px] flex flex-col text-white">
           <div className="flex items-center justify-between p-4 border-b border-pink-500">
-            <h3 className="font-semibold"> DeployBot AI Chat Support</h3>
+            <h3 className="font-semibold text-white">DeployBot AI Chat Support</h3>
             <button
               onClick={() => setIsOpen(false)}
               className="text-pink-300 hover:text-pink-500"
@@ -95,7 +196,6 @@ const Chatbot: React.FC = () => {
             </button>
           </div>
 
-          {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4">
             {messages.map((message) => (
               <div
@@ -108,10 +208,15 @@ const Chatbot: React.FC = () => {
                   className={`max-w-3/4 rounded-lg p-3 ${
                     message.isUser
                       ? 'bg-pink-500 text-white'
-                      : 'bg-gray-800 text-pink-300'
+                      : 'bg-gray-800 text-white'
                   }`}
                 >
-                  <p className="text-sm">{message.text}</p>
+                  <div className="text-sm">
+                    <MessageContent content={message.text} />
+                    {message.isStreaming && (
+                      <span className="inline-block w-2 h-4 ml-1 bg-pink-300 animate-pulse" />
+                    )}
+                  </div>
                   <span className="text-xs opacity-75 mt-1 block">
                     {message.timestamp.toLocaleTimeString([], {
                       hour: '2-digit',
@@ -124,7 +229,6 @@ const Chatbot: React.FC = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input */}
           <div className="border-t border-pink-500 p-4">
             <div className="flex items-center gap-2">
               <input
@@ -134,11 +238,12 @@ const Chatbot: React.FC = () => {
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Type your message..."
-                className="flex-1 border border-pink-500 bg-black text-pink-500 rounded-lg px-4 py-2 focus:outline-none focus:border-pink-600"
+                disabled={isLoading}
+                className="flex-1 border border-pink-500 bg-black text-white rounded-lg px-4 py-2 focus:outline-none focus:border-pink-600 disabled:opacity-50 placeholder-gray-400"
               />
               <button
                 onClick={handleSendMessage}
-                disabled={!inputValue.trim()}
+                disabled={!inputValue.trim() || isLoading}
                 className="bg-pink-500 hover:bg-pink-600 text-white rounded-lg p-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send className="w-5 h-5" />
