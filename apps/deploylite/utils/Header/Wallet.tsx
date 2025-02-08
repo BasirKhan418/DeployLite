@@ -5,7 +5,7 @@ declare global {
     ethereum?: any
   }
 }
-
+import {toast,Toaster} from "sonner";
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { ethers } from "ethers"
@@ -129,67 +129,71 @@ export default function ImprovedPlatformWallet() {
     alert(`Deposited ${cryptoAmount} ETH (~₹${convertedINR.toFixed(2)}) to your DeployLite balance!`)
   }
 
-  const handleRazorpayPayment=async()=> {
-    setLoading(true);
-    var amount;
-    if(addFundsAmount==""){
-      amount = Number(prompt("Enter the amount to add funds"));
-    }
-    else{
-      amount = addFundsAmount;
-    }
-    const data = { amount,email:user.email,name:user.name};
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_HOST}/api/precheckout`,
-    {
-      method: "POST", // or 'PUT'
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    }
-  );
-
-  const r = await response.json();
-  setLoading(false);
-  if(r.success){
-  var options =  {
-    key: `${process.env.NEXT_PUBLIC_KEY_ID}`,
-     // Enter the Key ID generated from the Dashboard
-    amount: r.order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-    currency: "INR",
-    name: `RadSab TicketBooking For Museum`, //your business name
-    description: `RadSab ticket booking for museum book your ticket now ."`,
-    image: "/logo.png",
-    order_id: r.order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-    callback_url: `${process.env.NEXT_PUBLIC_HOST}/api/postcheckout`,
-    prefill: {
-      //We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
-      name: name, //your customer's name
-      email: email,
-    },
-    notes: {
-      address: "Razorpay Corporate Office",
-    },
-    theme: {
-      color: "#FD0872",
-    },
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
   };
-  //@ts-ignore
-  var rzp1 = new window.Razorpay(options);
-  await rzp1.open();
-  e.preventDefault();
-}
-else{
-    toast.error('Error in Payment');
-}
-
-
-
-  }
+  
+  const handleRazorpayPayment = async (e) => {
+    setLoading(true);
+  
+    var amount = addFundsAmount || Number(prompt("Enter the amount to add funds"));
+  
+    const data = { amount, email: user.email, name: user.name };
+  
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_HOST}/api/precheckout`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }
+    );
+  
+    const r = await response.json();
+    setLoading(false);
+  
+    if (r.success) {
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        toast.error("Razorpay SDK failed to load.");
+        return;
+      }
+  
+      var options = {
+        key: process.env.NEXT_PUBLIC_KEY_ID,
+        amount: r.order.amount,
+        currency: "INR",
+        name: `DeployLite`,
+        description: `Add funds to DeployLite Wallet`,
+        image: "/logo.png",
+        order_id: r.order.id,
+        callback_url: `${process.env.NEXT_PUBLIC_HOST}/api/postcheckout`,
+        prefill: { name: user.name, email: user.email },
+        notes: { address: "Razorpay Corporate Office" },
+        theme: { color: "#FD0872" },
+      };
+  
+      var rzp1 = new window.Razorpay(options);
+      rzp1.open();
+      e.preventDefault();
+    } else {
+      toast.error("Error in Payment");
+    }
+  };
+  
 
   function handleStripePayment() {
-    alert("Stripe payment placeholder! Implement your checkout logic here.")
+    toast.error("Stripe Payment Gateway not implemented yet.Will be available soon...");
   }
 
   function handleAddFundsInINR() {
@@ -254,6 +258,8 @@ else{
     <div
       className={`min-h-screen bg-gradient-to-br from-black via-black to-pink-900 text-gray-100 transition-colors duration-300 backdrop-filter backdrop-blur-lg`}
     >
+      <Toaster position="top-right" />
+      <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
       <div className="max-w-7xl mx-auto p-4 md:p-8">
         {/* Row: Main Wallet + Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -326,7 +332,7 @@ else{
                   onChange={(e) => setAddFundsAmount(e.target.value)}
                   className="bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-sm text-pink-100 border-pink-700 placeholder-pink-400"
                 />
-                <Button className="bg-pink-700 hover:bg-pink-600 text-white" onClick={handleAddFundsInINR}>
+                <Button className="bg-pink-700 hover:bg-pink-600 text-white" onClick={handleRazorpayPayment}>
                   <CreditCardIcon className="mr-2 h-4 w-4" /> Add Funds
                 </Button>
               </div>
