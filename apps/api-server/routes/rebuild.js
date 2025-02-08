@@ -7,7 +7,7 @@ router.get('/', (req, res) => {
 })
 router.post('/', async(req, res) => {
     try{
-     let project =await Project.findOneAndUpdate({repourl:req.body.repourl},{projectstatus:req.body.status});
+     let project =await Project.findOneAndUpdate({repourl:req.body.repourl},{projectstatus:"creating"});
      if(project==null){
         return res.status(400).json({message:"Project not found",success:false});
      }
