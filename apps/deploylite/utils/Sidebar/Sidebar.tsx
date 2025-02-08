@@ -28,6 +28,7 @@ import {
   HomeIcon,
   Bot,
   LayersIcon,
+  Brain,
   SettingsIcon,
   PlusIcon,
   ChevronDownIcon,
@@ -118,6 +119,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </Link>
 
       {/* Deployments */}
+      <Link href="/ai" passHref>
+        <Button
+          variant="ghost"
+          className={cn(
+            "w-full justify-start rounded-md transition-colors",
+            "text-black dark:text-gray-300",
+            "hover:text-pink-600 dark:hover:text-pink-400",
+            isActiveRoute("/deployments") && "text-pink-600 dark:text-pink-400"
+          )}
+        >
+          <Brain className="mr-2 h-4 w-4" />
+          {!isSidebarCollapsed && "Automated Workflows"}
+        </Button>
+      </Link>
+
       <Link href="/mlmodel" passHref>
         <Button
           variant="ghost"
@@ -132,6 +148,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           {!isSidebarCollapsed && "ML Models"}
         </Button>
       </Link>
+
 
       {/* Projects (Collapsible) */}
       <Collapsible
