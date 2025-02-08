@@ -15,6 +15,7 @@
     "@aws-sdk/client-ec2": "^3.654.0",
     "@aws-sdk/client-ecs": "^3.738.0",
     "@aws-sdk/credential-providers": "^3.738.0",
+    "axios": "^1.7.9",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",

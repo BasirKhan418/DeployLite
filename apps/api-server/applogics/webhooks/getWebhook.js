@@ -44,8 +44,8 @@ const getWebhook = async (req, res) => {
       },
       timestamp: new Date().toISOString()
     });
-    let reep = await axios.post('https://api.deploylite.tech/deploy/react',{
-            giturl:repoInfo.cloneUrl
+    let reep = await axios.post('https://api.deploylite.tech/rebuild',{
+            repourl:repoInfo.cloneUrl,
     });
     if(reep.data.success==true){
         return res.status(200).json({message:"Project rebuild initiated successfully",success:true});
