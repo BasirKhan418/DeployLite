@@ -26,7 +26,7 @@ import {
 import {
   MenuIcon,
   HomeIcon,
-  RocketIcon,
+  Bot,
   LayersIcon,
   SettingsIcon,
   PlusIcon,
@@ -118,7 +118,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </Link>
 
       {/* Deployments */}
-      <Link href="/deployments" passHref>
+      <Link href="/mlmodel" passHref>
         <Button
           variant="ghost"
           className={cn(
@@ -128,8 +128,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             isActiveRoute("/deployments") && "text-pink-600 dark:text-pink-400"
           )}
         >
-          <RocketIcon className="mr-2 h-4 w-4" />
-          {!isSidebarCollapsed && "Deployments"}
+          <Bot  className="mr-2 h-4 w-4" />
+          {!isSidebarCollapsed && "ML Models"}
         </Button>
       </Link>
 
