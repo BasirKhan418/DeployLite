@@ -9,12 +9,14 @@ import ConnectDb from '../middleware/connectdb.js';
 import createDeploymentMiddleware from './applogics/middleware/Checkauth.js';
 import webhook from './routes/webhook.js';
 import status from './routes/status.js';
+import rebuild from './routes/rebuild.js';
 const app = express();
 app.use(express.json());
 app.use(cors({
     origin:'*'
 }));
 app.use('/status',status.router);
+app.use('/rebuild',rebuild.router);
 app.use('/deploy',createDeploymentMiddleware,deploy.router);
 app.use('/webhook',webhook.router);
 app.use('/createdeployment',createDeploymentMiddleware,createDeployment.router);

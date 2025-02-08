@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 const getWebhook = async (req, res) => {
   try {
     // Validate GitHub event header
@@ -42,6 +44,12 @@ const getWebhook = async (req, res) => {
       },
       timestamp: new Date().toISOString()
     });
+    let reep = await axios.post('https://api.deploylite.tech/deploy/react',{
+            giturl:repoInfo.cloneUrl
+    });
+    if(reep.data.success==true){
+        return res.status(200).json({message:"Project rebuild initiated successfully",success:true});
+    }
 
     // TODO: Add queue system implementation here
     // await queueDeployment(repoInfo);
