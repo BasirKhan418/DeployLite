@@ -24,7 +24,6 @@ import {
   RefreshCwIcon,
 } from "lucide-react"
 
-import { useAppSelector } from "@/lib/hook"
 
 import {
   Chart as ChartJS,
@@ -37,10 +36,14 @@ import {
   Legend,
 } from "chart.js"
 import { Line } from "react-chartjs-2"
+import { useAppSelector } from "@/lib/hook"
 
+
+ 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 export default function ImprovedPlatformWallet() {
+  const user = useAppSelector((state) => state.user.user)
   const wallet = useAppSelector((state) => state.wallet.wallet)
 
   const [addFundsAmount, setAddFundsAmount] = useState("")
@@ -48,6 +51,7 @@ export default function ImprovedPlatformWallet() {
   const [cryptoWalletAddress, setCryptoWalletAddress] = useState("")
   const [cryptoConnected, setCryptoConnected] = useState(false)
   const [cryptoBalance, setCryptoBalance] = useState("0")
+  const [loading, setLoading] = useState(false);
   const [transactions, setTransactions] = useState([
     {
       id: 1,
@@ -125,8 +129,63 @@ export default function ImprovedPlatformWallet() {
     alert(`Deposited ${cryptoAmount} ETH (~₹${convertedINR.toFixed(2)}) to your DeployLite balance!`)
   }
 
-  function handleRazorpayPayment() {
-    alert("Razorpay payment placeholder! Implement your checkout logic here.")
+  const handleRazorpayPayment=async()=> {
+    setLoading(true);
+    var amount;
+    if(addFundsAmount==""){
+      amount = Number(prompt("Enter the amount to add funds"));
+    }
+    else{
+      amount = addFundsAmount;
+    }
+    const data = { amount,email:user.email,name:user.name};
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_HOST}/api/precheckout`,
+    {
+      method: "POST", // or 'PUT'
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  const r = await response.json();
+  setLoading(false);
+  if(r.success){
+  var options =  {
+    key: `${process.env.NEXT_PUBLIC_KEY_ID}`,
+     // Enter the Key ID generated from the Dashboard
+    amount: r.order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    currency: "INR",
+    name: `RadSab TicketBooking For Museum`, //your business name
+    description: `RadSab ticket booking for museum book your ticket now ."`,
+    image: "/logo.png",
+    order_id: r.order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+    callback_url: `${process.env.NEXT_PUBLIC_HOST}/api/postcheckout`,
+    prefill: {
+      //We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
+      name: name, //your customer's name
+      email: email,
+    },
+    notes: {
+      address: "Razorpay Corporate Office",
+    },
+    theme: {
+      color: "#FD0872",
+    },
+  };
+  //@ts-ignore
+  var rzp1 = new window.Razorpay(options);
+  await rzp1.open();
+  e.preventDefault();
+}
+else{
+    toast.error('Error in Payment');
+}
+
+
+
   }
 
   function handleStripePayment() {

@@ -6,6 +6,7 @@ const page = () => {
   return (
     <>
    <Hero/>
+   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     </>
   )
 }
