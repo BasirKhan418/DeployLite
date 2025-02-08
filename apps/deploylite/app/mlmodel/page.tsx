@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Eye, EyeOff, Star } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 
+// Shared styling
 const textGradient =
   "text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500";
 const buttonBase =
@@ -14,13 +15,15 @@ const buttonPrimary =
 const glassCard =
   "rounded-2xl bg-gray-900/50 p-6 shadow-2xl backdrop-blur-sm border border-pink-500/20";
 
-// Sample ML Models data with pricing and features
+// Sample data
 const models = [
   {
     name: "DeepSeek",
-    logo: "https://miro.medium.com/v2/resize:fit:1200/1*tlUlwc-ABsXvhFjK3JpC9g.png", // update with your logo path or URL
+    logo: "https://miro.medium.com/v2/resize:fit:1200/1*tlUlwc-ABsXvhFjK3JpC9g.png",
     price: "$49/month",
     description: "Cutting-edge search capabilities for your ML solutions.",
+    parameters: "120M",
+    repo: "https://github.com/deepseek",
     features: ["Fast search", "Semantic understanding", "High precision"],
   },
   {
@@ -28,50 +31,40 @@ const models = [
     logo: "https://miro.medium.com/v2/resize:fit:695/1*UnUo_KuVO3gVcrwPqiAzAg.png",
     price: "$79/month",
     description: "Robust conversational AI powered by advanced NLP.",
+    parameters: "350M",
+    repo: "https://github.com/ollama",
     features: ["Conversational AI", "Natural language processing", "Scalable"],
   },
   {
     name: "Phi-4",
-    logo: "data:image/png;base64,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",
-    price: "$99/month",
-    description: "Unlock powerful ML features with blazing speed and reliability.",
-    features: ["Next-gen ML", "Real-time analytics", "Seamless integration"],
+    logo:
+      "data:image/png;base64,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",
   },
 ];
 
-export default function MLModelsPricingPage() {
-  // Modal state
+export default function MLModelPage() {
+  const [selectedModel, setSelectedModel] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [apiKeyLoaded, setApiKeyLoaded] = useState(false);
-  const [showKey, setShowKey] = useState(false);
 
-  // Constant API key (same for all models in this example)
-  const API_KEY = "API-KEY-123456";
+  // We'll use the Next.js 13 navigation hook to push a route
+  const router = useRouter();
 
-  // When the modal opens, wait 10 seconds to load the API key
-  useEffect(() => {
-    let timer;
-    if (showModal) {
-      timer = setTimeout(() => {
-        setApiKeyLoaded(true);
-      }, 10000);
-    }
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [showModal]);
-
-  // Reset modal state when closing
-  const closeModal = () => {
-    setShowModal(false);
-    setApiKeyLoaded(false);
-    setShowKey(false);
+  const openModal = (model) => {
+    setSelectedModel(model);
+    setShowModal(true);
   };
 
-  // Handler for purchase key button click
-  const handlePurchaseKey = (e) => {
-    e.preventDefault();
-    setShowModal(true);
+  const closeModal = () => {
+    setSelectedModel(null);
+    setShowModal(false);
+  };
+
+  // Called when user clicks "Continue" in the modal
+  const handleContinue = () => {
+    if (selectedModel) {
+      // Navigate to /mlmodel/apiml with a query param of name=theModelName
+      router.push(`/mlmodel/apiml?name=${encodeURIComponent(selectedModel.name)}`);
+    }
   };
 
   return (
@@ -87,14 +80,14 @@ export default function MLModelsPricingPage() {
           className="text-center mb-12"
         >
           <h1 className={`text-4xl sm:text-5xl font-bold mb-4 ${textGradient}`}>
-            ML Models API Keys
+            ML Models
           </h1>
           <p className="text-xl text-gray-300">
-            Choose the perfect API key to integrate state-of-the-art ML features into
-            your application.
+            Choose the perfect API key to integrate ML features into your application.
           </p>
         </motion.div>
 
+        {/* Grid of models */}
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {models.map((model, index) => (
             <motion.div
@@ -111,23 +104,21 @@ export default function MLModelsPricingPage() {
                   className="w-20 h-20 mb-4"
                 />
                 <h2 className="text-2xl font-bold mb-2">{model.name}</h2>
-                <p className="text-gray-300 text-center mb-4">
-                  {model.description}
-                </p>
+                <p className="text-gray-300 text-center mb-4">{model.description}</p>
                 <div className="mb-4">
                   <span className="text-3xl font-bold text-pink-500">
                     {model.price}
                   </span>
                 </div>
                 <ul className="mb-6 space-y-1">
-                  {model.features.map((feature, idx) => (
+                  {model.features?.map((feature, idx) => (
                     <li key={idx} className="text-sm text-gray-400">
                       • {feature}
                     </li>
                   ))}
                 </ul>
                 <button
-                  onClick={handlePurchaseKey}
+                  onClick={() => openModal(model)}
                   className={`${buttonBase} ${buttonPrimary}`}
                 >
                   Purchase Key <ArrowRight className="ml-2 h-5 w-5" />
@@ -138,48 +129,45 @@ export default function MLModelsPricingPage() {
         </div>
       </div>
 
-      {/* Modal Overlay */}
-      {showModal && (
+      {/* Modal for the selected model */}
+      {showModal && selectedModel && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
           <div className="bg-gray-900/80 rounded-2xl p-6 shadow-2xl backdrop-blur-sm border border-pink-500/20 w-80">
-            {apiKeyLoaded ? (
-              <>
-                <h2 className="text-2xl font-bold mb-4 text-pink-500">
-                  Your API Key
-                </h2>
-                <div className="flex items-center mb-4">
-                  <span className="text-lg font-mono text-white">
-                    {showKey ? API_KEY : "••••••••••••"}
-                  </span>
-                  <button
-                    onClick={() => setShowKey((prev) => !prev)}
-                    className="ml-2 text-pink-500"
-                  >
-                    {showKey ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-                <div className="flex justify-end space-x-4">
-                  <button
-                    onClick={closeModal}
-                    className={`${buttonBase} bg-gray-800 text-white`}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={closeModal}
-                    className={`${buttonBase} ${buttonPrimary}`}
-                  >
-                    OK
-                  </button>
-                </div>
-              </>
-            ) : (
-              <div className="text-center">
-                <p className="text-lg text-pink-500 mb-4">
-                  Generating your API key...
-                </p>
-              </div>
-            )}
+            <h2 className="text-2xl font-bold mb-4 text-pink-500">
+              {selectedModel.name} Details
+            </h2>
+            <p className="mb-2 text-gray-300">
+              <strong>Price:</strong> {selectedModel.price}
+            </p>
+            <p className="mb-2 text-gray-300">
+              <strong>Parameters:</strong> {selectedModel.parameters}
+            </p>
+            <p className="mb-4 text-gray-300">
+              <strong>Repo:</strong>{" "}
+              <a
+                href={selectedModel.repo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-pink-500 underline"
+              >
+                {selectedModel.repo}
+              </a>
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={closeModal}
+                className={`${buttonBase} bg-gray-800 text-white`}
+              >
+                Cancel
+              </button>
+              {/* Continue: go to /mlmodel/apiml?name=selectedModel.name */}
+              <button
+                onClick={handleContinue}
+                className={`${buttonBase} ${buttonPrimary}`}
+              >
+                Continue
+              </button>
+            </div>
           </div>
         </div>
       )}
