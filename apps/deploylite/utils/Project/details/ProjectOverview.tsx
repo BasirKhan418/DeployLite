@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { BarChart, Settings, MoreVertical, CheckCircle, XCircle, Zap, Cloud, Server, Clock, DollarSign, Bell, Rocket, GitBranch, Terminal, Shield, Database, Loader2,Globe
 
  } from 'lucide-react'
@@ -23,11 +23,11 @@ import {
 
 export default function ProjectOverview({projectdata,deploymentdata}:any) {
   const projectName = projectdata.name&&projectdata.name.toUpperCase()
-  const projectUrl = projectdata.projecturl?"":`https://${projectdata.name}.cloud.deploylite.tech`
+  const projectUrl = `https://${projectdata.name}.cloud.deploylite.tech`
   const isHealthy = true
   const cpuUtilization = projectdata.cpuusage
   const memoryUtilization = projectdata.memoryusage
-
+  const defaultvalue = projectdata.projectstatus=="creating"?"runtimelogs":"overview"
   const estimatedCost = projectdata.planid&&projectdata.planid.pricepmonth;
 
   const recentActivities = [
@@ -35,6 +35,7 @@ export default function ProjectOverview({projectdata,deploymentdata}:any) {
     { id: 2, type: 'deployment', status: 'failed', timestamp: '2023-05-14 10:15', user: 'Bob' },
     { id: 3, type: 'deployment', status: 'success', timestamp: '2023-05-13 09:00', user: 'Charlie' },
   ]
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 ">
@@ -91,7 +92,7 @@ export default function ProjectOverview({projectdata,deploymentdata}:any) {
             </div>
           </div>
 
-          <Tabs defaultValue="overview" className="p-6">
+          <Tabs defaultValue={defaultvalue} className="p-6">
             <TabsList className="grid grid-cols-3 lg:grid-cols-6 mb-6 dark:bg-gray-900">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -239,33 +240,7 @@ export default function ProjectOverview({projectdata,deploymentdata}:any) {
                 </Card>
               </div>
 
-              <div className="mt-6">
-                <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900 dark:to-indigo-800 border-indigo-200 dark:border-indigo-700">
-                  <CardHeader>
-                    <CardTitle className="flex items-center text-indigo-900 dark:text-indigo-100">
-                      <Rocket className="w-5 h-5 mr-2 text-indigo-600 dark:text-indigo-400" />
-                      Deployment Status
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center space-x-4">
-                      <div className="flex-shrink-0">
-                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 dark:border-indigo-400"></div>
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-indigo-900 dark:text-indigo-100">Deployment in Progress</h3>
-                        <p className="text-sm text-indigo-700 dark:text-indigo-300">Deploying version 2.1.0 to production</p>
-                      </div>
-                    </div>
-                    <div className="mt-4">
-                      <div className="w-full bg-indigo-200 dark:bg-indigo-700 rounded-full h-2.5">
-                        <div className="bg-indigo-600 dark:bg-indigo-400 h-2.5 rounded-full" style={{ width: '60%' }}></div>
-                      </div>
-                      <p className="text-xs text-indigo-700 dark:text-indigo-300 mt-1">Estimated time remaining: 2 minutes</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+             
             </TabsContent>
             <TabsContent value="analytics">
           <Analytics /> 
@@ -274,7 +249,7 @@ export default function ProjectOverview({projectdata,deploymentdata}:any) {
           <Activity/> 
         </TabsContent>
         <TabsContent value="runtimelogs">
-          <RuntimeLogs/> 
+          <RuntimeLogs projectdata={projectdata}/> 
         </TabsContent>
         <TabsContent value="console">
           <Console/> 

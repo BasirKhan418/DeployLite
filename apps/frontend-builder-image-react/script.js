@@ -40,8 +40,19 @@ console.log(outDirPath);
 p.stdout.on('data',(data)=>{
     publishLog(data.toString());
 })
-p.stdout.on('error',(data)=>{
+p.stdout.on('error',async(data)=>{
     publishLog(`exError: ${data.toString()}`);
+    let Hitwithanapi = await fetch("https://api.deploylite.tech/status/deploy",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            name:projectid,
+            status:"failed"
+        })
+    })
+    let HitwithanapiJson = await Hitwithanapi.json();
 })
 p.on('close',async()=>{
 publishLog("Build Completed...");
@@ -69,7 +80,19 @@ for(const file of distFolderContents){
 }
 publishLog("Upload Completed...");
 publishLog("Done ...")
+let Hitwithanapi = await fetch("https://api.deploylite.tech/status/deploy",{
+    method:"POST",
+    headers:{
+        "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+        name:projectid,
+        status:"live"
+    })
+})
+let HitwithanapiJson = await Hitwithanapi.json();
 publishLog("Success");
+
 publishLog(`Website is up and running at https://${projectid}.cloud.deploylite.tech`)
 process.exit(0)
 
