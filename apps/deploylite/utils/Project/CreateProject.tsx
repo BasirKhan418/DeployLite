@@ -87,6 +87,8 @@ export default function CreateProject({ name }: { name: string }) {
 
   const [stage, setStage] = useState(1);
   const router = useRouter();
+  const [buildScore, setBuildScore] = useState("");
+  const [buildText, setBuildText] = useState(""); 
   const [projectDetails, setProjectDetails] = useState({
     name: "",
     tech: "",
@@ -102,6 +104,118 @@ export default function CreateProject({ name }: { name: string }) {
     cloneurl: "",
     branchesurl: "",
   });
+//quesry
+async function queryAiAgent(message:string) {
+  const API_URL = 'https://agent-9bce58c1b5878cb58d14-brwoz.ondigitalocean.app/api/v1/chat/completions';
+  
+  const payload = {
+      messages: [
+          {
+              role: 'user',
+              content: message
+          }
+      ],
+      temperature: 0.7,  // You can adjust this
+      stream: false
+  };
+
+  try {
+      const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              // Add your bearer token here if needed
+              'Authorization': `Bearer ${process.env.NEXT_PUBLIC_DG1}`
+          },
+          body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      // Extract the response content from choices
+      if (data.choices && data.choices.length > 0) {
+          return data.choices[0]?.message?.content || 'No content found';
+      }
+      return 'No response generated';
+
+  } catch (error) {
+      console.error('Error:', error);
+      return `Error: ${error.message}`;
+  }
+}
+  //analyze using ai 
+  const processText = (text) => {
+    // Extract build score
+    const buildScoreMatch = text.match(/Build Score: (\d+)/);
+    const buildScore = buildScoreMatch ? parseInt(buildScoreMatch[1]) : null;
+  
+    // Replace markdown bold syntax with HTML bold tags
+    let processedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+    
+    // Replace single and double quotes with consistent double quotes
+    processedText = processedText.replace(/[']/g, '"');
+  
+    return {
+      buildScore,
+      processedText
+    };
+  }
+  const [isAnalyze, setIsAnalyze] = useState(false);
+  //handle analyze
+  const handleAnalyze = async(repourl:string)=>{
+    console.log("entering in anlazing function");
+    setIsAnalyze(true);
+    const response = await fetch('/api/repo', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ repoUrl:repourl, authToken:user.githubtoken }),
+    });
+    const data = await response.json();
+    
+    console.log(data); 
+    const testMessage = `
+    Hii, I am sending you the one of the repo code in this format <repository>
+  <folder name="src" path="src">
+    <folder name="components" path="src/components">
+      <folder name="ui" path="src/components/ui">
+        <folder name="buttons" path="src/components/ui/buttons">
+          <file name="Button.js" path="src/components/ui/buttons/Button.js">
+            <content>// Button code here</content>
+          </file>
+        </folder>
+        <folder name="forms" path="src/components/ui/forms">
+          <file name="Form.js" path="src/components/ui/forms/Form.js">
+            <content>// Form code here</content>
+          </file>
+        </folder>
+      </folder>
+      <file name="App.js" path="src/components/App.js">
+        <content>// App code here</content>
+      </file>
+    </folder>
+    <file name="index.js" path="src/index.js">
+      <content>// Index code here</content>
+    </file>
+  </folder>
+</repository> and you have to assume and the application in react.js and what to improve in the code practices like you are a code reviewer and you have to give the feedback to the developer in detailed manner and also if i have deploy it with deploylite give a build pass score if it 90 then high probably of pass the build build consit of all things all linitng and all give me the reponse like buildscore:then all texts in detailed manner .Whole code is ${data}. `; 
+    const response2 = await queryAiAgent(testMessage);
+    setIsAnalyze(false);
+    console.log('Response:', response2)  
+    const { buildScore, processedText } = processText(response2);
+    setBuildScore(buildScore);
+    setBuildText(processedText);
+
+  }
+  useEffect(()=>{
+    repoDetails.cloneurl && handleAnalyze(repoDetails.cloneurl);
+
+  },[repoDetails])
   const [isoverridebuid, setisoverridebuid] = useState(true);
   const [isrootdir, setisrootdir] = useState(true);
   const [isinstall, setisinstall] = useState(true);
