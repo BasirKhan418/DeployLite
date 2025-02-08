@@ -211,7 +211,7 @@ async function queryAiAgent(message:string) {
     setIsAnalyze(false);
     console.log('Response:', response2)  
     const { buildScore, processedText } = processText(response2);
-    setBuildScore(buildScore);
+    setBuildScore(buildScore?.toString() || '');
     setBuildText(processedText);
 
   }
@@ -1133,7 +1133,7 @@ async function queryAiAgent(message:string) {
           <span className="text-xs font-semibold text-pink-500">
             Build Score
           </span>
-          <span className="text-lg font-bold text-white">--</span>
+          <span className="text-lg font-bold text-white">{isAnalyze?"--":buildScore+"%"}</span>
         </div>
       </button>
     </div>
@@ -1357,7 +1357,7 @@ async function queryAiAgent(message:string) {
         onClick={() => setIsOpen(!isOpen)}
         className="flex w-full cursor-pointer px-4 py-2 bg-gray-900/50 border border-pink-500/20 rounded-xl backdrop-blur-sm"
       >
-        <span className="text-lg font-semibold text-pink-500">Console</span>
+        <span className="text-lg font-semibold text-pink-500">Code Review By DeployLite AI</span>
         <ChevronDown
           className={`w-6 h-6 text-pink-500 transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""
@@ -1367,16 +1367,8 @@ async function queryAiAgent(message:string) {
 
       {/* Dropdown content */}
       {isOpen && (
-        <div className="mt-2 px-4 py-2 bg-gray-800 rounded-xl border border-pink-500/20 backdrop-blur-sm text-white">
-          <p className="mb-2">Here is some console data:</p>
-          <pre className="text-xs whitespace-pre-wrap">
-            {`> System Check: OK
-> Memory Usage: 45%
-> CPU Load: 32%
-> Last Deployment: 2 hours ago`}
-          </pre>
-        </div>
-      )}
+  <FormattedBuildText text={isAnalyze ? "Analyzing ...." : buildText} />
+)}
     </div>
                 </div>
               </TabsContent>
@@ -1589,3 +1581,22 @@ async function queryAiAgent(message:string) {
     </div>
   );
 }
+const FormattedBuildText = ({ text }) => {
+  // Split the text by bold tags and process each part
+  const parts = text.split(/(<b>.*?<\/b>)/g);
+  
+  return (
+    <div className="mt-2 px-4 py-2 bg-gray-800 rounded-xl border border-pink-500/20 backdrop-blur-sm text-white">
+      <p className="mb-2">
+        {parts.map((part, index) => {
+          if (part.startsWith('<b>') && part.endsWith('</b>')) {
+            // Extract the text between bold tags and render it bold
+            const boldText = part.replace(/<\/?b>/g, '');
+            return <span key={index} className="font-bold">{boldText}</span>;
+          }
+          return <span key={index}>{part}</span>;
+        })}
+      </p>
+    </div>
+  );
+};
