@@ -10,6 +10,8 @@ import StoreProvider from "./StoreProvider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { get } from "http";
+import Chatbot from '@/components/Chatbot';
+
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -92,7 +94,10 @@ export default function RootLayout({
             pathname != "/otp" &&
             pathname != "/githubauth" &&
             pathname != "/githuberr" ? (
-              <Sidebar>{children}</Sidebar>
+              <>
+                <Sidebar>{children}</Sidebar>
+                <Chatbot/>
+              </>
             ) : (
               children
             )}
