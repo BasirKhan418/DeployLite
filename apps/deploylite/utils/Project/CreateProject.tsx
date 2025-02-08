@@ -28,12 +28,15 @@ import {
   GitFork,
   Rocket,
   Server,
+  ChevronDown,
   Cloud,
   Zap,
+  Star,
   Shield,
   Users,
   Code,
   Globe,
+  Bot,
   ChevronRight,
   Terminal,
   Layout,
@@ -527,7 +530,7 @@ async function queryAiAgent(message:string) {
 
     getPackageJson();
   };
-
+  const [isOpen, setIsOpen] = useState(false);
   //if root directory changes
   useEffect(() => {
     onRepoChanges(repovalue);
@@ -612,9 +615,16 @@ async function queryAiAgent(message:string) {
 
         <Card className="shadow-xl">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              New Project Setup
-            </CardTitle>
+          <CardTitle className="flex items-center justify-between text-2xl font-bold text-gray-900 dark:text-gray-100">
+       
+        <div>New Project Setup</div>
+        <div className="flex items-center space-x-2 border border-pink-500 rounded-md px-3 py-1 shining-border">
+          <Bot className="w-6 h-6 text-pink-500" />
+          <span className="text-sm text-gray-500 dark:text-gray-300">
+            Powered by AI Deployment
+          </span>
+        </div>
+      </CardTitle>
             <CardDescription>
               Follow the steps below to create your new project
             </CardDescription>
@@ -1110,9 +1120,23 @@ async function queryAiAgent(message:string) {
               </TabsContent>
               <TabsContent value="stage-3">
                 <div className="space-y-6 mt-6">
-                  <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-200">
-                    Review Your Project
-                  </h3>
+                <div className="flex items-center justify-between mt-6">
+      {/* Left side: Review header */}
+      <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-200">
+        Review Your Project
+      </h3>
+
+      {/* Right side: Build Score button */}
+      <button className="flex items-center px-3 py-2 bg-gray-900/50 rounded-xl shadow-lg border border-pink-500/20 backdrop-blur-sm hover:bg-gray-800 transition-all">
+        <Star className="w-6 h-6 text-yellow-500 mr-2" />
+        <div className="flex flex-col items-start">
+          <span className="text-xs font-semibold text-pink-500">
+            Build Score
+          </span>
+          <span className="text-lg font-bold text-white">--</span>
+        </div>
+      </button>
+    </div>
                   <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-800">
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                       <div className="col-span-2">
@@ -1327,6 +1351,33 @@ async function queryAiAgent(message:string) {
                       )}
                     </Button>
                   </div>
+                  <div className="w-full mx-auto">
+      {/* Header / Toggle */}
+      <div
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex w-full cursor-pointer px-4 py-2 bg-gray-900/50 border border-pink-500/20 rounded-xl backdrop-blur-sm"
+      >
+        <span className="text-lg font-semibold text-pink-500">Console</span>
+        <ChevronDown
+          className={`w-6 h-6 text-pink-500 transition-transform duration-200 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </div>
+
+      {/* Dropdown content */}
+      {isOpen && (
+        <div className="mt-2 px-4 py-2 bg-gray-800 rounded-xl border border-pink-500/20 backdrop-blur-sm text-white">
+          <p className="mb-2">Here is some console data:</p>
+          <pre className="text-xs whitespace-pre-wrap">
+            {`> System Check: OK
+> Memory Usage: 45%
+> CPU Load: 32%
+> Last Deployment: 2 hours ago`}
+          </pre>
+        </div>
+      )}
+    </div>
                 </div>
               </TabsContent>
             </Tabs>
