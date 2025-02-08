@@ -58,7 +58,7 @@ const CreateDeployment = async (req, res) => {
         let depdata = await Deployment.findOneAndUpdate({
           projectid:projectid
         },{status:"started",deploymentdate:new Date(),commit_message:"Deployment Created By Deploylite",author_name:"DeployLite"})
-        let updateproject = await Project.findOneAndUpdate({_id:projectid},{projecturl:`${projectname}+localhost:8000`,memoryusage:0,cpuusage:0,storageusage:0})
+        let updateproject = await Project.findOneAndUpdate({_id:projectid},{projecturl:`${projectname}.cloud.deploylite.tech`,memoryusage:0,cpuusage:0,storageusage:0})
         //start deployment for react
         console.log("react deployment started")
         const result = await fetch(`${process.env.DEPLOYMENT_API}/deploy/react`,{
@@ -74,9 +74,10 @@ const CreateDeployment = async (req, res) => {
         })
         let data = await result.json();
         if(data.success){
+        
           return res.status(201).json({
             success:true,
-            message:"Deployment Started"
+            message:"Deployment Started",
           })
         }
         else{

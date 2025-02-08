@@ -22,6 +22,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useRouter } from "next/navigation";
 import {
   GitBranch,
   GitFork,
@@ -85,6 +86,7 @@ export default function CreateProject({ name }: { name: string }) {
   const user = useAppSelector((state) => state.user.user);
 
   const [stage, setStage] = useState(1);
+  const router = useRouter();
   const [projectDetails, setProjectDetails] = useState({
     name: "",
     tech: "",
@@ -459,9 +461,12 @@ export default function CreateProject({ name }: { name: string }) {
         body: JSON.stringify({ ...data }),
       });
       const res = await createproject.json();
+      console.log("res is", res);
       setLoading(false);
       if (res.success) {
         toast.success(res.message);
+        console.log("res is is ",res.id);
+        router.push(`/project/overview?id=${res.project._id}`);
       } else {
         if (res.projectname == "exists") {
           setStage(1);

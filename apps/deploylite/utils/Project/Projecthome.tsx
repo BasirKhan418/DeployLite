@@ -251,7 +251,10 @@ const Projecthome = ({ name }: { name: string }) => {
                                   <span>Restart</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-red-600" onClick={()=>handleDeleteProject(project._id)}>
+                                <DropdownMenuItem className="text-red-600" onClick={(e)=>{
+                                  e.stopPropagation();
+                                  handleDeleteProject(project._id);
+                                }}>
                                   <Trash2 className="mr-2 h-4 w-4" />
                                   <span>Delete project</span>
                                 </DropdownMenuItem>
@@ -311,7 +314,7 @@ const Projecthome = ({ name }: { name: string }) => {
                   </div>}
 
                   
-                  {projects.length === 2 && (
+                  {projects.length <= 2 && (
                     <div className="mt-8 border border-pink-600 rounded-lg p-8 text-center">
                       <h2 className="text-xl font-bold text-pink-600 mb-2">
                         No Projects Found
