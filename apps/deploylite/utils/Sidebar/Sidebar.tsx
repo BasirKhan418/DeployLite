@@ -337,7 +337,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Navbar */}
-        <header className="flex items-center justify-between p-4 bg-background border-b">
+        <header className="flex items-center justify-between p-4 bg-background  border-b">
           <div className="flex items-center">
             {/* Mobile Sidebar Toggle */}
             <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
@@ -375,21 +375,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center space-x-4">
-            {/* Dark Mode Toggle */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-            >
-              {theme === "light" ? (
-                <SunIcon className="h-5 w-5" />
-              ) : (
-                <MoonIcon className="h-5 w-5" />
-              )}
-            </Button>
 
-            {/* Create Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button>

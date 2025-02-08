@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 const Page: React.FC = () => {
   return (
     <div className="flex h-screen -mt-10 bg-gradient-to-br from-black via-black to-pink-900 text-gray-100 p-8">
-      <div className="w-full max-w-7xl mx-auto flex rounded-2xl overflow-hidden  border-m relative">
+      <div className="w-full max-w-8xl mx-auto flex rounded-2xl overflow-hidden  border-m relative">
         <div className="absolute inset-0 bg-gradient-to-br from-black to-pink-600 opacity-10"></div>
         <div className="flex h-full w-full relative z-10">
           {/* Left Iframe Section */}
