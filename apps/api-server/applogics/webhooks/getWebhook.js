@@ -1,23 +1,69 @@
 const getWebhook = async (req, res) => {
-  console.log("web hook k is running");
-  const event = req.headers["x-github-event"];
-  const payload = req.body;
-  console.log(event);
-  console.log(".....before payload.....");
-  console.log("Normal URL:- ", payload.repository.html_url);
-  console.log("GIT URL:- ", payload.repository.clone_url);
-  console.log("COMMIT MESSAGE IS :- ", payload.head_commit.message);
-  console.log("COMMIT AUTHOR IS :- ", payload.head_commit.committer.name);
-  console.log(
-    "COMMIT AUTHOR EMAIL IS :- ",
-    payload.head_commit.committer.email
-  );
-  console.log(".....after payload.....");
+  try {
+    // Validate GitHub event header
+    const githubEvent = req.headers['x-github-event'];
+    if (!githubEvent) {
+      console.error('Missing X-GitHub-Event header');
+      return res.status(400).json({
+        success: false,
+        message: 'Missing GitHub event header'
+      });
+    }
 
-  //add queue system push all deployments into a queueu and then run them one by one
-  return res.status(200).json({
-    message: "Webhook received",
-    success: true,
-  });
+    // Validate payload
+    const payload = req.body;
+    if (!payload || !payload.repository) {
+      console.error('Invalid webhook payload structure');
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid webhook payload'
+      });
+    }
+
+    // Extract relevant information with optional chaining
+    const repoInfo = {
+      name: payload.repository?.name,
+      cloneUrl: payload.repository?.clone_url,
+      committer: payload.head_commit?.committer?.name || 'Unknown',
+      commitMessage: payload.head_commit?.message || 'No message provided'
+    };
+
+    // Structured logging
+    console.log({
+      event: 'GitHub Webhook Received',
+      type: githubEvent,
+      repository: {
+        name: repoInfo.name,
+        cloneUrl: repoInfo.cloneUrl
+      },
+      commit: {
+        author: repoInfo.committer,
+        message: repoInfo.commitMessage
+      },
+      timestamp: new Date().toISOString()
+    });
+
+    // TODO: Add queue system implementation here
+    // await queueDeployment(repoInfo);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Webhook processed successfully',
+      data: {
+        event: githubEvent,
+        repository: repoInfo.name
+      }
+    });
+
+  } catch (error) {
+    console.error('Webhook processing error:', error);
+    
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error processing webhook',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
 };
+
 export default getWebhook;
