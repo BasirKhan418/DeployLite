@@ -1,19 +1,26 @@
-"use client"
+"use client";
 
 declare global {
   interface Window {
-    ethereum?: any
+    ethereum?: any;
   }
 }
-import {toast,Toaster} from "sonner";
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { ethers } from "ethers"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { toast, Toaster } from "sonner";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ethers } from "ethers";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import {
   CreditCardIcon,
@@ -22,8 +29,7 @@ import {
   AlertTriangleIcon,
   FileTextIcon,
   RefreshCwIcon,
-} from "lucide-react"
-
+} from "lucide-react";
 
 import {
   Chart as ChartJS,
@@ -34,23 +40,29 @@ import {
   Title,
   Tooltip,
   Legend,
-} from "chart.js"
-import { Line } from "react-chartjs-2"
-import { useAppSelector } from "@/lib/hook"
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+import { useAppSelector } from "@/lib/hook";
 
-
- 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 export default function ImprovedPlatformWallet() {
-  const user = useAppSelector((state) => state.user.user)
-  const wallet = useAppSelector((state) => state.wallet.wallet)
+  const user = useAppSelector((state) => state.user.user);
+  const wallet = useAppSelector((state) => state.wallet.wallet);
 
-  const [addFundsAmount, setAddFundsAmount] = useState("")
-  const [cryptoAmount, setCryptoAmount] = useState("")
-  const [cryptoWalletAddress, setCryptoWalletAddress] = useState("")
-  const [cryptoConnected, setCryptoConnected] = useState(false)
-  const [cryptoBalance, setCryptoBalance] = useState("0")
+  const [addFundsAmount, setAddFundsAmount] = useState("");
+  const [cryptoAmount, setCryptoAmount] = useState("");
+  const [cryptoWalletAddress, setCryptoWalletAddress] = useState("");
+  const [cryptoConnected, setCryptoConnected] = useState(false);
+  const [cryptoBalance, setCryptoBalance] = useState("0");
   const [loading, setLoading] = useState(false);
   const [transactions, setTransactions] = useState([
     {
@@ -60,7 +72,13 @@ export default function ImprovedPlatformWallet() {
       date: "2023-09-15",
       time: "14:30",
     },
-    { id: 2, type: "Add Funds", amount: 100, date: "2023-09-14", time: "09:15" },
+    {
+      id: 2,
+      type: "Add Funds",
+      amount: 100,
+      date: "2023-09-14",
+      time: "09:15",
+    },
     {
       id: 3,
       type: "Service Upgrade",
@@ -68,12 +86,12 @@ export default function ImprovedPlatformWallet() {
       date: "2023-09-13",
       time: "18:45",
     },
-  ])
+  ]);
 
-  const router = useRouter()
+  const router = useRouter();
 
-  const midnightIST = new Date()
-  midnightIST.setHours(24, 0, 0, 0)
+  const midnightIST = new Date();
+  midnightIST.setHours(24, 0, 0, 0);
   const date = midnightIST.toLocaleString("en-IN", {
     timeZone: "Asia/Kolkata",
     day: "2-digit",
@@ -82,39 +100,85 @@ export default function ImprovedPlatformWallet() {
     hour: "2-digit",
     minute: "2-digit",
     hour12: true,
-  })
+  });
 
   async function handleConnectCryptoWallet() {
     try {
       if (!window.ethereum) {
-        alert("MetaMask not detected!")
-        return
+        alert("MetaMask not detected!");
+        return;
       }
-      const provider = new ethers.BrowserProvider(window.ethereum)
-      const accounts = await provider.send("eth_requestAccounts", [])
-      const account = accounts[0] || ""
-      setCryptoWalletAddress(account)
-      setCryptoConnected(true)
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const accounts = await provider.send("eth_requestAccounts", []);
+      const account = accounts[0] || "";
+      setCryptoWalletAddress(account);
+      setCryptoConnected(true);
 
-      const signer = await provider.getSigner()
-      const balanceWei = await provider.getBalance(account)
-      const balanceEth = ethers.formatEther(balanceWei)
-      setCryptoBalance(balanceEth)
+      const signer = await provider.getSigner();
+      const balanceWei = await provider.getBalance(account);
+      const balanceEth = ethers.formatEther(balanceWei);
+      setCryptoBalance(balanceEth);
     } catch (error) {
-      console.error(error)
+      console.error(error);
+    }
+  }
+  async function handleSendCryptoPayment() {
+    if (!cryptoConnected) {
+      toast.error("Connect your MetaMask wallet first!");
+      return;
+    }
+
+    if (
+      !cryptoAmount ||
+      isNaN(Number(cryptoAmount)) ||
+      Number(cryptoAmount) <= 0
+    ) {
+      toast.error("Enter a valid ETH amount!");
+      return;
+    }
+
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+
+      const tx = await signer.sendTransaction({
+        to: "0xeDe6eC29Fb53e32310e0960D35099aE9428700ff", 
+        value: ethers.parseEther(cryptoAmount),
+      });
+
+      toast.success("Transaction sent! Waiting for confirmation...");
+
+      await tx.wait();
+      toast.success(`Transaction confirmed! Hash: ${tx.hash}`);
+
+      // Convert ETH to INR for transaction history
+      const convertedINR = getConvertedAmountInINR(Number(cryptoAmount));
+      const newTx = {
+        id: Date.now(),
+        type: "Crypto Payment",
+        amount: convertedINR,
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+      };
+      setTransactions((prev) => [newTx, ...prev]);
+
+      setCryptoAmount("");
+    } catch (error) {
+      console.error(error);
+      toast.error("Transaction failed! Check console for details.");
     }
   }
 
   function getConvertedAmountInINR(cryptoValue: number) {
-    const conversionRate = 150000
-    return cryptoValue * conversionRate
+    const conversionRate = 150000;
+    return cryptoValue * conversionRate;
   }
 
   function handleDepositCrypto() {
-    if (!cryptoAmount) return
+    if (!cryptoAmount) return;
 
-    const ethValue = Number.parseFloat(cryptoAmount)
-    const convertedINR = getConvertedAmountInINR(ethValue)
+    const ethValue = Number.parseFloat(cryptoAmount);
+    const convertedINR = getConvertedAmountInINR(ethValue);
 
     const newTx = {
       id: Date.now(),
@@ -122,11 +186,13 @@ export default function ImprovedPlatformWallet() {
       amount: convertedINR,
       date: new Date().toLocaleDateString(),
       time: new Date().toLocaleTimeString(),
-    }
-    setTransactions((prev) => [newTx, ...prev])
+    };
+    setTransactions((prev) => [newTx, ...prev]);
 
-    setCryptoAmount("")
-    alert(`Deposited ${cryptoAmount} ETH (~₹${convertedINR.toFixed(2)}) to your DeployLite balance!`)
+    setCryptoAmount("");
+    alert(
+      `Deposited ${cryptoAmount} ETH (~₹${convertedINR.toFixed(2)}) to your DeployLite balance!`
+    );
   }
 
   const loadRazorpayScript = () => {
@@ -142,14 +208,15 @@ export default function ImprovedPlatformWallet() {
       document.body.appendChild(script);
     });
   };
-  
+
   const handleRazorpayPayment = async (e) => {
     setLoading(true);
-  
-    var amount = addFundsAmount || Number(prompt("Enter the amount to add funds"));
-  
+
+    var amount =
+      addFundsAmount || Number(prompt("Enter the amount to add funds"));
+
     const data = { amount, email: user.email, name: user.name };
-  
+
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_HOST}/api/precheckout`,
       {
@@ -158,17 +225,17 @@ export default function ImprovedPlatformWallet() {
         body: JSON.stringify(data),
       }
     );
-  
+
     const r = await response.json();
     setLoading(false);
-  
+
     if (r.success) {
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
         toast.error("Razorpay SDK failed to load.");
         return;
       }
-  
+
       var options = {
         key: process.env.NEXT_PUBLIC_KEY_ID,
         amount: r.order.amount,
@@ -182,7 +249,7 @@ export default function ImprovedPlatformWallet() {
         notes: { address: "Razorpay Corporate Office" },
         theme: { color: "#FD0872" },
       };
-  
+
       var rzp1 = new window.Razorpay(options);
       rzp1.open();
       e.preventDefault();
@@ -190,18 +257,19 @@ export default function ImprovedPlatformWallet() {
       toast.error("Error in Payment");
     }
   };
-  
 
   function handleStripePayment() {
-    toast.error("Stripe Payment Gateway not implemented yet.Will be available soon...");
+    toast.error(
+      "Stripe Payment Gateway not implemented yet.Will be available soon..."
+    );
   }
 
   function handleAddFundsInINR() {
-    if (!addFundsAmount) return
-    const amt = Number.parseFloat(addFundsAmount)
+    if (!addFundsAmount) return;
+    const amt = Number.parseFloat(addFundsAmount);
     if (amt <= 0) {
-      alert("Please enter a valid amount.")
-      return
+      alert("Please enter a valid amount.");
+      return;
     }
 
     const newTx = {
@@ -210,14 +278,22 @@ export default function ImprovedPlatformWallet() {
       amount: amt,
       date: new Date().toLocaleDateString(),
       time: new Date().toLocaleTimeString(),
-    }
-    setTransactions((prev) => [newTx, ...prev])
-    setAddFundsAmount("")
-    alert(`Deposited ₹${amt.toFixed(2)} to your DeployLite balance!`)
+    };
+    setTransactions((prev) => [newTx, ...prev]);
+    setAddFundsAmount("");
+    alert(`Deposited ₹${amt.toFixed(2)} to your DeployLite balance!`);
   }
 
-  const chartLabels = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"]
-  const chartValues = [50, 100, 75, 140, 200, 90, 120]
+  const chartLabels = [
+    "Day 1",
+    "Day 2",
+    "Day 3",
+    "Day 4",
+    "Day 5",
+    "Day 6",
+    "Day 7",
+  ];
+  const chartValues = [50, 100, 75, 140, 200, 90, 120];
 
   const chartData = {
     labels: chartLabels,
@@ -229,7 +305,7 @@ export default function ImprovedPlatformWallet() {
         backgroundColor: "rgba(244, 114, 182, 0.5)",
       },
     ],
-  }
+  };
 
   const chartOptions = {
     responsive: true,
@@ -252,7 +328,7 @@ export default function ImprovedPlatformWallet() {
         },
       },
     },
-  }
+  };
 
   return (
     <div
@@ -266,9 +342,15 @@ export default function ImprovedPlatformWallet() {
           {/* Wallet Card */}
           <Card className="col-span-2 overflow-hidden bg-black bg-opacity-50 backdrop-filter backdrop-blur-lg border border-pink-700 shadow-lg">
             <div className="bg-gradient-to-br from-pink-900 to-black p-6">
-              <CardTitle className="text-2xl mb-2 text-pink-100">DeployLite Balance</CardTitle>
-              <CardDescription className="text-pink-300">Available funds for your account</CardDescription>
-              <p className="text-5xl font-bold mt-4 text-pink-400">₹{wallet.balance}</p>
+              <CardTitle className="text-2xl mb-2 text-pink-100">
+                DeployLite Balance
+              </CardTitle>
+              <CardDescription className="text-pink-300">
+                Available funds for your account
+              </CardDescription>
+              <p className="text-5xl font-bold mt-4 text-pink-400">
+                ₹{wallet.balance}
+              </p>
             </div>
             <CardFooter className="flex justify-between mt-4">
               {/* Razorpay / Stripe Payment */}
@@ -278,13 +360,16 @@ export default function ImprovedPlatformWallet() {
               >
                 <DollarSignIcon className="mr-2 h-4 w-4" /> Pay (Razorpay)
               </Button>
-              <Button className="bg-pink-800 hover:bg-pink-700 text-white" onClick={handleStripePayment}>
+              <Button
+                className="bg-pink-800 hover:bg-pink-700 text-white"
+                onClick={handleStripePayment}
+              >
                 <DollarSignIcon className="mr-2 h-4 w-4" /> Pay (Stripe)
               </Button>
               <Button
                 className="bg-gray-800 hover:bg-gray-700 text-pink-100"
                 onClick={() => {
-                  router.push("/settings")
+                  router.push("/settings");
                 }}
               >
                 <SettingsIcon className="mr-2 h-4 w-4" /> Manage Account
@@ -302,10 +387,16 @@ export default function ImprovedPlatformWallet() {
                 <Button className="w-full bg-pink-700 hover:bg-pink-600 text-white">
                   <RefreshCwIcon className="mr-2 h-4 w-4" /> Auto-Recharge
                 </Button>
-                <Button variant="outline" className="w-full border-pink-700 text-pink-300 hover:bg-pink-900">
+                <Button
+                  variant="outline"
+                  className="w-full border-pink-700 text-pink-300 hover:bg-pink-900"
+                >
                   <FileTextIcon className="mr-2 h-4 w-4" /> Download Invoices
                 </Button>
-                <Button variant="outline" className="w-full border-pink-700 text-pink-300 hover:bg-pink-900">
+                <Button
+                  variant="outline"
+                  className="w-full border-pink-700 text-pink-300 hover:bg-pink-900"
+                >
                   <AlertTriangleIcon className="mr-2 h-4 w-4" /> View Alerts
                 </Button>
               </div>
@@ -332,7 +423,10 @@ export default function ImprovedPlatformWallet() {
                   onChange={(e) => setAddFundsAmount(e.target.value)}
                   className="bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-sm text-pink-100 border-pink-700 placeholder-pink-400"
                 />
-                <Button className="bg-pink-700 hover:bg-pink-600 text-white" onClick={handleRazorpayPayment}>
+                <Button
+                  className="bg-pink-700 hover:bg-pink-600 text-white"
+                  onClick={handleRazorpayPayment}
+                >
                   <CreditCardIcon className="mr-2 h-4 w-4" /> Add Funds
                 </Button>
               </div>
@@ -352,7 +446,9 @@ export default function ImprovedPlatformWallet() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-pink-300">Remaining Budget:</span>
-                  <span className="font-bold text-pink-100">₹{wallet.balance}</span>
+                  <span className="font-bold text-pink-100">
+                    ₹{wallet.balance}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-pink-300">Next Billing Date:</span>
@@ -384,7 +480,9 @@ export default function ImprovedPlatformWallet() {
           <TabsContent value="transactions">
             <Card className="bg-black bg-opacity-50 backdrop-filter backdrop-blur-lg border border-pink-700 shadow-lg">
               <CardHeader>
-                <CardTitle className="text-pink-100">Recent Transactions</CardTitle>
+                <CardTitle className="text-pink-100">
+                  Recent Transactions
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-4">
@@ -401,20 +499,27 @@ export default function ImprovedPlatformWallet() {
                       </div>
                       <p
                         className={`font-bold ${
-                          tx.type.toLowerCase().includes("add") || tx.type.toLowerCase().includes("crypto")
+                          tx.type.toLowerCase().includes("add") ||
+                          tx.type.toLowerCase().includes("crypto")
                             ? "text-green-400"
                             : "text-red-400"
                         }`}
                       >
-                        {tx.type.toLowerCase().includes("add") || tx.type.toLowerCase().includes("crypto") ? "+" : "-"}₹
-                        {tx.amount.toFixed(2)}
+                        {tx.type.toLowerCase().includes("add") ||
+                        tx.type.toLowerCase().includes("crypto")
+                          ? "+"
+                          : "-"}
+                        ₹{tx.amount.toFixed(2)}
                       </p>
                     </li>
                   ))}
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button variant="link" className="text-pink-400 hover:text-pink-300">
+                <Button
+                  variant="link"
+                  className="text-pink-400 hover:text-pink-300"
+                >
                   View All Transactions
                 </Button>
               </CardFooter>
@@ -425,7 +530,9 @@ export default function ImprovedPlatformWallet() {
           <TabsContent value="billing">
             <Card className="bg-black bg-opacity-50 backdrop-filter backdrop-blur-lg border border-pink-700 shadow-lg">
               <CardHeader>
-                <CardTitle className="text-pink-100">Billing Information</CardTitle>
+                <CardTitle className="text-pink-100">
+                  Billing Information
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -443,12 +550,17 @@ export default function ImprovedPlatformWallet() {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-pink-300">Payment Method:</span>
-                    <span className="font-bold text-pink-100">Visa ****1234</span>
+                    <span className="font-bold text-pink-100">
+                      Visa ****1234
+                    </span>
                   </div>
                 </div>
               </CardContent>
               <CardFooter>
-                <Button variant="link" className="text-pink-400 hover:text-pink-300">
+                <Button
+                  variant="link"
+                  className="text-pink-400 hover:text-pink-300"
+                >
                   Update Billing Info
                 </Button>
               </CardFooter>
@@ -459,7 +571,9 @@ export default function ImprovedPlatformWallet() {
           <TabsContent value="crypto">
             <Card className="bg-black bg-opacity-50 backdrop-filter backdrop-blur-lg border border-pink-700 shadow-lg">
               <CardHeader>
-                <CardTitle className="text-pink-100">Blockchain Wallet</CardTitle>
+                <CardTitle className="text-pink-100">
+                  Blockchain Wallet
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -467,13 +581,18 @@ export default function ImprovedPlatformWallet() {
                     <>
                       <p className="text-sm text-pink-300">
                         Connected Wallet:{" "}
-                        <span className="font-mono break-all text-xs text-pink-100">{cryptoWalletAddress}</span>
+                        <span className="font-mono break-all text-xs text-pink-100">
+                          {cryptoWalletAddress}
+                        </span>
                       </p>
                       <p className="text-sm text-pink-300">
-                        On-chain Balance: <span className="text-pink-100">{Number(cryptoBalance).toFixed(6)} ETH</span>
+                        On-chain Balance:{" "}
+                        <span className="text-pink-100">
+                          {Number(cryptoBalance).toFixed(6)} ETH
+                        </span>
                       </p>
                       <Label htmlFor="cryptoAmount" className="text-pink-300">
-                        Deposit Crypto (ETH)
+                        Enter Amount (ETH)
                       </Label>
                       <Input
                         id="cryptoAmount"
@@ -482,12 +601,19 @@ export default function ImprovedPlatformWallet() {
                         onChange={(e) => setCryptoAmount(e.target.value)}
                         className="bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-sm text-pink-100 border-pink-700 placeholder-pink-400"
                       />
-                      <Button className="bg-pink-700 hover:bg-pink-600 text-white" onClick={handleDepositCrypto}>
-                        <CreditCardIcon className="mr-2 h-4 w-4" /> Deposit
+                      <Button
+                        className="bg-green-700 hover:bg-green-600 text-white"
+                        onClick={handleSendCryptoPayment}
+                      >
+                        <DollarSignIcon className="mr-2 h-4 w-4" /> Pay with
+                        MetaMask
                       </Button>
                     </>
                   ) : (
-                    <Button className="bg-pink-700 hover:bg-pink-600 text-white" onClick={handleConnectCryptoWallet}>
+                    <Button
+                      className="bg-pink-700 hover:bg-pink-600 text-white"
+                      onClick={handleConnectCryptoWallet}
+                    >
                       Connect to MetaMask
                     </Button>
                   )}
@@ -512,6 +638,5 @@ export default function ImprovedPlatformWallet() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }
-
