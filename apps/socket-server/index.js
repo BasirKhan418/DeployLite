@@ -2,67 +2,68 @@ import { Server } from 'socket.io';
 import { createServer } from 'http';
 import Redis from 'ioredis';
 
-// Direct Redis Configuration (Visible but Well-Structured)
+// ✅ Redis Configuration for Valkey (Aiven)
 const redisConfig = {
-    username: 'default',
-    password: 'AVNS__TnY6dEjpphUtR6tTl4',
     host: 'valkey-1dec9a5f-basirkhanaws-5861.c.aivencloud.com',
     port: 24291,
-    retryStrategy: (times) => Math.min(times * 50, 2000),
-    maxRetriesPerRequest: 3
+    username: 'default', // Required for Aiven
+    password: 'AVNS__TnY6dEjpphUtR6tTl4',
+    tls: {} // ✅ Must enable TLS for Aiven
 };
 
-// Create Redis Subscriber & Publisher
+// Create Redis Publisher & Subscriber
 const subscriber = new Redis(redisConfig);
 const publisher = new Redis(redisConfig);
 
 // Redis Event Listeners
-subscriber.on('connect', () => console.log('✅ Connected to Redis'));
-subscriber.on('error', (error) => console.error('❌ Redis Error:', error));
-subscriber.on('close', () => console.warn('⚠️ Redis connection closed, reconnecting...'));
+subscriber.on('connect', () => console.log('✅ Connected to Redis (Valkey)'));
+subscriber.on('error', (err) => console.error('❌ Redis Error:', err));
+subscriber.on('close', () => console.warn('⚠️ Redis connection closed'));
+subscriber.on('ready', () => console.log('🟢 Redis Ready'));
 
 // Create HTTP Server and Attach Socket.io
 const httpServer = createServer();
-const io = new Server(httpServer, { 
+const io = new Server(httpServer, {
     cors: {
         origin: '*',
         methods: ['GET', 'POST']
     },
     pingTimeout: 60000,
     pingInterval: 25000,
-    connectTimeout: 45000,
     transports: ['websocket'],
     allowEIO3: true
 });
 
-// Socket.io Connection Handling
+// Socket.io Event Handling
 io.on('connection', (socket) => {
-    console.log(`🔗 New Client Connected: ${socket.id}`);
+    console.log(`🔗 Client connected: ${socket.id}`);
 
     socket.conn.on('ping', () => console.log(`📡 Ping from ${socket.id}`));
-    socket.conn.on('pong', (latency) => console.log(`📡 Pong from ${socket.id}, Latency: ${latency} ms`));
+    socket.conn.on('pong', (latency) => console.log(`📡 Pong from ${socket.id} | Latency: ${latency} ms`));
 
     socket.on('subscribe', (channel) => {
         socket.join(channel);
-        console.log(`📢 Client ${socket.id} subscribed to ${channel}`);
+        console.log(`📢 ${socket.id} subscribed to ${channel}`);
         socket.emit('message', `Joined ${channel}`);
     });
 
-    socket.on('disconnect', (reason) => console.log(`❌ Client ${socket.id} disconnected. Reason: ${reason}`));
+    socket.on('disconnect', (reason) => {
+        console.log(`❌ ${socket.id} disconnected | Reason: ${reason}`);
+    });
 });
 
-// Redis Subscription Logic
+// Redis Pub/Sub Handling
 async function initRedisSubscribe() {
     try {
-        console.log('📡 Subscribing to logs...');
+        console.log('📡 Subscribing to channels matching: logs:*');
         await subscriber.psubscribe('logs:*');
 
         subscriber.on('pmessage', (pattern, channel, message) => {
-            console.log(`📥 Received message on ${channel}: ${message}`);
+            console.log(`📥 Redis [${channel}]: ${message}`);
             io.to(channel).emit('message', message);
         });
-    } catch (error) {
-        console.error('❌ Redis Subscription Error:', error);
+    } catch (err) {
+        console.error('❌ Failed Redis Subscribe:', err);
     }
 }
 
@@ -70,8 +71,8 @@ async function initRedisSubscribe() {
 process.on('uncaughtException', (err) => console.error('🔥 Uncaught Exception:', err));
 process.on('unhandledRejection', (err) => console.error('🔥 Unhandled Promise Rejection:', err));
 
-// Start the Server
+// Start HTTP Server
 httpServer.listen(9000, () => {
-    console.log('🚀 Socket Server Running on Port 9000');
+    console.log('🚀 Socket.IO server running on port 9000');
     initRedisSubscribe();
 });

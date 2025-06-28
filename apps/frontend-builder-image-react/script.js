@@ -15,15 +15,11 @@ const LOG_TYPES = {
 };
 
 const redisConfig = {
-    username: 'default',
-    password: 'AVNS__TnY6dEjpphUtR6tTl4',
     host: 'valkey-1dec9a5f-basirkhanaws-5861.c.aivencloud.com',
     port: 24291,
-    retryStrategy: function(times) {
-        const delay = Math.min(times * 50, 2000);
-        return delay;
-    },
-    maxRetriesPerRequest: 3
+    username: 'default', // Required for Aiven
+    password: 'AVNS__TnY6dEjpphUtR6tTl4',
+    tls: {} // ✅ Must enable TLS for Aiven
 };
 
 const publisher = new Redis(redisConfig);
