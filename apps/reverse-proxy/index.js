@@ -3,7 +3,7 @@ const httpProxy = require('http-proxy');
 const app = express();
 const port = 8000;
 //ADD ENV
-const BASE_URL= "https://deploylite.tech.prod .s3.ap-south-1.amazonaws.com/__outputs"
+const BASE_URL= "https://s3.ap-south-1.amazonaws.com/deploylite.tech.prod/__outputs"
 const proxy = httpProxy.createProxy();
 app.use((req,res)=>{
     const hostname = req.hostname;
