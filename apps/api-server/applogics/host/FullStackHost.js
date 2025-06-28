@@ -19,9 +19,9 @@ const FullStackHost = async (req, res) => {
       awsvpcConfiguration: {
         assignPublicIp: "ENABLED",
         subnets: [
-         "subnet-0bd55e2dae6185a96","subnet-08bb8864b5cca45ee","subnet-031ad003d24e82efa"
+         "subnet-0f778bd1773b9fecd","subnet-00a124fa13c6797c9","subnet-0581f546c68a5ad8d"
         ],
-        securityGroups: ["sg-09b23c86c1cd38723"],
+        securityGroups: ["sg-09cd52a2ed850a619"],
       },
     },
     overrides: {

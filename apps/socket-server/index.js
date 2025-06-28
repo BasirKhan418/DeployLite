@@ -5,9 +5,9 @@ import Redis from 'ioredis';
 // Direct Redis Configuration (Visible but Well-Structured)
 const redisConfig = {
     username: 'default',
-    password: 'FxvuXWrG8SprckQkqEZXU4I7fUnW6VKH',
-    host: 'redis-19432.crce182.ap-south-1-1.ec2.redns.redis-cloud.com',
-    port: 19432,
+    password: 'AVNS__TnY6dEjpphUtR6tTl4',
+    host: 'valkey-1dec9a5f-basirkhanaws-5861.c.aivencloud.com',
+    port: 24291,
     retryStrategy: (times) => Math.min(times * 50, 2000),
     maxRetriesPerRequest: 3
 };
