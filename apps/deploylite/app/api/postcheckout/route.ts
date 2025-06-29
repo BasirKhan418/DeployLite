@@ -10,7 +10,7 @@ export const POST = async (req:NextRequest) => {
   try {
     // Attempt to parse the incoming request body as JSON
     await ConnectDb();
-    let result = CheckAuth()
+    let result = await CheckAuth()
     if(!result.result){
         return NextResponse.json({message:"You are not authenticated. Please login to continue",success:false,login:false})
     }

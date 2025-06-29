@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
-const CheckAuth =  () => {
+const CheckAuth = async () => {
     try{
-        const cook = cookies()
+        const cook = await cookies()
         let token: any = cook.get("token");
         if (token) {
             const decoded:any = jwt.verify(token.value, process.env.SECRET_KEY|| "");

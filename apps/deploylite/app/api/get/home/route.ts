@@ -7,10 +7,10 @@ import Crypto from "crypto-js";
 import { cookies } from "next/headers";
 export const GET = async(req:NextRequest,res:NextResponse)=>{
     console.log("entering to home auth")
-    const cook =cookies()
+    const cook = await cookies()
     try{
         await ConnectDb();
-    let result = CheckAuth()
+    let result = await CheckAuth() 
     if(!result.result){
         console.log('result',result)
         console.log("not authenticated")

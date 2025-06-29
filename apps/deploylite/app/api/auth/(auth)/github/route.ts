@@ -10,8 +10,8 @@ export const GET = async (req: NextRequest,res:NextResponse) => {
     const { searchParams } = new URL(req.url);
     const code = searchParams.get('code');
     const state = searchParams.get('state');
-    let res = CheckAuth();
-    if(!res.result){
+    let authResult = await CheckAuth();
+    if(!authResult.result){
         return NextResponse.redirect(`${process.env.NEXT_URL||""}/autherror`);
     }
     if(code==null && state==null){
@@ -24,7 +24,7 @@ export const GET = async (req: NextRequest,res:NextResponse) => {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "Accept": "application/json"  // Ensures you get the response in JSON format
+            "Accept": "application/json"  
         },
         body: JSON.stringify({
             client_id: process.env.NEXT_PUBLIC_GIT_HUB_CLIENT_ID,   
@@ -51,7 +51,7 @@ export const GET = async (req: NextRequest,res:NextResponse) => {
     console.log(githubuser);
 //encrypting the github token for security reasons
 let token = CryptoJS.AES.encrypt(data.access_token,process.env.SECRET_KEY||"").toString();
- let updateuser = await User.findOneAndUpdate({email:res.email},{connectgithub:true,githubid:githubuser.login,githubtoken:token,img:githubuser. avatar_url},{new:true});
+ let updateuser = await User.findOneAndUpdate({email:authResult.email},{connectgithub:true,githubid:githubuser.login,githubtoken:token,img:githubuser. avatar_url},{new:true});
  //HANDLING THE ERROR
  if(updateuser==null){
         return NextResponse.redirect(`${process.env.NEXT_URL||""}/githuberr`);

@@ -23,8 +23,13 @@ export const POST = async(req:NextRequest,res:NextResponse)=>{
             let deleteotp = await Otp.findByIdAndDelete(otp._id);
             //creating the token on behalf of user 
             let logintoken = jwt.sign({email:token.email,username:token.username},process.env.SECRET_KEY||"",{expiresIn: '7d'});
-            cookie.set('token',logintoken,{httpOnly:true,expires: new Date(Date.now() + 1000*60*60*24*7)});
-            return NextResponse.json({status: 'success',message: 'Login success',success: true})
+            
+            const response = NextResponse.json({status: 'success',message: 'Login success',success: true});
+            response.cookies.set('token', logintoken, {
+                httpOnly: true,
+                expires: new Date(Date.now() + 1000*60*60*24*7)
+            });
+            return response;
         }
         catch(err){
             return NextResponse.json({status: 'error',message: 'Invalid token or Otp code is expired.',success: false})

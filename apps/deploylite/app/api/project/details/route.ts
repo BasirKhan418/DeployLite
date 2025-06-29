@@ -12,7 +12,7 @@ export const GET = async(req:NextRequest,res:NextResponse) => {
     const { searchParams } = new URL(req.url);
     try{
      await ConnectDb();
-     let checkres = CheckAuth();
+     let checkres = await CheckAuth();
      //checking for proper authentication
      if(!checkres.result){
         return NextResponse.json({

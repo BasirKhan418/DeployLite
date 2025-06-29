@@ -1,4 +1,3 @@
-
 import { NextRequest,NextResponse } from "next/server";
 import ConnectDb from "../../../../../../middleware/connectdb";
 import User from "../../../../../../models/User";
@@ -9,7 +8,7 @@ import Wallet from "../../../../../../models/Wallet";
 import Notification from "../../../../../../models/Notification";
 export const GET = async(req:NextRequest,res:NextResponse)=>{
     const { searchParams } = new URL(req.url);
-    const cook = cookies();
+    const cook = await cookies();
     console.log("google hitting");
     const code = searchParams.get('code');
     console.log(code)
@@ -42,11 +41,11 @@ export const GET = async(req:NextRequest,res:NextResponse)=>{
     console.log("userinfo is",userInfo);
     let checkuser:any = await User.findOne({email:userInfo.email});
     //check if user already exists
-    if(checkuser!=null){
+    if (checkuser!=null){
         let checkuser2 = await User.findOne({email:userInfo.email,is0auth:true});
         if(checkuser2!=null){
             //creating token
-         let token = jwt.sign({email:checkuser2 .email,name:checkuser2.name,username:checkuser2.username},process.env.SECRET_KEY||"");
+         let token = jwt.sign({email:checkuser2.email,name:checkuser2.name,username:checkuser2.username},process.env.SECRET_KEY||"");
         //  setting cookie
          cook.set("reason","login",{maxAge:180})
          cook.set("username",checkuser2.username,{maxAge:180})
@@ -94,7 +93,8 @@ export const GET = async(req:NextRequest,res:NextResponse)=>{
 
     return NextResponse.redirect(`${process.env.NEXT_URL||""}/authsuccess`);
   } catch (error) {
+    const cook = await cookies();
     cook.set("msg","Error during token exchange or user info retrieval",{path:"/",expires:new Date(Date.now() + 1000*60*60*24*1)});
     return NextResponse.redirect(`${process.env.NEXT_URL||""}/autherror`);
   }
-} 
+}

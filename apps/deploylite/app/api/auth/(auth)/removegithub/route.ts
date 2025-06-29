@@ -8,7 +8,7 @@ export const GET = async (req: NextRequest, res: NextResponse) => {
     console.log("entering");
     try {
         await ConnectDb();
-        let result = CheckAuth();
+        let result = await CheckAuth();
         if (!result.result) {
             console.log("auth error");
             return NextResponse.json({ message: "authentication error", success: false });

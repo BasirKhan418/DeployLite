@@ -81,9 +81,16 @@ if(finduser.twofactor){
             return NextResponse.json({status: 'error',message: 'Otp Service is down please try agin after sometime',success: false})
      }
 }
+
 //if twofactor authentication is not enabled
 let token = jwt.sign({email:finduser.email,username:finduser.username},process.env.SECRET_KEY||"",{expiresIn: '7d'})
-cookie.set('token',token,{httpOnly:true,expires: new Date(Date.now() + 1000*60*60*24*7)});
+
+const cookiesObj = await cookies();
+cookiesObj.set('token', token, {
+  httpOnly: true, 
+  expires: new Date(Date.now() + 1000*60*60*24*7)
+});
+
 return NextResponse.json({status: 'success',message: 'Login success',success: true,token: token,otp:false})
 }
 catch(err:any){

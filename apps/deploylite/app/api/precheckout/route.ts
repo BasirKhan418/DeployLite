@@ -6,7 +6,7 @@ import TempPayment from '../../../../models/TempPayment';
 export const POST = async (req: NextRequest, res: NextResponse) => {
   const data = await req.json();
   await ConnectDb();
-  let result = CheckAuth()
+  let result = await CheckAuth()
   if(!result.result){
       return NextResponse.json({message:"You are not authenticated. Please login to continue",success:false,login:false})
   }
@@ -23,7 +23,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
    })
     let saved = await add.save()
   var options = {
-    amount: data.amount * 100,  // amount in the smallest currency unit
+    amount: data.amount * 100, 
     currency: "INR",
     receipt: `${rand}`
   };

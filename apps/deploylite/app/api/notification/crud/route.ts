@@ -6,7 +6,7 @@ import CheckAuth from "@/actions/CheckAuth";
 export const GET = async(req:NextRequest,res:NextResponse)=>{
     try{
         await ConnectDb();
-    let result = CheckAuth()
+    let result = await CheckAuth(); // Added await here
     if(!result.result){
         return NextResponse.json({message:"You are not authenticated. Please login to continue",success:false,login:false})
     }
@@ -25,7 +25,7 @@ export const POST = async(req:NextRequest,res:NextResponse)=>{
     try{
      await ConnectDb();
         let data = await req.json();
-        let result = CheckAuth();
+        let result = await CheckAuth(); // Added await here
         if(!result.result){
             return NextResponse.json({message:"You are not authenticated. Please login to continue",success:false,login:false})
         }

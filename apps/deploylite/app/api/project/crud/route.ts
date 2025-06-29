@@ -12,7 +12,7 @@ export const GET = async(req:NextRequest,res:NextResponse) => {
     const { searchParams } = new URL(req.url);
     try{
      await ConnectDb();
-     let checkres = CheckAuth();
+     let checkres = await CheckAuth();
      //checking for proper authentication
      if(!checkres.result){
         return NextResponse.json({
@@ -43,7 +43,7 @@ export const GET = async(req:NextRequest,res:NextResponse) => {
 }
 //for creating a new project.
 export const POST = async (req: NextRequest) => {
-    const getcookie = cookies();
+    const getcookie = await cookies();
     try {
         await ConnectDb();
         let data = await req.json()

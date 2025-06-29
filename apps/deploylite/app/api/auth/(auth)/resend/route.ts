@@ -1,6 +1,6 @@
 import { NextResponse,NextRequest } from "next/server";
 import Otp from "../../../../../../models/Otp";
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import SendOtp from "@/emails/auth/SendOtp";
 import ConnectDb from "../../../../../../middleware/connectdb";
 import User from "../../../../../../models/User";
@@ -11,10 +11,10 @@ export const GET=()=>{
 export const POST =async(req:NextRequest,res:NextResponse)=>{
     try{
     let data = await req.json();
-    let decryptdata;
+    let decryptdata: JwtPayload;
     await ConnectDb();
     try{
-    decryptdata = jwt.verify(data.token,process.env.JWT_SECRET||"");
+    decryptdata = jwt.verify(data.token,process.env.JWT_SECRET||"") as JwtPayload;
     }
     catch(err){
         return NextResponse.json({status: 'error',message: 'Resend endpoint error',success: false})
@@ -66,7 +66,8 @@ export const POST =async(req:NextRequest,res:NextResponse)=>{
             return NextResponse.json({ status: 'error', message: 'OTP send failed', success: false });
         }
     } catch (error) {
-        console.error("Error sending OTP:", error.message);
+        console.error("Error sending OTP:", 
+            error instanceof Error ? error.message : "Unknown error occurred");
         return NextResponse.json({ status: 'error', message: 'OTP Service is down, please try again later', success: false });
     }
 
