@@ -5,7 +5,7 @@ import { RepoContent } from '@/lib/githubExtractor';
 import dynamic from 'next/dynamic';
 import { Loader2 } from 'lucide-react';
 
-// Dynamically import Monaco Editor to avoid SSR issues
+
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), {
   ssr: false,
   loading: () => (
