@@ -12,11 +12,13 @@ import { Toaster,toast } from 'sonner'
 import { useAppSelector } from '@/lib/hook'
 import { useAppDispatch } from '@/lib/hook'
 import { add } from '@/lib/features/aws/aws'
+
 type ModalProps = {
     open: boolean;
     setOpen: (open: boolean) => void;
     isupdate:boolean;
   };
+
 export default function AwsModal({open,setOpen,isupdate}:ModalProps) {
   const [termsAccepted, setTermsAccepted] = useState(false)
   const aws = useAppSelector(state=>state.aws.aws);
@@ -33,20 +35,22 @@ export default function AwsModal({open,setOpen,isupdate}:ModalProps) {
     s3bucket:""
   })
   const [loading,setLoading] = useState(false)
+  
   //useEffect for setting the form data
   useEffect(()=>{
-setForm({
-  awskey:aws.awskey,
-  awssecret:aws.awssecret,
-  region:aws.region,
-  vpcid:aws.vpcid,
-  subnetid1:aws.subnetid1,
-  subnetid2:aws.subnetid2,
-  subnetid3:aws.subnetid3,
-  securitygroupid:aws.securitygroupid,
-  s3bucket:aws.s3bucket
-})
+    setForm({
+      awskey:aws.awskey,
+      awssecret:aws.awssecret,
+      region:aws.region,
+      vpcid:aws.vpcid,
+      subnetid1:aws.subnetid1,
+      subnetid2:aws.subnetid2,
+      subnetid3:aws.subnetid3,
+      securitygroupid:aws.securitygroupid,
+      s3bucket:aws.s3bucket
+    })
   },[isupdate,aws])
+  
   //handlechnage
   const handleChange = async(e:any)=>{
     setForm({
@@ -54,6 +58,7 @@ setForm({
       [e.target.id]:e.target.value
     })
   }
+  
   //handleSubmit 
   const handleSubmit = async()=>{
     if(!termsAccepted){
@@ -88,6 +93,7 @@ setForm({
       toast.error("Something Went Wrong Please try again after some time")
     }
   }
+  
   //handle Update
   const handleUpdateInput = async()=>{
     try{
@@ -122,7 +128,6 @@ setForm({
       toast.error("Something went wrong please try again after some time")
     }
   }
-  //update aws configuration
   
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -246,28 +251,18 @@ setForm({
               How to set up AWS <ExternalLink className="w-3 h-3 ml-1" />
             </a>
           </div>
-          {!isupdate&&(<Button type="submit" disabled={!termsAccepted} className="w-full sm:w-auto" onClick={handleSubmit}>
-           {loading?<LoginLoader/>:<ModalButton/>}
-          </Button>)}
-          {isupdate&&(<Button type="submit" disabled={!termsAccepted} className="w-full sm:w-auto" onClick={handleUpdateInput}>
-           {loading?<LoginLoader/>:<ModalButtonUpdate/>}
-          </Button>)}
+          {!isupdate && (
+            <Button type="submit" disabled={!termsAccepted} className="w-full sm:w-auto" onClick={handleSubmit}>
+              {loading ? <LoginLoader /> : "Save Changes"}
+            </Button>
+          )}
+          {isupdate && (
+            <Button type="submit" disabled={!termsAccepted} className="w-full sm:w-auto" onClick={handleUpdateInput}>
+              {loading ? <LoginLoader /> : "Update Changes"}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
-}
-const ModalButton=()=>{
-  return(
-    <>
-    Save Changes
-    </>
-  )
-}
-const ModalButtonUpdate=()=>{
-  return(
-    <>
-    Update Changes
-    </>
   )
 }

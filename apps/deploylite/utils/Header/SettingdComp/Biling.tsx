@@ -57,7 +57,7 @@ const Biling = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">Current Balance</p>
-              <p className="text-2xl font-bold">₹{currentWallet.balance?.toFixed(2) || "0.00"}</p>
+              <p className="text-2xl font-bold">₹{(currentWallet.balance || 0).toFixed(2)}</p>
             </div>
             <Button>
               <Wallet className="mr-2 h-4 w-4" />
@@ -76,11 +76,11 @@ const Biling = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {currentWallet.transactions && currentWallet.transactions.length > 0 ? (
-                  currentWallet.transactions.map((item: any, index) => (
+                {currentWallet.transactions && Array.isArray(currentWallet.transactions) && currentWallet.transactions.length > 0 ? (
+                  currentWallet.transactions.map((item: any, index: number) => (
                     <TableRow key={index}>
                       <TableCell>
-                        {item.date ? new Date(item.date)
+                        {item?.date ? new Date(item.date)
                           .toLocaleString("en-IN", {
                             month: "short",
                             day: "2-digit",
@@ -91,11 +91,11 @@ const Biling = () => {
                           })
                           .replace(",", "") : "N/A"}
                       </TableCell>
-                      <TableCell>{item.description || "No description"}</TableCell>
+                      <TableCell>{item?.description || "No description"}</TableCell>
                       <TableCell className="text-right">
-                        {item.type === "credit"
-                          ? `+₹${item.amount || 0}`
-                          : `-₹${item.amount || 0}`}
+                        {item?.type === "credit"
+                          ? `+₹${item?.amount || 0}`
+                          : `-₹${item?.amount || 0}`}
                       </TableCell>
                     </TableRow>
                   ))

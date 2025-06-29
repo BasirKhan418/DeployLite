@@ -117,11 +117,6 @@ const Aws = () => {
     }
   };
 
-  // Fixed component - render as JSX, not as object
-  const ButtonDisc = () => (
-    <span>Disconnect</span>
-  );
-
   return (
     <div>
       <AwsModal open={open} setOpen={setOpen} isupdate={isupdate} />
@@ -152,7 +147,7 @@ const Aws = () => {
                   setAlertOpen(true);
                 }}
               >
-                {loading ? <LoginLoader /> : <ButtonDisc />}
+                {loading ? <LoginLoader /> : "Disconnect"}
               </Button>
             )}
             {!isconnected && (

@@ -1276,24 +1276,28 @@ async function queryAiAgent(message:string) {
 
                     <Separator className="my-6" />
 
-                    <div>
-                      <h4 className="text-lg font-semibold text-gray-900 mb-4">
-                        Plan Details:{" "}
-                        {selectedPlan.name.charAt(0).toUpperCase() +
-                          selectedPlan.name.slice(1)}
-                      </h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {selectedPlan.features.map((item: any, index: number) => (
-  <div className="flex items-center" key={index}>
-    <Check className="h-5 w-5 text-green-500 mr-2" />
-    <span className="text-sm text-gray-600 dark:text-gray-300">
-      {typeof item === 'string' ? item : typeof item === 'object' ? JSON.stringify(item) : String(item)}
-    </span>
-  </div>
-))}
-                      </div>
-                    </div>
-
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  {selectedPlan.features && selectedPlan.features.map((item: any, index: number) => {
+    
+    let featureText = '';
+    if (typeof item === 'string') {
+      featureText = item;
+    } else if (typeof item === 'object' && item !== null) {
+      featureText = JSON.stringify(item);
+    } else {
+      featureText = String(item);
+    }
+    
+    return (
+      <div className="flex items-center" key={index}>
+        <Check className="h-5 w-5 text-green-500 mr-2" />
+        <span className="text-sm text-gray-600 dark:text-gray-300">
+          {featureText}
+        </span>
+      </div>
+    );
+  })}
+</div>
                     <Separator className="my-6" />
 
                     <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md">
@@ -1583,7 +1587,7 @@ async function queryAiAgent(message:string) {
   );
 }
 const FormattedBuildText = ({ text }: { text: string }) => {
-  // Split the text by bold tags and process each part
+ 
   const parts = text.split(/(<b>.*?<\/b>)/g);
   
   return (

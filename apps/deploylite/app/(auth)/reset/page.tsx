@@ -35,7 +35,7 @@ function ResetComponent() {
         toast.error('Passwords and confirm password do not match')
         return;
     }
-    if(searchurl.get('token') === null){
+    if(!searchurl || searchurl.get('token') === null){
         toast.error('Invalid token')
         return;
     }
