@@ -95,11 +95,6 @@ const Profile = () => {
         }
     }
 
-    // Fixed component - render as JSX, not as object
-    const ButtonNormal = () => (
-        <span>Save Changes</span>
-    )
-
     return (
         <div>
             <Toaster position="top-right" />
@@ -142,7 +137,9 @@ const Profile = () => {
                       </div>
                     </CardContent>
                     <CardFooter>
-                      <Button onClick={handleSubmit}>{loading?<LoginLoader/>:<ButtonNormal/>}</Button>
+                      <Button onClick={handleSubmit}>
+                        {loading ? <LoginLoader /> : "Save Changes"}
+                      </Button>
                     </CardFooter>
                   </Card>
 

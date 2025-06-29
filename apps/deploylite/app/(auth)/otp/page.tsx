@@ -52,7 +52,7 @@ function ResetComponent() {
     const res = await fetch("/api/auth/otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ otp: form.otp, token: searchurl.get("token") }),
+      body: JSON.stringify({ otp: form.otp, token: searchurl?.get("token") || "" }),
     });
 
     const result = await res.json();
@@ -76,7 +76,7 @@ function ResetComponent() {
   
   const handleResend = async () => {
     resetTimer();
-    let data = { token: searchurl.get("token"), status: "resend" };
+    let data = { token: searchurl?.get("token") || "", status: "resend" };
     try {
       let fetchresult = await fetch("/api/auth/resend", {
         method: "POST",
@@ -99,7 +99,7 @@ function ResetComponent() {
   //sendusing whatsappp
   const handleWhatsApp = async () => {
     resetTimer();
-    let data = { token: searchurl.get("token") };
+    let data = { token: searchurl?.get("token") || "" };
     try {
       let fetchresult = await fetch("/api/auth/resend", {
         method: "POST",

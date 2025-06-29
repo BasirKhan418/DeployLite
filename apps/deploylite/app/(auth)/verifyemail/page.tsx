@@ -14,7 +14,7 @@ const PageComponent = () => {
 
     const SendEmail = async()=>{
         setLoading(true)
-        let token = Search.get('token')
+        let token = Search?.get('token')
         const res = await fetch('/api/auth/verify',{
           method: 'POST',
           headers: {
@@ -33,7 +33,7 @@ const PageComponent = () => {
     }
 
     const VerifyUser = async()=>{
-        let token = Search.get('token')
+        let token = Search?.get('token')
         setLoading(true)
         const res = await fetch('/api/auth/verify',{
           method: 'POST',
