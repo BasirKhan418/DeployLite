@@ -6,9 +6,6 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CheckCircle, XCircle, Clock, Terminal, GitBranch, User, Calendar, Info } from "lucide-react"
 
-export default function Activity() {
-  const [selectedDeployment, setSelectedDeployment] = useState<Deployment>()
-  //type
 interface Deployment {
     id: number; 
     name: string; 
@@ -19,7 +16,11 @@ interface Deployment {
     commitMessage: string; 
     logs: string; 
 }
-  const deployments:Deployment[] = [
+
+export default function Activity() {
+  const [selectedDeployment, setSelectedDeployment] = useState<Deployment | null>(null)
+
+  const deployments: Deployment[] = [
     { 
       id: 1, 
       name: 'Main Branch Deploy', 
@@ -50,12 +51,41 @@ interface Deployment {
       commitMessage: 'Fix critical login bug',
       logs: 'Cloning repository...\nInstalling dependencies...\nRunning tests...\nBuilding project...',
     },
-    // Add more deployments as needed
   ]
 
+  const getStatusIcon = (status: Deployment['status']) => {
+    switch (status) {
+      case 'success':
+        return <CheckCircle className="text-green-500" size={20} />
+      case 'failed':
+        return <XCircle className="text-red-500" size={20} />
+      case 'in-progress':
+        return (
+          <div className="animate-spin">
+            <Clock className="text-blue-500" size={20} />
+          </div>
+        )
+      default:
+        return <Clock className="text-gray-500" size={20} />
+    }
+  }
+
+  const getStatusBadgeClass = (status: Deployment['status']) => {
+    switch (status) {
+      case 'success':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+      case 'failed':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
+      case 'in-progress':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100'
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100'
+    }
+  }
+
   return (
-    <div className="min-h-screen ">
-      <div className="grid grid-cols-1  gap-6">
+    <div className="min-h-screen">
+      <div className="grid grid-cols-1 gap-6">
         <Card className="bg-white dark:bg-gray-800 lg:col-span-2">
           <CardHeader>
             <CardTitle>Recent Deployments</CardTitle>
@@ -67,13 +97,7 @@ interface Deployment {
                   <li key={deployment.id} className="relative">
                     <div className="flex items-center mb-2">
                       <div className="absolute left-0 mt-1">
-                        {deployment.status === 'success' && <CheckCircle className="text-green-500" size={20} />}
-                        {deployment.status === 'failed' && <XCircle className="text-red-500" size={20} />}
-                        {deployment.status === 'in-progress' && (
-                          <div className="animate-spin">
-                            <Clock className="text-blue-500" size={20} />
-                          </div>
-                        )}
+                        {getStatusIcon(deployment.status)}
                       </div>
                       <div className="ml-8">
                         <h3 className="text-lg font-semibold">{deployment.name}</h3>
@@ -82,21 +106,12 @@ interface Deployment {
                           <span>{deployment.timestamp}</span>
                         </div>
                       </div>
-                      <Badge
-                        className={`ml-auto ${
-                          deployment.status === 'success'
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
-                            : deployment.status === 'failed'
-                            ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
-                            : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100'
-                        }`}
-                      >
+                      <Badge className={`ml-auto ${getStatusBadgeClass(deployment.status)}`}>
                         {deployment.status}
                       </Badge>
                     </div>
                     <Card
                       className="ml-8 cursor-pointer hover:shadow-md transition-shadow"
-                      //@ts-ignore
                       onClick={() => setSelectedDeployment(deployment)}
                     >
                       <CardContent className="p-4">
@@ -117,11 +132,10 @@ interface Deployment {
             </ScrollArea>
           </CardContent>
         </Card>
-        
       </div>
-      <div className='my-2 '>
       
-      <Card className="bg-white dark:bg-gray-800">
+      <div className='my-2'>
+        <Card className="bg-white dark:bg-gray-800">
           <CardHeader>
             <CardTitle>Deployment Details</CardTitle>
           </CardHeader>
@@ -146,15 +160,7 @@ interface Deployment {
                     </div>
                     <div>
                       <h3 className="font-semibold">Status</h3>
-                      <Badge
-                        className={`${
-                          selectedDeployment.status === 'success'
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
-                            : selectedDeployment.status === 'failed'
-                            ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
-                            : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100'
-                        }`}
-                      >
+                      <Badge className={getStatusBadgeClass(selectedDeployment.status)}>
                         {selectedDeployment.status}
                       </Badge>
                     </div>
@@ -187,7 +193,6 @@ interface Deployment {
             )}
           </CardContent>
         </Card>
-          
       </div>
     </div>
   )

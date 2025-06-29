@@ -37,8 +37,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 const Biling = () => {
   const wallet = useAppSelector((state) => state.wallet.wallet);
+  
+  // Ensure wallet exists and has default values
+  const currentWallet = wallet || { balance: 0, transactions: [] };
+  
   return (
     <div>
       <Card>
@@ -52,7 +57,7 @@ const Biling = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">Current Balance</p>
-              <p className="text-2xl font-bold">₹{wallet.balance.toFixed(2)}</p>
+              <p className="text-2xl font-bold">₹{currentWallet.balance?.toFixed(2) || "0.00"}</p>
             </div>
             <Button>
               <Wallet className="mr-2 h-4 w-4" />
@@ -71,28 +76,36 @@ const Biling = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {wallet.transactions.map((item: any, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      {new Date(item.date)
-                        .toLocaleString("en-IN", {
-                          month: "short",
-                          day: "2-digit",
-                          year: "numeric",
-                          hour: "numeric",
-                          minute: "2-digit",
-                          hour12: true,
-                        })
-                        .replace(",", "")}
-                    </TableCell>
-                    <TableCell>{item.description}</TableCell>
-                    <TableCell className="text-right">
-                      {item.type == "credit"
-                        ? `+₹${item.amount}`
-                        : `-₹${item.amount}`}
+                {currentWallet.transactions && currentWallet.transactions.length > 0 ? (
+                  currentWallet.transactions.map((item: any, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        {item.date ? new Date(item.date)
+                          .toLocaleString("en-IN", {
+                            month: "short",
+                            day: "2-digit",
+                            year: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit",
+                            hour12: true,
+                          })
+                          .replace(",", "") : "N/A"}
+                      </TableCell>
+                      <TableCell>{item.description || "No description"}</TableCell>
+                      <TableCell className="text-right">
+                        {item.type === "credit"
+                          ? `+₹${item.amount || 0}`
+                          : `-₹${item.amount || 0}`}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center py-4">
+                      No transactions found
                     </TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </div>

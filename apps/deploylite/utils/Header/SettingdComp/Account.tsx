@@ -126,7 +126,7 @@ const Account = () => {
                 </div>
                 <Switch 
                     id="twoFactor" 
-                    checked={user.twofactor || false} 
+                    checked={user?.twofactor || false} 
                     onCheckedChange={twoFactorChange} 
                 />
             </div>

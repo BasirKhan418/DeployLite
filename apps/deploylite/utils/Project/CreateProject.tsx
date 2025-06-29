@@ -1283,16 +1283,14 @@ async function queryAiAgent(message:string) {
                           selectedPlan.name.slice(1)}
                       </h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {selectedPlan.features.map(
-                          (item: any, index: number) => (
-                            <div className="flex items-center" key={index}>
-                              <Check className="h-5 w-5 text-green-500 mr-2" />
-                              <span className="text-sm text-gray-600 dark:text-gray-300">
-                                {item}
-                              </span>
-                            </div>
-                          )
-                        )}
+                        {selectedPlan.features.map((item: any, index: number) => (
+  <div className="flex items-center" key={index}>
+    <Check className="h-5 w-5 text-green-500 mr-2" />
+    <span className="text-sm text-gray-600 dark:text-gray-300">
+      {typeof item === 'string' ? item : typeof item === 'object' ? JSON.stringify(item) : String(item)}
+    </span>
+  </div>
+))}
                       </div>
                     </div>
 

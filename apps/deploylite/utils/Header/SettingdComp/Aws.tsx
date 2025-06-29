@@ -40,6 +40,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+
 const Aws = () => {
   const [isconnected, setIsconnected] = useState(false);
   const [open, setOpen] = useState(false);
@@ -48,6 +49,7 @@ const Aws = () => {
   const [isupdate, setisUpdate] = useState(false);
   const [alertopen, setAlertOpen] = useState(false);
   const dispatch = useAppDispatch();
+  
   const checkAws = async () => {
     try {
       const res = await fetch("/api/cutomization/aws");
@@ -61,10 +63,12 @@ const Aws = () => {
       toast.error("Something went wrong please try again after some time");
     }
   };
+  
   //useeffect for checking if aws account is connected or not
   useEffect(() => {
     checkAws();
   }, []);
+  
   //disconnect aws account
   const disconnectAws = async () => {
     try {
@@ -91,6 +95,7 @@ const Aws = () => {
       toast.error("Something went wrong please try again after some time");
     }
   };
+  
   //update aws configuration
   const updateConfiguration = async (data: any) => {
     try {
@@ -111,6 +116,12 @@ const Aws = () => {
       toast.error("Something went wrong please try again after some time");
     }
   };
+
+  // Fixed component - render as JSX, not as object
+  const ButtonDisc = () => (
+    <span>Disconnect</span>
+  );
+
   return (
     <div>
       <AwsModal open={open} setOpen={setOpen} isupdate={isupdate} />
@@ -198,7 +209,7 @@ const Aws = () => {
             <div className="space-y-2">
               <Label htmlFor="awsRegion">AWS Region</Label>
               <Select
-                value={aws.region}
+                value={aws?.region || ""}
                 onValueChange={(value) =>
                   updateConfiguration({ region: value })
                 }
@@ -232,7 +243,7 @@ const Aws = () => {
                 <Input
                   id="awsAccessKey"
                   placeholder="Enter your AWS Access Key ID"
-                  value={aws.awskey}
+                  value={aws?.awskey || ""}
                   readOnly
                 />
               </div>
@@ -242,7 +253,7 @@ const Aws = () => {
                   id="awsSecretKey"
                   type="password"
                   placeholder="Enter your AWS Secret Access Key"
-                  value={aws.awssecret}
+                  value={aws?.awssecret || ""}
                   readOnly
                 />
               </div>
@@ -281,9 +292,9 @@ const Aws = () => {
               </div>
               <Switch
                 id="s3Service"
-                defaultChecked={!!aws.s3}
+                checked={!!aws?.s3}
                 onCheckedChange={() => {
-                  updateConfiguration({ s3: !aws.s3 });
+                  updateConfiguration({ s3: !aws?.s3 });
                 }}
               />
             </div>
@@ -295,9 +306,9 @@ const Aws = () => {
               </div>
               <Switch
                 id="ec2Service"
-                defaultChecked={!!aws.ec2}
+                checked={!!aws?.ec2}
                 onCheckedChange={() => {
-                  updateConfiguration({ ec2: !aws.ec2 });
+                  updateConfiguration({ ec2: !aws?.ec2 });
                 }}
               />
             </div>
@@ -311,9 +322,9 @@ const Aws = () => {
               </div>
               <Switch
                 id="rdsService"
-                defaultChecked={!!aws.fargate}
+                checked={!!aws?.fargate}
                 onCheckedChange={() => {
-                  updateConfiguration({ fargate: !aws.fargate });
+                  updateConfiguration({ fargate: !aws?.fargate });
                 }}
               />
             </div>
@@ -329,9 +340,9 @@ const Aws = () => {
               </div>
               <Switch
                 id="rdsService"
-                defaultChecked={!!aws.ecs}
+                checked={!!aws?.ecs}
                 onCheckedChange={() => {
-                  updateConfiguration({ ecs: !aws.ecs });
+                  updateConfiguration({ ecs: !aws?.ecs });
                 }}
               />
             </div>
@@ -348,9 +359,9 @@ const Aws = () => {
               </div>
               <Switch
                 id="rdsService"
-                defaultChecked={!!aws.ecr}
+                checked={!!aws?.ecr}
                 onCheckedChange={() => {
-                  updateConfiguration({ ecr: !aws.ecr });
+                  updateConfiguration({ ecr: !aws?.ecr });
                 }}
               />
             </div>
@@ -390,6 +401,3 @@ const Aws = () => {
 };
 
 export default Aws;
-const ButtonDisc = () => {
-  return <>Disconnect</>;
-};
