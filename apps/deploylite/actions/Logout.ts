@@ -2,8 +2,8 @@
 import { cookies } from "next/headers"
 const Logout = async () => {
     try{
-        const cook = cookies()
-        cook.delete('token');
+        const cookieStore = await cookies();
+        cookieStore.delete('token');
         return true;
     }
     catch(err){
