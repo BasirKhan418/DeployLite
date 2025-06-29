@@ -1,12 +1,20 @@
 import React from 'react'
 import CreateProject from '@/utils/Project/CreateProject'
 import CreateWebbuilder from '@/utils/Project/CreateWebbuider'
-const page = ({params}:any) => {
-    console.log(params)
+
+interface PageProps {
+  params: Promise<{ type: string }>
+}
+
+const page = async ({ params }: PageProps) => {
+  const { type } = await params
+  
+  console.log(type)
+  
   return (
     <div>
-      {params.type=="app-platform"&&<CreateProject name={params.type}/>}
-        {params.type=="webbuilder"&&<CreateWebbuilder />}
+      {type === "app-platform" && <CreateProject name={type}/>}
+      {type === "webbuilder" && <CreateWebbuilder />}
     </div>
   )
 }

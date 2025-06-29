@@ -9,15 +9,12 @@ import Deployment from "../../../../../models/Deployment"
 import { cookies } from "next/headers"
 import CryptoJS from "crypto-js"
 
-export const GET = async (req: NextRequest) => {
-    const { searchParams } = new URL(req.url);
-    
+export const GET = async () => {
     try {
         await ConnectDb();
         
         const checkres = await CheckAuth();
         
-        // Checking for proper authentication
         if (!checkres.result) {
             return NextResponse.json({
                 success: false,
@@ -25,16 +22,15 @@ export const GET = async (req: NextRequest) => {
             }, { status: 401 });
         }
         
-        const userId = searchParams.get("id");
-        if (!userId) {
+        const user = await User.findOne({ email: checkres.email });
+        if (!user) {
             return NextResponse.json({
                 success: false,
-                message: "User ID is required"
-            }, { status: 400 });
+                message: "User not found"
+            }, { status: 404 });
         }
         
-        // Check the entry and return it
-        const projectdata = await Project.find({ userid: userId }).populate("userid");
+        const projectdata = await Project.find({ userid: user._id }).populate("userid");
         
         if (!projectdata || projectdata.length === 0) {
             return NextResponse.json({
@@ -59,7 +55,6 @@ export const GET = async (req: NextRequest) => {
     }
 }
 
-// For creating a new project
 export const POST = async (req: NextRequest) => {
     const getcookie = await cookies();
     
@@ -68,7 +63,6 @@ export const POST = async (req: NextRequest) => {
         const data = await req.json();
         const auth = await CheckAuth();
         
-        // Checking if user is authenticated or not
         if (!auth.result) {
             return NextResponse.json({
                 message: "User is not authenticated",
@@ -77,10 +71,8 @@ export const POST = async (req: NextRequest) => {
             }, { status: 401 });
         }
         
-        // Sanitize user payload
         const sanitizePayload = CreateprojectSchema.safeParse(data);
         
-        // Checking if payload is valid or not
         console.log(data);
         if (!sanitizePayload.success) {
             return NextResponse.json({
@@ -105,7 +97,6 @@ export const POST = async (req: NextRequest) => {
             }, { status: 409 });
         }
         
-        // Checks pricing plan exists or not
         console.log(data.planid);
         const checkplan = await PricingPlan.findOne({ _id: data.planid });
         
@@ -117,7 +108,6 @@ export const POST = async (req: NextRequest) => {
             }, { status: 400 });
         }
         
-        // Check if user has access to the plan
         console.log("checking user");
         const user = await User.findOne({ email: auth.email });
         console.log(user);
@@ -130,10 +120,8 @@ export const POST = async (req: NextRequest) => {
             }, { status: 404 });
         }
 
-        // If everything is ok then continue
         console.log("creating project");
         
-        // Setting date
         const startbilingdate = new Date(); 
         const endbilingdate = new Date(startbilingdate); 
         
@@ -143,7 +131,6 @@ export const POST = async (req: NextRequest) => {
         console.log('Start Billing Date (Today, local time):', startbilingdate.toLocaleString());
         console.log('End Billing Date (Next day, 12:00 AM local time):', endbilingdate.toLocaleString());
         
-        // Creating project
         const project = new Project({
             name: name,
             type: data.type,
@@ -166,7 +153,6 @@ export const POST = async (req: NextRequest) => {
         
         await project.save();
         
-        // Create a deployment schema
         const deploymentData = new Deployment({
             userid: user._id,
             projectid: project._id,
@@ -185,7 +171,6 @@ export const POST = async (req: NextRequest) => {
         
         const decryptgithubauth = CryptoJS.AES.decrypt(user.githubtoken, process.env.SECRET_KEY || "").toString(CryptoJS.enc.Utf8);
         
-        // Firing API to better handle the deployment
         const createdep = await fetch(`${process.env.DEPLOYMENT_API}/createdeployment`, {
             method: 'POST',
             headers: {
@@ -235,7 +220,6 @@ export const POST = async (req: NextRequest) => {
     }
 }
 
-// Delete project data
 export const DELETE = async (req: NextRequest) => {
     try {
         const data = await req.json();
@@ -243,7 +227,6 @@ export const DELETE = async (req: NextRequest) => {
         
         const auth = await CheckAuth();
         
-        // Checking if user is authenticated or not
         if (!auth.result) {
             return NextResponse.json({
                 message: "User is not authenticated",

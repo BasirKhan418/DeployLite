@@ -86,31 +86,41 @@ const Projecthome = ({ name }: { name: string }) => {
       logo: "/placeholder.svg?height=40&width=40",
     },
   ]);
-  const getDetails = async()=>{
-    setLoading(true)
-    console.log('fetching data')
-    try{
-     setLoading(true)
-     // Use username or email as identifier instead of id
-     let result = await fetch(`/api/project/crud?username=${user?.username || ''}`);
-     const data = await result.json();
-     setLoading(false)
-      setLoading(false)
-      console.log("result is ",data)
-     if(data.success){
-        setProjects(data.projectdata)
-       console.log("data is ",data)
-     }
-     else{
-      toast.error(data.message)
-     }
-    }
-    catch(err){
-      console.log(err)
-      toast.error('Error while fetching data');
-     
-    }
+  const getDetails = async () => {
+  if (!user) {
+    console.log('No user found for project fetch');
+    setLoading(false);
+    return;
   }
+
+  setLoading(true);
+  console.log('Fetching project details for user:', user.email);
+  
+  try {
+    // Call API without parameters since it gets user from auth
+    const result = await fetch(`/api/project/crud`);
+    const data = await result.json();
+    
+    console.log('Project API Response:', data);
+    
+    if (data.success && data.projectdata) {
+      setProjects(data.projectdata);
+      console.log('Projects loaded successfully:', data.projectdata.length);
+    } else {
+      console.log('No projects found or API error:', data.message);
+      setProjects([]);
+      if (data.message && !data.message.includes('No Projects found')) {
+        toast.error(data.message);
+      }
+    }
+  } catch (err) {
+    console.error('Error fetching project details:', err);
+    toast.error('Error while fetching data');
+    setProjects([]);
+  } finally {
+    setLoading(false);
+  }
+};
   useEffect(()=>{
     getDetails()
   },[user]) 
@@ -146,12 +156,12 @@ const Projecthome = ({ name }: { name: string }) => {
     }
     
     try{
-      let confirm = window.confirm('Are you sure you want to delete this project?');
+      const confirm = window.confirm('Are you sure you want to delete this project?');
       if(!confirm){
         return;
       }
       setLoading(true);
-      let deleteproject = await fetch(`/api/project/crud`,{
+      const deleteproject = await fetch(`/api/project/crud`,{
         method:'DELETE',
         headers:{
           'Content-Type':'application/json'
@@ -169,6 +179,8 @@ const Projecthome = ({ name }: { name: string }) => {
       }
     }
     catch(err){
+      console.error('Error while deleting project:', err);
+      setLoading(false);
       toast.error('Error while deleting project');
     }
   }
@@ -218,7 +230,7 @@ const Projecthome = ({ name }: { name: string }) => {
                  {!loading&& <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {projects.map((project) => (
                       <Card
-                        key={project.id}
+                        key={project._id}
                         className="overflow-hidden hover:shadow-lg transition-shadow duration-300"
                         onClick={() => window.open(`/project/overview?id=${project._id || project.id}`)}
                       >

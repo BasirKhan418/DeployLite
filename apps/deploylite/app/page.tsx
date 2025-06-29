@@ -1,12 +1,15 @@
 "use client"
-import React, { useEffect } from 'react'
+import Script from 'next/script'
 import Hero from '@/utils/Banners/Hero'
 
 const page = () => {
   return (
     <>
    <Hero/>
-   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+   <Script 
+     src="https://checkout.razorpay.com/v1/checkout.js" 
+     strategy="lazyOnload"
+   />
     </>
   )
 }

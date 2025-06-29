@@ -379,87 +379,116 @@ const DashboardHero = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
-  // Data fetching logic (keeping your existing implementation)
-  const fetchDashboardData = async () => {
-    if (!user?._id) return;
-    
-    setIsLoading(true);
-    try {
-      const projectsRes = await fetch(`/api/project/crud?id=${user._id}`);
-      const projectsData = await projectsRes.json();
-      
-      if (projectsData.success && projectsData.projectdata) {
-        const projects = projectsData.projectdata;
-        setActiveProjects(projects);
-        
-        const totalDeployments = projects.length;
-        const activeProjectsCount = projects.filter((p: ProjectData) => 
-          p.projectstatus === 'live' || p.projectstatus === 'building'
-        ).length;
-        
-        const chartData = generateChartDataFromProjects(projects);
-        
-        setDeploymentStats({
-          chartData,
-          totalDeployments,
-          activeProjects: activeProjectsCount,
-        });
-        
-        const liveProjects = projects.filter((p: ProjectData) => p.projectstatus === 'live').length;
-        const failedProjects = projects.filter((p: ProjectData) => p.projectstatus === 'failed').length;
-        const totalFinished = liveProjects + failedProjects;
-        
-        const successRate = totalFinished > 0 ? Math.round((liveProjects / totalFinished) * 100) : 0;
-        
-        setBuildStats({
-          successfulBuildPercentage: successRate,
-          failedBuildPercentage: 100 - successRate,
-        });
-        
-        const recentDeployments = projects
-          .filter((p: ProjectData) => p.lastdeploy || p.startdate)
-          .map((p: ProjectData) => ({
-            id: p._id,
-            projectName: p.name,
-            status: p.projectstatus as 'live' | 'failed' | 'building' | 'creating',
-            timestamp: new Date(p.lastdeploy || p.startdate || new Date()),
-            techStack: p.techused,
-            projectUrl: p.projecturl,
-          }))
-          .sort((a: RecentDeployment, b: RecentDeployment) => b.timestamp.getTime() - a.timestamp.getTime())
-          .slice(0, 8);
-        
-        setRecentDeployments(recentDeployments);
-      } else {
-        setDeploymentStats({
-          chartData: [],
-          totalDeployments: 0,
-          activeProjects: 0,
-        });
-        setBuildStats({
-          successfulBuildPercentage: 0,
-          failedBuildPercentage: 0,
-        });
-        setRecentDeployments([]);
-        setActiveProjects([]);
-      }
 
-      setLastUpdated(new Date());
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      toast.error('Failed to load dashboard data');
+
+const fetchDashboardData = async () => {
+  if (!user?._id && !user?.username) {
+    console.log('No user identifier found');
+    return;
+  }
+  
+  setIsLoading(true);
+  try {
+    // Try different API endpoints based on available user data
+    let apiUrl = '';
+    if (user._id) {
+      apiUrl = `/api/project/crud?id=${user._id}`;
+    } else if (user.username) {
+      apiUrl = `/api/project/crud?username=${user.username}`;
+    }
+
+    console.log('Fetching from:', apiUrl);
+    const projectsRes = await fetch(apiUrl);
+    const projectsData = await projectsRes.json();
+    
+    console.log('API Response:', projectsData);
+    
+    if (projectsData.success && projectsData.projectdata) {
+      const projects = projectsData.projectdata;
+      setActiveProjects(projects);
+      
+      const totalDeployments = projects.length;
+      const activeProjectsCount = projects.filter((p: ProjectData) => 
+        p.projectstatus === 'live' || p.projectstatus === 'building'
+      ).length;
+      
+      const chartData = generateChartDataFromProjects(projects);
+      
+      setDeploymentStats({
+        chartData,
+        totalDeployments,
+        activeProjects: activeProjectsCount,
+      });
+      
+      const liveProjects = projects.filter((p: ProjectData) => p.projectstatus === 'live').length;
+      const failedProjects = projects.filter((p: ProjectData) => p.projectstatus === 'failed').length;
+      const totalFinished = liveProjects + failedProjects;
+      
+      const successRate = totalFinished > 0 ? Math.round((liveProjects / totalFinished) * 100) : 0;
+      
+      setBuildStats({
+        successfulBuildPercentage: successRate,
+        failedBuildPercentage: 100 - successRate,
+      });
+      
+      const recentDeployments = projects
+        .filter((p: ProjectData) => p.lastdeploy || p.startdate)
+        .map((p: ProjectData) => ({
+          id: p._id,
+          projectName: p.name,
+          status: p.projectstatus as 'live' | 'failed' | 'building' | 'creating',
+          timestamp: new Date(p.lastdeploy || p.startdate || new Date()),
+          techStack: p.techused,
+          projectUrl: p.projecturl,
+        }))
+        .sort((a: RecentDeployment, b: RecentDeployment) => b.timestamp.getTime() - a.timestamp.getTime())
+        .slice(0, 8);
+      
+      setRecentDeployments(recentDeployments);
+    } else {
+      console.log('No project data or unsuccessful response:', projectsData);
       setDeploymentStats({
         chartData: [],
         totalDeployments: 0,
         activeProjects: 0,
       });
-    } finally {
-      setIsLoading(false);
+      setBuildStats({
+        successfulBuildPercentage: 0,
+        failedBuildPercentage: 0,
+      });
+      setRecentDeployments([]);
+      setActiveProjects([]);
     }
-  };
+
+    setLastUpdated(new Date());
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+    toast.error('Failed to load dashboard data');
+    setDeploymentStats({
+      chartData: [],
+      totalDeployments: 0,
+      activeProjects: 0,
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+// Also update the useEffect to better handle user changes:
+useEffect(() => {
+  if (user && (user._id || user.username)) {
+    console.log('User available, fetching dashboard data:', user);
+    fetchDashboardData();
+    const interval = setInterval(fetchDashboardData, 120000);
+    return () => clearInterval(interval);
+  } else {
+    console.log('No user available or missing identifier');
+    setIsLoading(false);
+  }
+}, [user]);
 
   const generateChartDataFromProjects = (projects: ProjectData[]) => {
-    const last6Months = [];
+    const last6Months: ChartDataPoint[] = [];
     const now = new Date();
     
     for (let i = 5; i >= 0; i--) {
@@ -487,15 +516,7 @@ const DashboardHero = () => {
     return () => clearInterval(interval);
   }, [user]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'live': return 'text-emerald-400';
-      case 'failed': return 'text-red-400';
-      case 'building': return 'text-amber-400';
-      case 'creating': return 'text-pink-400';
-      default: return 'text-gray-400';
-    }
-  };
+ 
 
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
@@ -533,10 +554,7 @@ const DashboardHero = () => {
 
   const trend = calculateTrend();
 
-  // Function to render icon safely
-  const renderIcon = (IconComponent: React.ComponentType<any>, className: string) => {
-    return <IconComponent className={className} />;
-  };
+ 
 
   if (isLoading) {
     return (

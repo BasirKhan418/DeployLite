@@ -8,7 +8,6 @@ import { FaUsers } from "react-icons/fa";
 import { FaDrupal } from "react-icons/fa";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { PlusCircle, Search, MoreHorizontal ,ExternalLink, Layers, Cpu, Eye, BarChart2, Edit, Trash2, Play, Pause, RefreshCw, Settings,Globe } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import Image from 'next/image'

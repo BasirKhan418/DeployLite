@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch"
 import { Slider } from "@/components/ui/slider"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Bell, Lock, Globe, Zap, CreditCard, Users, Clock, Server, Shield, AlertTriangle } from 'lucide-react'
+import {  Globe, Zap, CreditCard, Users, Clock, Shield, AlertTriangle } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -29,11 +29,11 @@ export default function ProjectSettings() {
     { key: 'API_KEY', value: '********' },
     { key: 'DATABASE_URL', value: 'postgres://user:pass@host:5432/db' }
   ])
-  const [deployments, setDeployments] = useState([
+  const deployments = [
     { id: 1, status: 'success', version: 'v1.2.3', date: '2023-10-20', author: 'John Doe' },
     { id: 2, status: 'failed', version: 'v1.2.2', date: '2023-10-19', author: 'Jane Smith' },
     { id: 3, status: 'success', version: 'v1.2.1', date: '2023-10-18', author: 'John Doe' },
-  ])
+  ]
 
   const handleAddCustomDomain = () => {
     alert(`Custom domain ${customDomain} added!`)
@@ -116,7 +116,7 @@ export default function ProjectSettings() {
           <Card>
             <CardHeader>
               <CardTitle>Domain Settings</CardTitle>
-              <CardDescription>Manage your project's domain names</CardDescription>
+              <CardDescription>Manage your project&apos;s domain names</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
