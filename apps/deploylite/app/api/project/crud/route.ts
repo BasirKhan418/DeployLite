@@ -8,114 +8,143 @@ import User from "../../../../../models/User"
 import Deployment from "../../../../../models/Deployment"
 import { cookies } from "next/headers"
 import CryptoJS from "crypto-js"
-export const GET = async(req:NextRequest,res:NextResponse) => {
+
+export const GET = async (req: NextRequest) => {
     const { searchParams } = new URL(req.url);
-    try{
-     await ConnectDb();
-     let checkres = await CheckAuth();
-     //checking for proper authentication
-     if(!checkres.result){
-        return NextResponse.json({
-            success:false,
-            message:"Authentication failed please try again later!"
-        })
-     }
-     //check the entry and return it;
-     let projectdata = await Project.find({userid:searchParams.get("id")}).populate("userid");
-     if(projectdata==null){
-        return NextResponse.json({
-            success:false,
-            message:"No Projects found."
-        })
-     }
-     return NextResponse.json({
-        success:true,
-        projectdata:projectdata,
-        message:"Successfully fetched"
-    })
-    }
-    catch(err){
-        return NextResponse.json({
-            success:false,
-            message:"Some thing went wrong please try again later!"
-        })
-    }
-}
-//for creating a new project.
-export const POST = async (req: NextRequest) => {
-    const getcookie = await cookies();
+    
     try {
         await ConnectDb();
-        let data = await req.json()
+        
+        const checkres = await CheckAuth();
+        
+        // Checking for proper authentication
+        if (!checkres.result) {
+            return NextResponse.json({
+                success: false,
+                message: "Authentication failed please try again later!"
+            }, { status: 401 });
+        }
+        
+        const userId = searchParams.get("id");
+        if (!userId) {
+            return NextResponse.json({
+                success: false,
+                message: "User ID is required"
+            }, { status: 400 });
+        }
+        
+        // Check the entry and return it
+        const projectdata = await Project.find({ userid: userId }).populate("userid");
+        
+        if (!projectdata || projectdata.length === 0) {
+            return NextResponse.json({
+                success: true,
+                projectdata: [],
+                message: "No Projects found."
+            });
+        }
+        
+        return NextResponse.json({
+            success: true,
+            projectdata: projectdata,
+            message: "Successfully fetched"
+        });
+        
+    } catch (err) {
+        console.error("Error in GET /api/project/crud:", err);
+        return NextResponse.json({
+            success: false,
+            message: "Something went wrong please try again later!"
+        }, { status: 500 });
+    }
+}
+
+// For creating a new project
+export const POST = async (req: NextRequest) => {
+    const getcookie = await cookies();
+    
+    try {
+        await ConnectDb();
+        const data = await req.json();
         const auth = await CheckAuth();
-        //checking if user is authenticated or not.
+        
+        // Checking if user is authenticated or not
         if (!auth.result) {
             return NextResponse.json({
                 message: "User is not authenticated",
                 success: false,
                 autherror: true
-            })
+            }, { status: 401 });
         }
-        //sanitize user payload
-        const santizepayload = CreateprojectSchema.safeParse(data);
-        //checking if payload is valid or not.
-        console.log(data)
-        if(!santizepayload.success){
+        
+        // Sanitize user payload
+        const sanitizePayload = CreateprojectSchema.safeParse(data);
+        
+        // Checking if payload is valid or not
+        console.log(data);
+        if (!sanitizePayload.success) {
             return NextResponse.json({
                 message: "Invalid Payload tampering detected",
                 success: false,
-                error: santizepayload.error,
-            })
+                error: sanitizePayload.error,
+            }, { status: 400 });
         }
-        //check project is unique or not
-        let name = data.name.replace(/\s+/g, '').toLowerCase();
+        
+        // Check project is unique or not
+        const name = data.name.replace(/\s+/g, '').toLowerCase();
         console.log(name);
-        let projectname = await Project.findOne({name:name});
-        //if project name already exists
-        if(projectname!=null){
+        
+        const projectname = await Project.findOne({ name: name });
+        
+        // If project name already exists
+        if (projectname != null) {
             return NextResponse.json({
-                message:"Project name already exists. Select a different name",
-                success:false,
-                projectname:"exists"
-            })
+                message: "Project name already exists. Select a different name",
+                success: false,
+                projectname: "exists"
+            }, { status: 409 });
         }
-        //checks pricing plan exists or not
-        console.log(data.planid)
-        let checkplan = await PricingPlan.findOne({_id:data.planid});
-        if(checkplan==null){
+        
+        // Checks pricing plan exists or not
+        console.log(data.planid);
+        const checkplan = await PricingPlan.findOne({ _id: data.planid });
+        
+        if (checkplan == null) {
             return NextResponse.json({
-                message:"Pricing Plan does not exists. Pricing plan may be deleted or invalid",
-                success:false,
-                planid:"invalid"
-            })
+                message: "Pricing Plan does not exist. Pricing plan may be deleted or invalid",
+                success: false,
+                planid: "invalid"
+            }, { status: 400 });
         }
-        //check if user has access to the plan
-        console.log("checking user")
-        let user = await User.findOne({email:auth.email});
-        console.log(user)
-        if(user==null){
+        
+        // Check if user has access to the plan
+        console.log("checking user");
+        const user = await User.findOne({ email: auth.email });
+        console.log(user);
+        
+        if (user == null) {
             return NextResponse.json({
-                message:"User not found",
-                success:false,
-                user:"notfound"
-            })
+                message: "User not found",
+                success: false,
+                user: "notfound"
+            }, { status: 404 });
         }
 
-        //if every thing is ok then continue
-        console.log("creating project")
-        //setting date
-        const startbilingdate = new Date(); // Today's date and current time
-        const endbilingdate = new Date(startbilingdate); // Clone startbilingdate to preserve the date
+        // If everything is ok then continue
+        console.log("creating project");
         
-        // Set endbilingdate to midnight (12:00 AM) of the next day
-        endbilingdate.setDate(startbilingdate.getDate() + 1); // Move to the next day
-        endbilingdate.setHours(0, 0, 0, 0); // Set time to 12:00 AM (start of the day)
+        // Setting date
+        const startbilingdate = new Date(); 
+        const endbilingdate = new Date(startbilingdate); 
+        
+        endbilingdate.setDate(startbilingdate.getDate() + 1); 
+        endbilingdate.setHours(0, 0, 0, 0); 
         
         console.log('Start Billing Date (Today, local time):', startbilingdate.toLocaleString());
         console.log('End Billing Date (Next day, 12:00 AM local time):', endbilingdate.toLocaleString());
         
-        //creating project
-        let project = new Project({
+        // Creating project
+        const project = new Project({
             name: name,
             type: data.type,
             repourl: data.repourl,
@@ -130,21 +159,33 @@ export const POST = async (req: NextRequest) => {
             userid: user._id,
             startdate: new Date(),
             projectstatus: "creating",
-            billstatus:"pending",
+            billstatus: "pending",
             startbilingdate: startbilingdate,
             endbilingdate: endbilingdate,
         });
+        
         await project.save();
-        //create a deployment schema
-        let Deploymentdata = new Deployment({
-            userid:user._id,
-            projectid:project._id,
-            status:"creating",
-            deploymentdate:new Date(),
-        })
-        await Deploymentdata.save();
-        let decryptgithubauth = CryptoJS.AES.decrypt(user.githubtoken, process.env.SECRET_KEY||"").toString(CryptoJS.enc.Utf8);
-        //firing some api toi better handle the deployment
+        
+        // Create a deployment schema
+        const deploymentData = new Deployment({
+            userid: user._id,
+            projectid: project._id,
+            status: "creating",
+            deploymentdate: new Date(),
+        });
+        
+        await deploymentData.save();
+        
+        if (!user.githubtoken) {
+            return NextResponse.json({
+                message: "GitHub token not found. Please connect your GitHub account.",
+                success: false,
+            }, { status: 400 });
+        }
+        
+        const decryptgithubauth = CryptoJS.AES.decrypt(user.githubtoken, process.env.SECRET_KEY || "").toString(CryptoJS.enc.Utf8);
+        
+        // Firing API to better handle the deployment
         const createdep = await fetch(`${process.env.DEPLOYMENT_API}/createdeployment`, {
             method: 'POST',
             headers: {
@@ -163,64 +204,73 @@ export const POST = async (req: NextRequest) => {
                 outputfolder: data.outputfolder,
                 installcommand: data.installcommand,
                 name: name,
-                authtoken:decryptgithubauth,
+                authtoken: decryptgithubauth,
             })
         });
+        
         const result = await createdep.json();
         console.log(result);
         
-        if(result.success){
+        if (result.success) {
             return NextResponse.json({
                 message: "Project Created & Deployment Started",
                 success: true,
-                project: project});
-        }
-        else{
+                project: project
+            });
+        } else {
             return NextResponse.json({
-                message: `Project creation failed: Reason-`+result.message,
+                message: `Project creation failed: Reason - ${result.message}`,
                 success: false,
-                project: project});
+                project: project
+            }, { status: 500 });
         }
 
-    }
-    catch (err) {
-        console.log("error occured while creating project")
-        console.log(err)
+    } catch (err) {
+        console.error("Error occurred while creating project:", err);
         return NextResponse.json({
-            message: "error occured while creating project",
-            error: err,
+            message: "Error occurred while creating project",
+            error: err instanceof Error ? err.message : "Unknown error",
             success: false,
-        })
+        }, { status: 500 });
     }
 }
-//delete project data
 
-export const DELETE = async(req:NextRequest,res:NextResponse) => {
-    try{
-    let data = await req.json();
-    await ConnectDb();
-    const auth = await CheckAuth();
-        //checking if user is authenticated or not.
+// Delete project data
+export const DELETE = async (req: NextRequest) => {
+    try {
+        const data = await req.json();
+        await ConnectDb();
+        
+        const auth = await CheckAuth();
+        
+        // Checking if user is authenticated or not
         if (!auth.result) {
             return NextResponse.json({
                 message: "User is not authenticated",
                 success: false,
                 autherror: true
-            })
+            }, { status: 401 });
         }
-        let projectdelete = await Project.findOneAndDelete({_id:data.id});
-        if(projectdelete==null){
+        
+        const projectdelete = await Project.findOneAndDelete({ _id: data.id });
+        
+        if (projectdelete == null) {
             return NextResponse.json({
-                success:false,
-                message:"Project not found"
-            })
+                success: false,
+                message: "Project not found"
+            }, { status: 404 });
         }
+        
         return NextResponse.json({
-            success:true,
-            message:"Project Deleted Successfully"
+            success: true,
+            message: "Project Deleted Successfully"
         });
-    }
-    catch(err){
-        return NextResponse.json({success:false,message:"Some thing went wrong please try again later!"})
+        
+    } catch (err) {
+        console.error("Error deleting project:", err);
+        return NextResponse.json({
+            success: false,
+            message: "Something went wrong please try again later!"
+        }, { status: 500 });
     }
 }

@@ -15,7 +15,11 @@ import {
   ExternalLink,
   Clock,
   Server,
-  GitBranch
+  GitBranch,
+  Code,
+  Database,
+  Cloud,
+  Zap
 } from "lucide-react";
 import { useAppSelector } from "@/lib/hook";
 
@@ -74,10 +78,10 @@ interface ProjectData {
   planid?: string;
 }
 
-// Design system
+// Professional animations
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.4, 0.25, 1] } }
 };
 
 const stagger = {
@@ -85,7 +89,12 @@ const stagger = {
   visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
 };
 
-// Enhanced Interactive Line Chart
+const scaleIn = {
+  hidden: { scale: 0.95, opacity: 0 },
+  visible: { scale: 1, opacity: 1, transition: { duration: 0.3, ease: "easeOut" } }
+};
+
+// Professional Interactive Line Chart
 const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
   const [hoveredPoint, setHoveredPoint] = useState<number | null>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
@@ -105,7 +114,6 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
     `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`
   ).join(' ');
 
-  // Create gradient area path
   const areaPath = pathData + ` L ${points[points.length - 1]?.x || 0} ${height - padding} L ${padding} ${height - padding} Z`;
 
   useEffect(() => {
@@ -117,9 +125,9 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
     return (
       <div className="w-full h-80 flex items-center justify-center">
         <div className="text-center text-gray-400">
-          <BarChart3 className="w-12 h-12 mx-auto mb-2 opacity-50" aria-hidden="true" />
-          <p>No deployment data available</p>
-          <p className="text-sm">Deploy your first project to see trends</p>
+          <BarChart3 className="w-16 h-16 mx-auto mb-4 opacity-30" />
+          <p className="text-lg font-medium mb-2">No deployment data available</p>
+          <p className="text-sm text-gray-500">Deploy your first project to see trends</p>
         </div>
       </div>
     );
@@ -131,11 +139,13 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
         <defs>
           <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="#ec4899" stopOpacity={0.3} />
+            <stop offset="50%" stopColor="#a855f7" stopOpacity={0.15} />
             <stop offset="100%" stopColor="#ec4899" stopOpacity={0.05} />
           </linearGradient>
           <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="#ec4899" />
-            <stop offset="100%" stopColor="#f97316" />
+            <stop offset="50%" stopColor="#a855f7" />
+            <stop offset="100%" stopColor="#ec4899" />
           </linearGradient>
         </defs>
         
@@ -149,11 +159,10 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
             y2={padding + (height - padding * 2) * ratio}
             stroke="#374151"
             strokeDasharray="2 4"
-            opacity={0.3}
+            opacity={0.2}
           />
         ))}
         
-        {/* Vertical grid lines */}
         {points.map((point, index) => (
           <line
             key={index}
@@ -162,8 +171,8 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
             x2={point.x}
             y2={height - padding}
             stroke="#374151"
-            strokeDasharray="2 4"
-            opacity={0.2}
+            strokeDasharray="1 3"
+            opacity={0.1}
           />
         ))}
 
@@ -197,7 +206,7 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
                 cx={point.x}
                 cy={point.y}
                 r={hoveredPoint === index ? 8 : 6}
-                fill={hoveredPoint === index ? "#f97316" : "#ec4899"}
+                fill={hoveredPoint === index ? "#a855f7" : "#ec4899"}
                 stroke="#000"
                 strokeWidth="2"
                 className="cursor-pointer"
@@ -209,7 +218,7 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
                 whileHover={{ scale: 1.2 }}
               />
               
-              {/* Hover tooltip */}
+              {/* Tooltip */}
               {hoveredPoint === index && (
                 <motion.g
                   initial={{ opacity: 0, y: 10 }}
@@ -218,10 +227,10 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
                   transition={{ duration: 0.2 }}
                 >
                   <rect
-                    x={point.x - 40}
-                    y={point.y - 50}
-                    width="80"
-                    height="35"
+                    x={point.x - 45}
+                    y={point.y - 55}
+                    width="90"
+                    height="40"
                     fill="#000"
                     stroke="#ec4899"
                     strokeWidth="1"
@@ -230,7 +239,7 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
                   />
                   <text
                     x={point.x}
-                    y={point.y - 35}
+                    y={point.y - 38}
                     textAnchor="middle"
                     fill="#fff"
                     fontSize="12"
@@ -240,7 +249,7 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
                   </text>
                   <text
                     x={point.x}
-                    y={point.y - 22}
+                    y={point.y - 25}
                     textAnchor="middle"
                     fill="#ec4899"
                     fontSize="14"
@@ -254,7 +263,7 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
           ))}
         </AnimatePresence>
         
-        {/* X-axis labels */}
+        {/* Axis labels */}
         {points.map((point, index) => (
           <text
             key={index}
@@ -269,7 +278,6 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
           </text>
         ))}
         
-        {/* Y-axis labels */}
         {[0, 0.25, 0.5, 0.75, 1].map((ratio) => (
           <text
             key={ratio}
@@ -287,7 +295,7 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
   );
 };
 
-// Enhanced Donut Chart
+// Professional Donut Chart
 const DonutChart = ({ percentage, color, label }: { percentage: number; color: string; label: string }) => {
   const [animatedPercentage, setAnimatedPercentage] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -306,11 +314,12 @@ const DonutChart = ({ percentage, color, label }: { percentage: number; color: s
   const strokeDashoffset = circumference - (animatedPercentage / 100) * circumference;
 
   return (
-    <div 
-      className="relative flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer"
+    <motion.div 
+      className="relative flex items-center justify-center transition-transform duration-300 cursor-pointer"
       style={{ width: size, height: size }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      whileHover={{ scale: 1.05 }}
     >
       <svg width={size} height={size} className="transform -rotate-90">
         <circle
@@ -343,9 +352,9 @@ const DonutChart = ({ percentage, color, label }: { percentage: number; color: s
         >
           {animatedPercentage}%
         </motion.span>
-        <span className="text-xs text-gray-400 mt-1">{label}</span>
+        <span className="text-xs text-gray-400 mt-1 font-medium">{label}</span>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -353,7 +362,7 @@ const DashboardHero = () => {
   const user = useAppSelector((state) => state.user.user) as User | null;
   const router = useRouter();
 
-  // Real data states
+  // State management
   const [deploymentStats, setDeploymentStats] = useState<DeploymentStats>({
     chartData: [],
     totalDeployments: 0,
@@ -370,13 +379,12 @@ const DashboardHero = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
-  // Fetch real data from your actual APIs
+  // Data fetching logic (keeping your existing implementation)
   const fetchDashboardData = async () => {
     if (!user?._id) return;
     
     setIsLoading(true);
     try {
-      // Fetch user projects using your actual API endpoint
       const projectsRes = await fetch(`/api/project/crud?id=${user._id}`);
       const projectsData = await projectsRes.json();
       
@@ -384,13 +392,11 @@ const DashboardHero = () => {
         const projects = projectsData.projectdata;
         setActiveProjects(projects);
         
-        // Calculate real deployment stats from project data
         const totalDeployments = projects.length;
         const activeProjectsCount = projects.filter((p: ProjectData) => 
           p.projectstatus === 'live' || p.projectstatus === 'building'
         ).length;
         
-        // Create chart data based on project creation dates
         const chartData = generateChartDataFromProjects(projects);
         
         setDeploymentStats({
@@ -399,7 +405,6 @@ const DashboardHero = () => {
           activeProjects: activeProjectsCount,
         });
         
-        // Calculate build success rate from project statuses
         const liveProjects = projects.filter((p: ProjectData) => p.projectstatus === 'live').length;
         const failedProjects = projects.filter((p: ProjectData) => p.projectstatus === 'failed').length;
         const totalFinished = liveProjects + failedProjects;
@@ -411,7 +416,6 @@ const DashboardHero = () => {
           failedBuildPercentage: 100 - successRate,
         });
         
-        // Create recent deployments from project data
         const recentDeployments = projects
           .filter((p: ProjectData) => p.lastdeploy || p.startdate)
           .map((p: ProjectData) => ({
@@ -427,7 +431,6 @@ const DashboardHero = () => {
         
         setRecentDeployments(recentDeployments);
       } else {
-        // Set default values if no projects
         setDeploymentStats({
           chartData: [],
           totalDeployments: 0,
@@ -445,7 +448,6 @@ const DashboardHero = () => {
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
       toast.error('Failed to load dashboard data');
-      // Set fallback data on error
       setDeploymentStats({
         chartData: [],
         totalDeployments: 0,
@@ -456,7 +458,6 @@ const DashboardHero = () => {
     }
   };
 
-  // Generate chart data from project creation dates
   const generateChartDataFromProjects = (projects: ProjectData[]) => {
     const last6Months = [];
     const now = new Date();
@@ -482,45 +483,43 @@ const DashboardHero = () => {
 
   useEffect(() => {
     fetchDashboardData();
-    
-  
     const interval = setInterval(fetchDashboardData, 120000);
     return () => clearInterval(interval);
   }, [user]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'live': return 'text-green-400';
+      case 'live': return 'text-emerald-400';
       case 'failed': return 'text-red-400';
-      case 'building': return 'text-orange-400';
+      case 'building': return 'text-amber-400';
       case 'creating': return 'text-pink-400';
       default: return 'text-gray-400';
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusBadgeColor = (status: string) => {
     switch (status) {
-      case 'live': return '✅';
-      case 'failed': return '❌';
-      case 'building': return '🔄';
-      case 'creating': return '⏳';
-      default: return '⚪';
+      case 'live': return 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400';
+      case 'failed': return 'bg-red-500/10 border-red-500/30 text-red-400';
+      case 'building': return 'bg-amber-500/10 border-amber-500/30 text-amber-400';
+      case 'creating': return 'bg-pink-500/10 border-pink-500/30 text-pink-400';
+      default: return 'bg-gray-500/10 border-gray-500/30 text-gray-400';
     }
   };
 
   const getTechStackIcon = (techStack: string) => {
     switch (techStack?.toLowerCase()) {
-      case 'react': return '⚛️';
-      case 'vue': case 'vue.js': return '💚';
-      case 'angular': return '🅰️';
-      case 'next.js': return '▲';
-      case 'svelte': return '🧡';
-      case 'node.js': return '💚';
-      case 'python': return '🐍';
-      case 'django': return '🎸';
-      case 'flask': return '🌶️';
-      case 'html,css,js': return '🌐';
-      default: return '💻';
+      case 'react': return 'React';
+      case 'vue': case 'vue.js': return 'Vue';
+      case 'angular': return 'Angular';
+      case 'next.js': return 'Next.js';
+      case 'svelte': return 'Svelte';
+      case 'node.js': return 'Node';
+      case 'python': return 'Python';
+      case 'django': return 'Django';
+      case 'flask': return 'Flask';
+      case 'html,css,js': return 'Web';
+      default: return 'Code';
     }
   };
 
@@ -536,61 +535,85 @@ const DashboardHero = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-300">Loading your dashboard...</p>
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            className="w-12 h-12 border-2 border-pink-500 border-t-transparent rounded-full mx-auto mb-6"
+          />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <p className="text-gray-200 text-xl font-medium mb-2">Loading your dashboard</p>
+            <p className="text-gray-400">Preparing your deployment insights...</p>
+          </motion.div>
         </div>
       </div>
     );
   }
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black text-white p-6">
+    <section className="min-h-screen bg-black text-white p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial="hidden"
           animate="visible"
           variants={stagger}
-          className="space-y-6"
+          className="space-y-8"
         >
           {/* Header */}
-          <motion.div variants={fadeIn} className="flex justify-between items-center">
+          <motion.div variants={fadeIn} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-400 to-pink-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent mb-2">
                 Welcome back, {user?.name}
               </h1>
-              <div className="flex items-center gap-2 text-gray-400 mt-1">
+              <div className="flex items-center gap-2 text-gray-400">
                 <Clock className="w-4 h-4" />
-                <span>Last updated: {lastUpdated.toLocaleTimeString()}</span>
+                <span className="text-sm">Last updated: {lastUpdated.toLocaleTimeString()}</span>
+                <motion.div
+                  className="w-2 h-2 bg-emerald-400 rounded-full"
+                  animate={{ opacity: [1, 0.3, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
               </div>
             </div>
-            <button
+            <motion.button
               onClick={fetchDashboardData}
-              className="px-4 py-2 bg-pink-600 rounded-lg hover:bg-pink-700 transition-colors flex items-center gap-2 group"
+              className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 rounded-xl transition-all duration-300 flex items-center gap-2 group shadow-lg shadow-pink-500/25"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
-              Refresh
-            </button>
+              <span className="font-medium">Refresh</span>
+            </motion.button>
           </motion.div>
 
-          {/* Key Metrics */}
+          {/* Key Metrics - Fixed uniform sizing */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Total Deployments */}
             <motion.div
-              variants={fadeIn}
-              className="bg-gray-900/50 backdrop-blur-sm border border-pink-500/20 rounded-2xl p-6 hover:border-pink-500/40 transition-colors"
+              variants={scaleIn}
+              className="relative overflow-hidden"
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2 text-gray-300 mb-2">
-                    <BarChart3 className="w-5 h-5 text-pink-500" />
-                    <span>Total Deployments</span>
+              <div className="relative bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20 rounded-2xl p-6 h-full group transition-all duration-300 hover:border-pink-500/40">
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-lg">
+                        <BarChart3 className="w-5 h-5 text-pink-400" />
+                      </div>
+                      <span className="text-gray-300 font-medium">Total Deployments</span>
+                    </div>
                   </div>
-                  <div className="text-3xl font-bold text-pink-500">
+                  <div className="text-3xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent mb-2">
                     {deploymentStats.totalDeployments}
                   </div>
                   {trend && (
-                    <div className={`text-sm flex items-center gap-1 ${trend.isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                    <div className={`text-sm flex items-center gap-1 ${trend.isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
                       {trend.isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                       {trend.change}% from last period
                     </div>
@@ -599,83 +622,150 @@ const DashboardHero = () => {
               </div>
             </motion.div>
 
+            {/* Active Projects */}
             <motion.div
-              variants={fadeIn}
-              className="bg-gray-900/50 backdrop-blur-sm border border-pink-500/20 rounded-2xl p-6 hover:border-pink-500/40 transition-colors"
+              variants={scaleIn}
+              className="relative overflow-hidden"
             >
-              <div className="flex items-center gap-2 text-gray-300 mb-2">
-                <Activity className="w-5 h-5 text-pink-500" />
-                <span>Active Projects</span>
-              </div>
-              <div className="text-3xl font-bold text-pink-500">
-                {deploymentStats.activeProjects}
-              </div>
-              <div className="text-sm text-gray-400">
-                Live: {activeProjects.filter(p => p.projectstatus === 'live').length} • 
-                Building: {activeProjects.filter(p => p.projectstatus === 'building').length} • 
-                Failed: {activeProjects.filter(p => p.projectstatus === 'failed').length}
+              <div className="relative bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20 rounded-2xl p-6 h-full group transition-all duration-300 hover:border-pink-500/40">
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-lg">
+                        <Activity className="w-5 h-5 text-purple-400" />
+                      </div>
+                      <span className="text-gray-300 font-medium">Active Projects</span>
+                    </div>
+                    <motion.div
+                      className="w-2 h-2 bg-emerald-400 rounded-full"
+                      animate={{ opacity: [1, 0.3, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  </div>
+                  <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+                    {deploymentStats.activeProjects}
+                  </div>
+                  <div className="text-sm text-gray-400 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span>Live:</span>
+                      <span className="text-emerald-400 font-medium">{activeProjects.filter(p => p.projectstatus === 'live').length}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Building:</span>
+                      <span className="text-amber-400 font-medium">{activeProjects.filter(p => p.projectstatus === 'building').length}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Failed:</span>
+                      <span className="text-red-400 font-medium">{activeProjects.filter(p => p.projectstatus === 'failed').length}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </motion.div>
 
+            {/* Success Rate */}
             <motion.div
-              variants={fadeIn}
-              className="bg-gray-900/50 backdrop-blur-sm border border-pink-500/20 rounded-2xl p-6 hover:border-pink-500/40 transition-colors"
+              variants={scaleIn}
+              className="relative overflow-hidden"
             >
-              <div className="flex items-center gap-2 text-gray-300 mb-2">
-                <PieChart className="w-5 h-5 text-pink-500" />
-                <span>Success Rate</span>
-              </div>
-              <div className="text-3xl font-bold text-green-400">
-                {buildStats.successfulBuildPercentage}%
-              </div>
-              <div className="text-sm text-gray-400">
-                Last 30 days build success rate
+              <div className="relative bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20 rounded-2xl p-6 h-full group transition-all duration-300 hover:border-emerald-500/40">
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 rounded-lg">
+                        <PieChart className="w-5 h-5 text-emerald-400" />
+                      </div>
+                      <span className="text-gray-300 font-medium">Success Rate</span>
+                    </div>
+                  </div>
+                  <div className="text-3xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent mb-2">
+                    {buildStats.successfulBuildPercentage}%
+                  </div>
+                  <div className="text-sm text-gray-400">
+                    Build success rate over time
+                  </div>
+                </div>
               </div>
             </motion.div>
           </div>
 
-          {/* Charts and Data */}
+          {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Deployment Trends */}
+            {/* Deployment Trends Chart */}
             <motion.div
               variants={fadeIn}
-              className="lg:col-span-2 bg-gray-900/50 backdrop-blur-sm border border-pink-500/20 rounded-2xl p-6 hover:border-pink-500/40 transition-colors"
+              className="lg:col-span-2 relative overflow-hidden"
             >
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <PieChart className="w-5 h-5 text-pink-500" />
-                Deployment Trends
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              </h2>
-              <InteractiveLineChart data={deploymentStats.chartData} />
+              <div className="relative bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20 rounded-2xl p-6 group transition-all duration-300 hover:border-pink-500/40">
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-lg">
+                        <PieChart className="w-5 h-5 text-pink-400" />
+                      </div>
+                      Deployment Trends
+                      <motion.div
+                        className="w-2 h-2 bg-emerald-400 rounded-full"
+                        animate={{ opacity: [1, 0.3, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      />
+                    </h2>
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <Clock className="w-4 h-4" />
+                      <span>Last 6 months</span>
+                    </div>
+                  </div>
+                  <InteractiveLineChart data={deploymentStats.chartData} />
+                </div>
+              </div>
             </motion.div>
 
             {/* Build Success Stats */}
             <motion.div variants={fadeIn} className="space-y-6">
-              <div className="bg-green-900/20 border border-green-500/20 rounded-2xl p-6 hover:border-green-500/40 transition-colors">
-                <h3 className="text-lg font-semibold text-green-100 mb-4 flex items-center gap-2">
-                  <Server className="w-5 h-5" />
-                  Successful Builds
-                </h3>
-                <div className="flex justify-center">
-                  <DonutChart 
-                    percentage={buildStats.successfulBuildPercentage} 
-                    color="#10b981" 
-                    label="Success"
-                  />
+              {/* Successful Builds */}
+              <div className="relative overflow-hidden">
+                <div className="relative bg-gradient-to-br from-emerald-900/20 via-black to-black border border-emerald-500/20 rounded-2xl p-6 group transition-all duration-300 hover:border-emerald-500/40">
+                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+                  <div className="relative">
+                    <h3 className="text-lg font-semibold text-emerald-100 mb-4 flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 rounded-lg">
+                        <Server className="w-5 h-5 text-emerald-400" />
+                      </div>
+                      Successful Builds
+                    </h3>
+                    <div className="flex justify-center">
+                      <DonutChart 
+                        percentage={buildStats.successfulBuildPercentage} 
+                        color="#10b981" 
+                        label="Success"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="bg-red-900/20 border border-red-500/20 rounded-2xl p-6 hover:border-red-500/40 transition-colors">
-                <h3 className="text-lg font-semibold text-red-100 mb-4 flex items-center gap-2">
-                  <GitBranch className="w-5 h-5" />
-                  Failed Builds
-                </h3>
-                <div className="flex justify-center">
-                  <DonutChart 
-                    percentage={buildStats.failedBuildPercentage} 
-                    color="#ef4444" 
-                    label="Failed"
-                  />
+              {/* Failed Builds */}
+              <div className="relative overflow-hidden">
+                <div className="relative bg-gradient-to-br from-red-900/20 via-black to-black border border-red-500/20 rounded-2xl p-6 group transition-all duration-300 hover:border-red-500/40">
+                  <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+                  <div className="relative">
+                    <h3 className="text-lg font-semibold text-red-100 mb-4 flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-r from-red-500/20 to-orange-500/20 rounded-lg">
+                        <GitBranch className="w-5 h-5 text-red-400" />
+                      </div>
+                      Failed Builds
+                    </h3>
+                    <div className="flex justify-center">
+                      <DonutChart 
+                        percentage={buildStats.failedBuildPercentage} 
+                        color="#ef4444" 
+                        label="Failed"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -686,165 +776,285 @@ const DashboardHero = () => {
             {/* Recent Deployments */}
             <motion.div
               variants={fadeIn}
-              className="bg-gray-900/50 backdrop-blur-sm border border-pink-500/20 rounded-2xl p-6 hover:border-pink-500/40 transition-colors"
+              className="relative overflow-hidden"
             >
-              <h2 className="text-xl font-semibold mb-4">Recent Deployments</h2>
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {recentDeployments.length > 0 ? (
-                  recentDeployments.map((deployment) => (
-                    <motion.div 
-                      key={deployment.id} 
-                      className="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg hover:bg-gray-800/50 transition-colors group"
-                      whileHover={{ x: 2 }}
+              <div className="relative bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20 rounded-2xl p-6 group transition-all duration-300 hover:border-pink-500/40">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-lg">
+                        <Clock className="w-5 h-5 text-blue-400" />
+                      </div>
+                      Recent Deployments
+                    </h2>
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                     >
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg">{getStatusIcon(deployment.status)}</span>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{deployment.projectName}</span>
-                            {deployment.techStack && (
-                              <span className="text-sm">{getTechStackIcon(deployment.techStack)}</span>
-                            )}
-                          </div>
-                          <div className="text-sm text-gray-400">
-                            {deployment.timestamp.toLocaleString()}
-                          </div>
-                          {deployment.projectUrl && deployment.status === 'live' && (
-                            <a 
-                              href={`https://${deployment.projectUrl}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-pink-400 hover:text-pink-300 flex items-center gap-1 group-hover:translate-x-1 transition-transform"
-                            >
-                              <ExternalLink className="w-3 h-3" />
-                              {deployment.projectUrl}
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                      <div className={`text-sm font-medium ${getStatusColor(deployment.status)}`}>
-                        {deployment.status}
-                      </div>
+                      <RefreshCw className="w-4 h-4 text-gray-400" />
                     </motion.div>
-                  ))
-                ) : (
-                  <div className="text-center text-gray-400 py-8">
-                    <div className="text-4xl mb-2">🚀</div>
-                    <div>No deployments yet</div>
-                    <div className="text-sm">Create your first project to get started</div>
                   </div>
-                )}
+                  <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
+                    <AnimatePresence>
+                      {recentDeployments.length > 0 ? (
+                        recentDeployments.map((deployment, index) => (
+                          <motion.div 
+                            key={deployment.id}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 20 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="group/item relative"
+                          >
+                            <div className="relative flex items-center justify-between p-4 bg-gray-800/30 hover:bg-gray-800/50 rounded-lg transition-all duration-300 border border-transparent hover:border-pink-500/20">
+                              <div className="flex items-center gap-4">
+                                <div className="relative">
+                                  <div className={`w-3 h-3 rounded-full ${
+                                    deployment.status === 'live' ? 'bg-emerald-400' :
+                                    deployment.status === 'failed' ? 'bg-red-400' :
+                                    deployment.status === 'building' ? 'bg-amber-400' : 'bg-pink-400'
+                                  }`} />
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-3">
+                                    <span className="font-medium text-gray-200 group-hover/item:text-pink-300 transition-colors">
+                                      {deployment.projectName}
+                                    </span>
+                                    {deployment.techStack && (
+                                      <span className="text-xs px-2 py-1 bg-gray-700/50 text-gray-300 rounded-md">
+                                        {getTechStackIcon(deployment.techStack)}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="text-sm text-gray-400 mt-1">
+                                    {deployment.timestamp.toLocaleString()}
+                                  </div>
+                                  {deployment.projectUrl && deployment.status === 'live' && (
+                                    <motion.a 
+                                      href={`https://${deployment.projectUrl}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-xs text-pink-400 hover:text-pink-300 flex items-center gap-1 mt-1 group-hover/item:translate-x-1 transition-transform"
+                                      whileHover={{ x: 2 }}
+                                    >
+                                      <ExternalLink className="w-3 h-3" />
+                                      {deployment.projectUrl}
+                                    </motion.a>
+                                  )}
+                                </div>
+                              </div>
+                              <div className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadgeColor(deployment.status)}`}>
+                                {deployment.status}
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))
+                      ) : (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="text-center text-gray-400 py-12"
+                        >
+                          <div className="text-6xl opacity-20 mb-4">🚀</div>
+                          <div className="space-y-2">
+                            <p className="text-lg font-medium">No deployments yet</p>
+                            <p className="text-sm text-gray-500">Create your first project to see deployment history</p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
               </div>
             </motion.div>
 
             {/* Quick Actions */}
             <motion.div
               variants={fadeIn}
-              className="bg-gray-900/50 backdrop-blur-sm border border-pink-500/20 rounded-2xl p-6 hover:border-pink-500/40 transition-colors"
+              className="relative overflow-hidden"
             >
-              <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-              <div className="space-y-3">
-                <motion.button
-                  onClick={() => router.push("/project/createproject/app-platform")}
-                  className="w-full flex items-center justify-between p-4 bg-pink-600 hover:bg-pink-700 rounded-lg transition-colors group"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <span>New Deployment</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </motion.button>
-                <motion.button
-                  onClick={() => router.push("/project/app-platform")}
-                  className="w-full flex items-center justify-between p-4 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors group"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <span>View All Projects</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </motion.button>
-                <motion.button
-                  onClick={() => router.push("/settings")}
-                  className="w-full flex items-center justify-between p-4 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors group"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <span>Settings</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </motion.button>
-              </div>
-
-              {/* Project Status Overview */}
-              <div className="mt-6 pt-6 border-t border-gray-700">
-                <h3 className="font-semibold mb-3">Your Projects ({activeProjects.length})</h3>
-                <div className="space-y-2">
-                  {activeProjects.slice(0, 4).map((project) => (
-                    <motion.div 
-                      key={project._id} 
-                      className="flex items-center justify-between text-sm p-2 bg-gray-800/30 rounded hover:bg-gray-800/50 transition-colors group cursor-pointer"
-                      whileHover={{ x: 2 }}
-                      onClick={() => router.push(`/project/overview?id=${project._id}`)}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span>{getTechStackIcon(project.techused)}</span>
-                        <span className="truncate font-medium group-hover:text-pink-400 transition-colors">{project.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className={`text-xs px-2 py-1 rounded ${getStatusColor(project.projectstatus)} bg-gray-700/50`}>
-                          {project.projectstatus}
-                        </span>
-                        <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                    </motion.div>
-                  ))}
-                  {activeProjects.length === 0 && (
-                    <div className="text-center text-gray-400 py-4">
-                      <div className="text-2xl mb-1">📦</div>
-                      <div className="text-sm">No projects yet</div>
+              <div className="relative bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20 rounded-2xl p-6 group transition-all duration-300 hover:border-pink-500/40">
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+                <div className="relative">
+                  <h2 className="text-xl font-semibold mb-6 flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-lg">
+                      <Zap className="w-5 h-5 text-purple-400" />
                     </div>
-                  )}
-                  {activeProjects.length > 4 && (
-                    <motion.button 
-                      onClick={() => router.push("/project/app-platform")}
-                      className="w-full text-center text-gray-400 text-sm py-2 hover:text-pink-400 transition-colors"
-                      whileHover={{ scale: 1.02 }}
+                    Quick Actions
+                  </h2>
+                  <div className="space-y-4">
+                    <motion.button
+                      onClick={() => router.push("/project/createproject/app-platform")}
+                      className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 rounded-xl transition-all duration-300 group/btn shadow-lg shadow-pink-500/25"
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      View all {activeProjects.length} projects →
+                      <div className="flex items-center gap-3">
+                        <div className="p-1 bg-white/20 rounded-lg">
+                          <Code className="w-4 h-4" />
+                        </div>
+                        <span className="font-medium">New Deployment</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
                     </motion.button>
-                  )}
+                    
+                    <motion.button
+                      onClick={() => router.push("/project/app-platform")}
+                      className="w-full flex items-center justify-between p-4 bg-gray-800/50 hover:bg-gray-700/50 rounded-xl transition-all duration-300 group/btn border border-gray-700/50 hover:border-pink-500/30"
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-1 bg-gray-600/50 rounded-lg">
+                          <Database className="w-4 h-4 text-gray-400 group-hover/btn:text-pink-400 transition-colors" />
+                        </div>
+                        <span className="font-medium">View All Projects</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform text-gray-400 group-hover/btn:text-pink-400" />
+                    </motion.button>
+                    
+                    <motion.button
+                      onClick={() => router.push("/settings")}
+                      className="w-full flex items-center justify-between p-4 bg-gray-800/50 hover:bg-gray-700/50 rounded-xl transition-all duration-300 group/btn border border-gray-700/50 hover:border-pink-500/30"
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-1 bg-gray-600/50 rounded-lg">
+                          <Cloud className="w-4 h-4 text-gray-400 group-hover/btn:text-pink-400 transition-colors" />
+                        </div>
+                        <span className="font-medium">Settings</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform text-gray-400 group-hover/btn:text-pink-400" />
+                    </motion.button>
+                  </div>
+
+                  {/* Project Status Overview */}
+                  <div className="mt-8 pt-6 border-t border-gray-700/50">
+                    <h3 className="font-semibold mb-4 flex items-center gap-2">
+                      <div className="p-1 bg-gray-600/50 rounded-lg">
+                        <Server className="w-4 h-4 text-pink-400" />
+                      </div>
+                      Your Projects ({activeProjects.length})
+                    </h3>
+                    <div className="space-y-3 max-h-64 overflow-y-auto custom-scrollbar">
+                      <AnimatePresence>
+                        {activeProjects.slice(0, 4).map((project, index) => (
+                          <motion.div 
+                            key={project._id}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 10 }}
+                            transition={{ delay: index * 0.05 }}
+                            className="group/project relative"
+                          >
+                            <div 
+                              className="relative flex items-center justify-between text-sm p-3 bg-gray-800/30 hover:bg-gray-800/50 rounded-lg transition-all duration-300 border border-transparent hover:border-pink-500/20 cursor-pointer"
+                              onClick={() => router.push(`/project/overview?id=${project._id}`)}
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="text-xs px-2 py-1 bg-gray-700/50 text-gray-300 rounded-md">
+                                  {getTechStackIcon(project.techused)}
+                                </span>
+                                <span className="truncate font-medium group-hover/project:text-pink-300 transition-colors max-w-32">
+                                  {project.name}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className={`text-xs px-2 py-1 rounded-full border ${getStatusBadgeColor(project.projectstatus)}`}>
+                                  {project.projectstatus}
+                                </span>
+                                <ArrowRight className="w-3 h-3 opacity-0 group-hover/project:opacity-100 transition-opacity text-pink-400" />
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+                      
+                      {activeProjects.length === 0 && (
+                        <motion.div 
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="text-center text-gray-400 py-6"
+                        >
+                          <div className="text-3xl mb-2 opacity-50">📦</div>
+                          <div className="text-sm">No projects yet</div>
+                          <div className="text-xs text-gray-500 mt-1">Create your first project to get started</div>
+                        </motion.div>
+                      )}
+                      
+                      {activeProjects.length > 4 && (
+                        <motion.button 
+                          onClick={() => router.push("/project/app-platform")}
+                          className="w-full text-center text-gray-400 text-sm py-3 hover:text-pink-400 transition-colors rounded-lg hover:bg-gray-800/30"
+                          whileHover={{ scale: 1.02 }}
+                        >
+                          View all {activeProjects.length} projects →
+                        </motion.button>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>
           </div>
 
           {/* Additional Stats Row */}
-          <motion.div variants={fadeIn} className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-gray-900/30 border border-gray-700/50 rounded-xl p-4 text-center">
-              <div className="text-2xl font-bold text-pink-500">
-                {activeProjects.filter(p => p.techused?.toLowerCase() === 'react').length}
-              </div>
-              <div className="text-sm text-gray-400">React Apps</div>
-            </div>
-            <div className="bg-gray-900/30 border border-gray-700/50 rounded-xl p-4 text-center">
-              <div className="text-2xl font-bold text-pink-500">
-                {activeProjects.filter(p => p.projectstatus === 'live').length}
-              </div>
-              <div className="text-sm text-gray-400">Live Projects</div>
-            </div>
-            <div className="bg-gray-900/30 border border-gray-700/50 rounded-xl p-4 text-center">
-              <div className="text-2xl font-bold text-pink-500">
-                {deploymentStats.chartData.reduce((sum, month) => sum + month.deployments, 0)}
-              </div>
-              <div className="text-sm text-gray-400">Total This Year</div>
-            </div>
-            <div className="bg-gray-900/30 border border-gray-700/50 rounded-xl p-4 text-center">
-              <div className="text-2xl font-bold text-pink-500">
-                {Math.round((activeProjects.filter(p => p.projectstatus === 'live').length / Math.max(activeProjects.length, 1)) * 100)}%
-              </div>
-              <div className="text-sm text-gray-400">Success Rate</div>
-            </div>
+          <motion.div variants={fadeIn} className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              {
+                value: activeProjects.filter(p => p.techused?.toLowerCase() === 'react').length,
+                label: "React Apps",
+                icon: Code,
+                gradient: "from-cyan-400 to-blue-400"
+              },
+              {
+                value: activeProjects.filter(p => p.projectstatus === 'live').length,
+                label: "Live Projects",
+                icon: Server,
+                gradient: "from-emerald-400 to-green-400"
+              },
+              {
+                value: deploymentStats.chartData.reduce((sum, month) => sum + month.deployments, 0),
+                label: "Total This Year",
+                icon: BarChart3,
+                gradient: "from-purple-400 to-pink-400"
+              },
+              {
+                value: Math.round((activeProjects.filter(p => p.projectstatus === 'live').length / Math.max(activeProjects.length, 1)) * 100),
+                label: "Success Rate",
+                icon: Activity,
+                gradient: "from-yellow-400 to-orange-400",
+                suffix: "%"
+              }
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                variants={scaleIn}
+                transition={{ delay: index * 0.1 }}
+                className="relative overflow-hidden"
+              >
+                <div className="relative bg-gradient-to-br from-gray-900/50 via-black to-gray-900/50 border border-gray-700/50 hover:border-pink-500/30 rounded-xl p-4 text-center transition-all duration-300 backdrop-blur-sm group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl" />
+                  <div className="relative">
+                    <div className="flex items-center justify-center mb-3">
+                      <div className="p-2 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-lg">
+                        <stat.icon className="w-5 h-5 text-pink-400" />
+                      </div>
+                    </div>
+                    <div className={`text-2xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent mb-1`}>
+                      {stat.value}{stat.suffix || ''}
+                    </div>
+                    <div className="text-sm text-gray-400 font-medium">{stat.label}</div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </motion.div>
         </motion.div>
       </div>
+
     </section>
   );
 };
