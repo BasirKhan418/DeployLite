@@ -5,6 +5,14 @@ import { Button } from '@/components/ui/button'
 import { ArrowLeft, Home, Search } from 'lucide-react'
 
 export default function NotFound() {
+  const handleGoBack = () => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      window.history.back()
+    } else {
+      window.location.href = '/'
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900/50 to-black flex items-center justify-center">
       <div className="text-center space-y-8 max-w-md mx-auto px-4">
@@ -37,11 +45,13 @@ export default function NotFound() {
         </div>
         
         <div className="pt-8">
-          <Button asChild variant="ghost" className="text-gray-400 hover:text-pink-300">
-            <Link href="javascript:history.back()">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Go Back
-            </Link>
+          <Button 
+            variant="ghost" 
+            className="text-gray-400 hover:text-pink-300"
+            onClick={handleGoBack}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Go Back
           </Button>
         </div>
       </div>

@@ -1,4 +1,3 @@
-"use client"
 import { NextPageContext } from 'next'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -11,6 +10,12 @@ interface ErrorProps {
 }
 
 function ErrorPage({ statusCode, hasGetInitialPropsRun, err }: ErrorProps) {
+  const handleRefresh = () => {
+    if (typeof window !== 'undefined') {
+      window.location.reload()
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center">
@@ -36,15 +41,15 @@ function ErrorPage({ statusCode, hasGetInitialPropsRun, err }: ErrorProps) {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/">
-              <Button className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white border-0 rounded-xl px-6 h-12 font-medium shadow-lg shadow-pink-500/25 transition-all duration-300">
+            <Button asChild className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white border-0 rounded-xl px-6 h-12 font-medium shadow-lg shadow-pink-500/25 transition-all duration-300">
+              <Link href="/">
                 <Home className="mr-2 h-4 w-4" />
                 Go Home
-              </Button>
-            </Link>
+              </Link>
+            </Button>
             <Button 
               variant="outline" 
-              onClick={() => window.location.reload()}
+              onClick={handleRefresh}
               className="border-pink-500/30 text-pink-300 hover:bg-pink-500/10 hover:border-pink-500/50 rounded-xl px-6 h-12 font-medium transition-all duration-300"
             >
               <RefreshCw className="mr-2 h-4 w-4" />
