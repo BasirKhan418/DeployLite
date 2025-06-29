@@ -5,7 +5,7 @@ import "./globals.css";
 import StoreProvider from "./StoreProvider";
 import ClientLayout from "@/components/ClientLayout";
 import ThemeWrapper from "@/components/ThemeWrapper";
-import ErrorBoundary from "@/components/ErrorBoundary";
+import { Toaster } from "sonner";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -41,26 +41,25 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ErrorBoundary>
-          <StoreProvider>
-            <ThemeWrapper>
-              <NextTopLoader
-                color="#D81B60"
-                initialPosition={0.08}
-                crawlSpeed={200}
-                height={3}
-                crawl={true}
-                showSpinner={false}
-                easing="ease"
-                speed={200}
-                shadow="0 0 10px #2299DD,0 0 5px #2299DD"
-                zIndex={1600}
-                showAtBottom={false}
-              />
-              <ClientLayout>{children}</ClientLayout>
-            </ThemeWrapper>
-          </StoreProvider>
-        </ErrorBoundary>
+        <StoreProvider>
+          <ThemeWrapper>
+            <NextTopLoader
+              color="#D81B60"
+              initialPosition={0.08}
+              crawlSpeed={200}
+              height={3}
+              crawl={true}
+              showSpinner={false}
+              easing="ease"
+              speed={200}
+              shadow="0 0 10px #2299DD,0 0 5px #2299DD"
+              zIndex={1600}
+              showAtBottom={false}
+            />
+            <ClientLayout>{children}</ClientLayout>
+            <Toaster position="top-right" />
+          </ThemeWrapper>
+        </StoreProvider>
       </body>
     </html>
   );

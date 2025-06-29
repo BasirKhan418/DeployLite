@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
 import { cn } from "@/lib/utils";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import LoginLoader from "@/utils/Loaders/LoginLoader";
 import { Suspense } from "react";
@@ -13,15 +13,15 @@ function ResetComponent() {
   const searchurl = useSearchParams();
   const router = useRouter();
 
-  // All application states
+ 
   const [form, setForm] = useState({ otp: "" });
   const [loading, setLoading] = useState(false);
 
-  // Timer state
+ 
   const [timer, setTimer] = useState(30);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
-  // Start timer when component mounts
+ 
   useEffect(() => {
     if (timer > 0) {
       const interval = setInterval(() => {
@@ -29,7 +29,7 @@ function ResetComponent() {
       }, 1000);
       return () => clearInterval(interval);
     } else {
-      setIsButtonDisabled(false); // Enable buttons after timer ends
+      setIsButtonDisabled(false); 
     }
   }, [timer]);
 
@@ -73,6 +73,7 @@ function ResetComponent() {
     setTimer(30);
     setIsButtonDisabled(true);
   };
+  
   const handleResend = async () => {
     resetTimer();
     let data = { token: searchurl.get("token"), status: "resend" };
@@ -117,10 +118,10 @@ function ResetComponent() {
       toast.error("Resend endpoint error");
     }
   };
+  
   return (
     <div className="flex justify-center items-center h-[100vh]">
       <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
-        <Toaster position="top-right" />
         <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
           Enter your OTP (one-time password)
         </h2>
@@ -145,7 +146,7 @@ function ResetComponent() {
             className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
             type="submit"
           >
-            {loading ? <LoginLoader /> : <ButtonText />}
+            {loading ? <LoginLoader /> : "Login Now →"}
             <BottomGradient />
           </button>
 
@@ -215,11 +216,6 @@ const LabelInputContainer = ({
       {children}
     </div>
   );
-};
-
-// Button Text Component
-const ButtonText = () => {
-  return <>Login Now&rarr;</>;
 };
 
 // Suspense Wrapper for Reset Component

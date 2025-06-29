@@ -1,9 +1,9 @@
 "use client";
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { cn } from "@/lib/utils";
-import { Toaster,toast } from "sonner";
+import { toast } from "sonner";
 import Link from "next/link";
 import LoginLoader from "@/utils/Loaders/LoginLoader";
 import {
@@ -12,15 +12,23 @@ import {
   IconBrandOnlyfans,
 } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
+
 export default function Login() {
-  const [form,setForm] = useState({
-    email:"",
-    password:"",
-    score:""
-  })
-  const router = useRouter()
-  const [loading,setLoading] = useState(false)
-  //handle changes
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    score: ""
+  });
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  // Behavioral tracking states
+  const [keyStrokes, setKeyStrokes] = useState<{ key: string; timestamp: number; type: string; field: string }[]>([]);
+  const [mouseMovements, setMouseMovements] = useState<{ x: number; y: number; timestamp: number }[]>([]);
+  const [formPatterns, setFormPatterns] = useState<{ field: string; value: string; timestamp: number }[]>([]);
+  const [confidenceScore, setConfidenceScore] = useState(0);
+
+  // Handle changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({
       ...form,
@@ -34,19 +42,13 @@ export default function Login() {
     setFormPatterns(prev => [...prev, pattern]);
   };
 
-  //getting bot or user details ->
-  const [keyStrokes, setKeyStrokes] = useState<{ key: string; timestamp: number; type: string; field: string }[]>([]);
-  const [mouseMovements, setMouseMovements] = useState<{ x: number; y: number; timestamp: number }[]>([]);
-  const [formPatterns, setFormPatterns] = useState<{ field: string; value: string; timestamp: number }[]>([]);
-  const [confidenceScore, setConfidenceScore] = useState(0);
-
   // Track typing patterns
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const newKeystroke = {
       key: e.key,
       timestamp: Date.now(),
-      type: e.type, // keydown or keyup
-      field: (e.target as HTMLInputElement).name
+      type: e.type,
+      field: (e.target as HTMLInputElement).name || (e.target as HTMLInputElement).id
     };
     setKeyStrokes(prev => [...prev, newKeystroke]);
   };
@@ -59,7 +61,6 @@ export default function Login() {
       timestamp: Date.now()
     };
     setMouseMovements(prev => {
-      // Keep only last 50 movements to prevent memory issues
       const movements = [...prev, newMovement];
       return movements.slice(-50);
     });
@@ -67,7 +68,7 @@ export default function Login() {
 
   // Calculate behavior metrics
   const calculateMetrics = () => {
-    // 1. Calculate typing speed (characters per minute)
+    // 1. Calculate typing speed
     const calculateTypingSpeed = () => {
       if (keyStrokes.length < 2) return 0;
       const timeSpan = keyStrokes[keyStrokes.length - 1].timestamp - keyStrokes[0].timestamp;
@@ -95,7 +96,7 @@ export default function Login() {
         const dx = mouseMovements[i].x - mouseMovements[i-1].x;
         const dy = mouseMovements[i].y - mouseMovements[i-1].y;
         const distance = Math.sqrt(dx*dx + dy*dy);
-        if (distance < 100) smoothness++; // Smooth if movement is not too jerky
+        if (distance < 100) smoothness++;
       }
       return (smoothness / (mouseMovements.length - 1)) * 100;
     };
@@ -106,7 +107,7 @@ export default function Login() {
       let naturalness = 0;
       for (let i = 1; i < formPatterns.length; i++) {
         const timeGap = formPatterns[i].timestamp - formPatterns[i-1].timestamp;
-        if (timeGap > 100 && timeGap < 5000) naturalness++; // Natural if not too fast or too slow
+        if (timeGap > 100 && timeGap < 5000) naturalness++;
       }
       return (naturalness / (formPatterns.length - 1)) * 100;
     };
@@ -124,14 +125,12 @@ export default function Login() {
       (formPattern * 0.25) / 100
     ) * 100;
 
-    // Log detailed metrics
-    console.log({
-      typingSpeed,
-      rhythmConsistency,
-      mousePattern,
-      formPattern,
-      finalScore: Math.round(score)
-    });
+    // Log individual values instead of object
+    console.log("Typing Speed:", typingSpeed);
+    console.log("Rhythm Consistency:", rhythmConsistency);
+    console.log("Mouse Pattern:", mousePattern);
+    console.log("Form Pattern:", formPattern);
+    console.log("Final Score:", Math.round(score));
 
     setConfidenceScore(Math.round(score));
   };
@@ -140,42 +139,48 @@ export default function Login() {
   useEffect(() => {
     calculateMetrics();
   }, [keyStrokes, mouseMovements, formPatterns]);
-  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true)
-    const res = await fetch('/api/auth/login',{
+    setLoading(true);
+    
+    const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({email:form.email,password:form.password,score:confidenceScore})  
-    })
-    const result = await res.json()
-    setLoading(false)
-    if(result.success){
-      if(result.otp){
-        toast.success(result.message)
-        setTimeout(()=>{
-          router.push(`/otp?token=${result.token}`)
-        },2000)
+      body: JSON.stringify({
+        email: form.email,
+        password: form.password,
+        score: confidenceScore
+      })
+    });
+    
+    const result = await res.json();
+    setLoading(false);
+    
+    if (result.success) {
+      if (result.otp) {
+        toast.success(result.message);
+        setTimeout(() => {
+          router.push(`/otp?token=${result.token}`);
+        }, 2000);
+      } else {
+        toast.success(result.message);
+        setTimeout(() => {
+          window.open("/", "_self");
+        }, 2000);
       }
-      else{
-        toast.success(result.message)
-        setTimeout(()=>{
-         window.open("/","_self");
-        },2000)
-      }
+    } else {
+      toast.error(result.message);
     }
-    else{
-      toast.error(result.message)
-    }
-
   };
+
   return (
-    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black"
-    onMouseMove={handleMouseMove}
+    <div 
+      className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black"
+      onMouseMove={handleMouseMove}
     >
-      <Toaster position="top-right"/>
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
         Welcome to DeployLite
       </h2>
@@ -186,51 +191,63 @@ export default function Login() {
       <form className="my-8" onSubmit={handleSubmit}>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="email">Email Address</Label>
-          <Input id="email" placeholder="basir@deploylite.tech" type="email" onChange={handleChange} value={form.email}
-           onKeyDown={handleKeyPress}
-           onKeyUp={handleKeyPress}
+          <Input 
+            id="email" 
+            placeholder="basir@deploylite.tech" 
+            type="email" 
+            onChange={handleChange} 
+            value={form.email}
+            onKeyDown={handleKeyPress}
+            onKeyUp={handleKeyPress}
           />
         </LabelInputContainer>
+        
         <div className="flex justify-end absolute right-10 mb-8">
-          <Link href="/forgot" className="text-sm text-neutral-700 dark:text-neutral-300 hover:underline">Forgot password?</Link>
+          <Link href="/forgot" className="text-sm text-neutral-700 dark:text-neutral-300 hover:underline">
+            Forgot password?
+          </Link>
         </div>
-        <LabelInputContainer className="mb-4 ">
         
+        <LabelInputContainer className="mb-4">
           <Label htmlFor="password">Password</Label>
-          
-          <Input id="password" placeholder="••••••••" type="password" onChange={handleChange} value={form.password}
-           onKeyDown={handleKeyPress}
-           onKeyUp={handleKeyPress}
+          <Input 
+            id="password" 
+            placeholder="••••••••" 
+            type="password" 
+            onChange={handleChange} 
+            value={form.password}
+            onKeyDown={handleKeyPress}
+            onKeyUp={handleKeyPress}
           />
         </LabelInputContainer>
-        
-      
 
         <button
           className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
           type="submit"
         >
-         {loading ? <LoginLoader/> : <ButtonText/>}
+          {loading ? <LoginLoader /> : "Login →"}
           <BottomGradient />
         </button>
+        
         <div className="flex justify-center items-center mt-4">
-          <span className="text-sm text-neutral-700 dark:text-neutral-300 ">Don’t have an account? <Link href="/signup" className="underline text-green-500 mx-1">Create an account</Link>
-        </span>
+          <span className="text-sm text-neutral-700 dark:text-neutral-300">
+            Don't have an account? 
+            <Link href="/signup" className="underline text-green-500 mx-1">
+              Create an account
+            </Link>
+          </span>
         </div>
 
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 
         <div className="flex flex-col space-y-4">
-        
-        <button
-            className=" g-signin2 relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
-              data-onsuccess="onSignIn"
-              type="button"
-              onClick={()=>{
-              let url  = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI}&scope=${process.env.NEXT_PUBLIC_GOOGLE_SCOPE}&response_type=${"code"}&access_type=${"offline"}`
-              window.open(url,"_self");
-
-              }}
+          <button
+            className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
+            type="button"
+            onClick={() => {
+              let url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI}&scope=${process.env.NEXT_PUBLIC_GOOGLE_SCOPE}&response_type=code&access_type=offline`;
+              window.open(url, "_self");
+            }}
           >
             <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
             <span className="text-neutral-700 dark:text-neutral-300 text-sm">
@@ -266,9 +283,3 @@ const LabelInputContainer = ({
     </div>
   );
 };
-
-const ButtonText = ()=>{
-  return (
-    <>Login &rarr;</>
-  )
-}
