@@ -228,9 +228,9 @@ const Projecthome = ({ name }: { name: string }) => {
 
                   {/* Projects Grid */}
                  {!loading&& <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {projects.map((project) => (
+                    {projects.map((project, index) => (
                       <Card
-                        key={project._id}
+                        key={project._id || project.id || index} 
                         className="overflow-hidden hover:shadow-lg transition-shadow duration-300"
                         onClick={() => window.open(`/project/overview?id=${project._id || project.id}`)}
                       >
