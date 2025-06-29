@@ -78,8 +78,11 @@ export class GitHubCodeExtractor {
         return Buffer.from(data.content, 'base64').toString();
       }
       return '[No content available]';
-    } catch (error) {
-      return `[Error reading file: ${error.message}]`;
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : String(error);
+      return `[Error reading file: ${errorMessage}]`;
     }
   }
 

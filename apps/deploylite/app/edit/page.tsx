@@ -1,10 +1,25 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { RepoContent } from '@/lib/githubExtractor';
+
 import dynamic from 'next/dynamic';
 import { Loader2 } from 'lucide-react';
 
+// Define the RepoContent interface
+interface RepoContent {
+  type: 'file' | 'folder';
+  name: string;
+  path: string;
+  content?: string;
+  children?: RepoContent[];
+}
+
+// Define the RepoData interface
+interface RepoData {
+  name: string;
+  stars: number;
+  contents: RepoContent[];
+}
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), {
   ssr: false,
@@ -20,13 +35,14 @@ const RepoViewer = () => {
   const [authToken, setAuthToken] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [repoData, setRepoData] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [repoData, setRepoData] = useState<RepoData | null>(null);
+  const [selectedFile, setSelectedFile] = useState<RepoContent | null>(null);
   const [selectedFilePath, setSelectedFilePath] = useState('');
 
-  const getFileLanguage = (fileName) => {
-    const ext = fileName.split('.').pop().toLowerCase();
-    const languageMap = {
+  const getFileLanguage = (fileName: string) => {
+    const ext = fileName.split('.').pop()?.toLowerCase() || '';
+    
+    const languageMap: Record<string, string> = {
       js: 'javascript',
       jsx: 'javascript',
       ts: 'typescript',
@@ -55,10 +71,12 @@ const RepoViewer = () => {
       kt: 'kotlin',
       dart: 'dart',
     };
-    return languageMap[ext] || 'plaintext';
+    
+    // Type-safe indexing
+    return ext in languageMap ? languageMap[ext] : 'plaintext';
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -81,7 +99,12 @@ const RepoViewer = () => {
       const data = await response.json();
       setRepoData(data);
     } catch (err) {
-      setError(err.message);
+      // Type checking to safely access the message property
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
     } finally {
       setLoading(false);
     }

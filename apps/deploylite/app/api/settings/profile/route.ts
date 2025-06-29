@@ -3,7 +3,7 @@ import CheckAuth from "@/actions/CheckAuth";
 import User from "../../../../../models/User";
 import ConnectDb from "../../../../../middleware/connectdb";
 import { Profilezod } from "@/zod/settings/Profilezod";
-export const POST = async (req: NextRequest,res:NextResponse) => {
+export const POST = async (req: NextRequest) => {
     try{
         await ConnectDb();  
         let data = await req.json();

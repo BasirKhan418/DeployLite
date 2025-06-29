@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import CryptoJS from "crypto-js";
 import { Forget ,Reset} from "@/zod/auth/Forget";
 import ForgotEmail from "@/emails/auth/ForgotEmail";
-export const POST = async(req:NextRequest,res:NextResponse)=>{
+export const POST = async(req:NextRequest)=>{
 try{
 let data = await req.json();
 await ConnectDb();

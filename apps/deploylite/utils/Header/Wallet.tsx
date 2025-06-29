@@ -3,6 +3,7 @@
 declare global {
   interface Window {
     ethereum?: any;
+    Razorpay?: any;
   }
 }
 import { toast, Toaster } from "sonner";
@@ -209,7 +210,7 @@ export default function ImprovedPlatformWallet() {
     });
   };
 
-  const handleRazorpayPayment = async (e) => {
+  const handleRazorpayPayment = async (e: React.MouseEvent<HTMLButtonElement> | React.FormEvent<HTMLFormElement>) => {
     setLoading(true);
 
     var amount =
@@ -315,16 +316,16 @@ export default function ImprovedPlatformWallet() {
     },
     scales: {
       x: {
+        type: 'category' as const,
         grid: {
           color: "rgba(244, 114, 182, 0.2)",
         },
       },
       y: {
+        beginAtZero: true,
+        type: 'linear' as const,
         grid: {
           color: "rgba(244, 114, 182, 0.2)",
-        },
-        ticks: {
-          beginAtZero: true,
         },
       },
     },

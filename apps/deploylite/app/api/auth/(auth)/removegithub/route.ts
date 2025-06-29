@@ -4,7 +4,7 @@ import ConnectDb from "../../../../../../middleware/connectdb";
 import { Octokit } from 'octokit';
 import User from "../../../../../../models/User";
 
-export const GET = async (req: NextRequest, res: NextResponse) => {
+export const GET = async () => {
     console.log("entering");
     try {
         await ConnectDb();

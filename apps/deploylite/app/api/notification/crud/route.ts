@@ -3,7 +3,7 @@ import ConnectDb from "../../../../../middleware/connectdb";
 import User from "../../../../../models/User";
 import Notification from "../../../../../models/Notification";
 import CheckAuth from "@/actions/CheckAuth";
-export const GET = async(req:NextRequest,res:NextResponse)=>{
+export const GET = async()=>{
     try{
         await ConnectDb();
     let result = await CheckAuth(); // Added await here
@@ -21,7 +21,7 @@ catch(err){
 }
 }
 //post request to create a new notification
-export const POST = async(req:NextRequest,res:NextResponse)=>{
+export const POST = async(req:NextRequest)=>{
     try{
      await ConnectDb();
         let data = await req.json();

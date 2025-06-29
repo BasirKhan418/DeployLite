@@ -43,10 +43,26 @@ import { useAppSelector } from "@/lib/hook";
 import Connect from "./Connect";
 import NoProject from "./NoProject";
 
+interface Project {
+  id?: number;
+  _id?: string;
+  name: string;
+  url?: string;
+  lastDeployment?: string;
+  branch?: string;
+  repobranch?: string;
+  status?: string;
+  projectstatus?: string;
+  cpu?: number;
+  memory?: number;
+  logo?: string;
+  updatedAt?: string;
+}
+
 const Projecthome = ({ name }: { name: string }) => {
   // Getting user from Redux
   const user = useAppSelector((state) => state.user.user);
-  const [projects,setProjects] = useState([
+  const [projects, setProjects] = useState<Project[]>([
     {
       id: 1,
       name: "My Blog",
@@ -75,7 +91,8 @@ const Projecthome = ({ name }: { name: string }) => {
     console.log('fetching data')
     try{
      setLoading(true)
-     let result = await fetch(`/api/project/crud?id=${user._id}`);
+     // Use username or email as identifier instead of id
+     let result = await fetch(`/api/project/crud?username=${user?.username || ''}`);
      const data = await result.json();
      setLoading(false)
       setLoading(false)
@@ -122,20 +139,25 @@ const Projecthome = ({ name }: { name: string }) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleDeleteProject = async (id: number) => {
+  const handleDeleteProject = async (id: number | string | undefined) => {
+    if (!id) {
+      toast.error('Project ID is missing');
+      return;
+    }
+    
     try{
       let confirm = window.confirm('Are you sure you want to delete this project?');
       if(!confirm){
         return;
       }
       setLoading(true);
-     let deleteproject = await fetch(`/api/project/crud`,{
+      let deleteproject = await fetch(`/api/project/crud`,{
         method:'DELETE',
         headers:{
           'Content-Type':'application/json'
         },
         body:JSON.stringify({id})
-     });
+      });
       const result = await deleteproject.json();
       setLoading(false);
       if(result.success){
@@ -198,7 +220,7 @@ const Projecthome = ({ name }: { name: string }) => {
                       <Card
                         key={project.id}
                         className="overflow-hidden hover:shadow-lg transition-shadow duration-300"
-                        onClick={() => window.open(`/project/overview?id=${project._id}`)}
+                        onClick={() => window.open(`/project/overview?id=${project._id || project.id}`)}
                       >
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                           <div className="flex items-center space-x-2">
@@ -253,7 +275,7 @@ const Projecthome = ({ name }: { name: string }) => {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem className="text-red-600" onClick={(e)=>{
                                   e.stopPropagation();
-                                  handleDeleteProject(project._id);
+                                  handleDeleteProject(project._id || project.id);
                                 }}>
                                   <Trash2 className="mr-2 h-4 w-4" />
                                   <span>Delete project</span>
@@ -305,7 +327,9 @@ const Projecthome = ({ name }: { name: string }) => {
                               </div>
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              Last deploy: {new Date(project.updatedAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+                              Last deploy: {project.updatedAt 
+                                ? new Date(project.updatedAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
+                                : "Never deployed"}
                             </div>
                           </div>
                         </CardContent>

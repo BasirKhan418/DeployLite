@@ -5,54 +5,49 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useRouter } from 'next/navigation';
+
 const AuthSuccessPage = () => {
-    const router = useRouter();
+  const router = useRouter();
   const [showContent, setShowContent] = useState(false);
   const [title, setTitle] = useState('');
-  const [description,setDescription] = useState('')
-  const [color,setColor] =useState("");
-  function getCookie(name:string) {
+  const [description, setDescription] = useState('');
+  const [color, setColor] = useState("");
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+
+  function getCookie(name: string): string {
+    if (typeof document === 'undefined') return '';
+    
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
-    //@ts-ignore
-    if (parts.length === 2) return parts.pop().split(';').shift();
-  }
-  
-let username ;
-let email;
-  useEffect(() => {
-    const reason = getCookie("reason")
-    username = getCookie("username")
-    email = getCookie("email");
-    setTimeout(() => setShowContent(true), 300);
-    if(reason=="login"){
-      setTitle("Welcome back!")
-      setDescription("You have successfully logged into your account.")
-      setColor("indigo")
+    if (parts.length === 2) {
+      const result = parts.pop()?.split(';').shift();
+      return result || '';
     }
-    else{
-        setTitle("Account Created")
-        setDescription("Your new account has been successfully set up.")
-        setColor("emerald")
+    return '';
+  }
+
+  useEffect(() => {
+    const reason = getCookie("reason");
+    const cookieUsername = getCookie("username");
+    const cookieEmail = getCookie("email");
+    
+    // Set state instead of direct variables
+    setUsername(cookieUsername || 'User');
+    setEmail(cookieEmail ? cookieEmail.replace("%40", "@") : 'user@example.com');
+    
+    setTimeout(() => setShowContent(true), 300);
+    
+    if (reason === "login") {
+      setTitle("Welcome back!");
+      setDescription("You have successfully logged into your account.");
+      setColor("indigo");
+    } else {
+      setTitle("Account Created");
+      setDescription("Your new account has been successfully set up.");
+      setColor("emerald");
     }
   }, []);
-
-  const reasons = {
-    login: {
-      title: 'Welcome back!',
-      description: 'You have successfully logged into your account.',
-      icon: <Lock className="w-6 h-6" />,
-      color: 'indigo'
-    },
-    create: {
-      title: 'Account Created',
-      description: 'Your new account has been successfully set up.',
-      icon: <User className="w-6 h-6" />,
-      color: 'emerald'
-    },
-  };
-
-  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -80,16 +75,17 @@ let email;
               </div>
               <div className="flex items-center text-gray-600">
                 <Mail className="w-4 h-4 mr-2" />
-                {/* @ts-ignore */}
-                <span>Email: {email?.replace("%40","@")}</span>
+                <span>Email: {email}</span>
               </div>
             </AlertDescription>
           </Alert>
           <p className="text-gray-600">Your account is now active. Get ready to deploy with ease!</p>
         </CardContent>
         <CardFooter className="flex justify-center pt-2">
-          <Button className={`w-full bg-gradient-to-r from-indigo-500 to-emerald-500 hover:from-indigo-600 hover:to-emerald-600 text-white transition-all duration-300 transform hover:scale-105`}
-          onClick={() => router.push('/')}>
+          <Button 
+            className={`w-full bg-gradient-to-r from-indigo-500 to-emerald-500 hover:from-indigo-600 hover:to-emerald-600 text-white transition-all duration-300 transform hover:scale-105`}
+            onClick={() => router.push('/')}
+          >
             Go to Dashboard
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>

@@ -2,7 +2,7 @@ import { NextRequest,NextResponse } from "next/server";
 import ConnectDb from "../../../../../middleware/connectdb";
 import PricingPlan from "../../../../../models/PricingPlan";
 import CheckAuth from "@/actions/CheckAuth";
-export const GET = async(req:NextRequest)=>{
+export const GET = async()=>{
     try{
     await ConnectDb();
     ///checking for the auth

@@ -10,7 +10,7 @@ import Notification from "../../../../../../models/Notification";
 export const GET = async()=>{
     return NextResponse.json({status: 'success'})
 }
-export const POST = async(req:NextRequest,res:NextResponse)=>{
+export const POST = async(req:NextRequest)=>{
 try{
     //connecting to db
 await ConnectDb()

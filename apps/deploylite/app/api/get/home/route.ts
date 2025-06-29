@@ -5,7 +5,7 @@ import CheckAuth from "@/actions/CheckAuth";
 import Wallet from "../../../../../models/Wallet";
 import Crypto from "crypto-js";
 import { cookies } from "next/headers";
-export const GET = async(req:NextRequest,res:NextResponse)=>{
+export const GET = async()=>{
     console.log("entering to home auth")
     const cook = await cookies()
     try{

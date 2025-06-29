@@ -8,7 +8,7 @@ import axios from 'axios';
 export const GET=()=>{
     return NextResponse.json({status: 'success from resend'})
 }
-export const POST =async(req:NextRequest,res:NextResponse)=>{
+export const POST =async(req:NextRequest)=>{
     try{
     let data = await req.json();
     let decryptdata: JwtPayload;

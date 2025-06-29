@@ -15,6 +15,17 @@ const buttonPrimary =
 const glassCard =
   "rounded-2xl bg-gray-900/50 p-6 shadow-2xl backdrop-blur-sm border border-pink-500/20";
 
+// Define interface for model data
+interface ModelData {
+  name: string;
+  logo: string;
+  price?: string;
+  description?: string;
+  parameters?: string;
+  repo?: string;
+  features?: string[];
+}
+
 // Sample data
 const models = [
   {
@@ -43,13 +54,13 @@ const models = [
 ];
 
 export default function MLModelPage() {
-  const [selectedModel, setSelectedModel] = useState(null);
+  const [selectedModel, setSelectedModel] = useState<ModelData | null>(null);
   const [showModal, setShowModal] = useState(false);
 
   // We'll use the Next.js 13 navigation hook to push a route
   const router = useRouter();
 
-  const openModal = (model) => {
+  const openModal = (model: ModelData) => {
     setSelectedModel(model);
     setShowModal(true);
   };

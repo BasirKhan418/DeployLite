@@ -1,8 +1,9 @@
 import React from 'react';
 import { AlertTriangle, ArrowLeft } from 'lucide-react';
 import { cookies } from 'next/headers';
-const AuthErrorPage = () => {
-    const cook = cookies();
+
+const AuthErrorPage = async () => {
+    const cook = await cookies();
     let msg = cook.get("msg");
     let message = msg?.value;
   return (

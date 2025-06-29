@@ -147,11 +147,14 @@ async function queryAiAgent(message:string) {
 
   } catch (error) {
       console.error('Error:', error);
-      return `Error: ${error.message}`;
+      if (error instanceof Error) {
+        return `Error: ${error.message}`;
+      }
+      return 'An unknown error occurred';
   }
 }
   //analyze using ai 
-  const processText = (text) => {
+  const processText = (text: string) => {
     // Extract build score
     const buildScoreMatch = text.match(/Build Score: (\d+)/);
     const buildScore = buildScoreMatch ? parseInt(buildScoreMatch[1]) : null;
@@ -1581,7 +1584,7 @@ async function queryAiAgent(message:string) {
     </div>
   );
 }
-const FormattedBuildText = ({ text }) => {
+const FormattedBuildText = ({ text }: { text: string }) => {
   // Split the text by bold tags and process each part
   const parts = text.split(/(<b>.*?<\/b>)/g);
   

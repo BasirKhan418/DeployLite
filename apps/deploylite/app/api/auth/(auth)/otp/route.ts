@@ -4,7 +4,7 @@ import User from "../../../../../../models/User";
 import Otp from "../../../../../../models/Otp";
 import jwt from 'jsonwebtoken';
 import { cookies } from "next/headers";
-export const POST = async(req:NextRequest,res:NextResponse)=>{
+export const POST = async(req:NextRequest)=>{
     try{
      await ConnectDb();
      const cookie = cookies();

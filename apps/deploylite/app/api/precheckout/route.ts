@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import ConnectDb from '../../../../middleware/connectdb';
 import CheckAuth from '@/actions/CheckAuth';
 import TempPayment from '../../../../models/TempPayment';
-export const POST = async (req: NextRequest, res: NextResponse) => {
+export const POST = async (req: NextRequest) => {
   const data = await req.json();
   await ConnectDb();
   let result = await CheckAuth()

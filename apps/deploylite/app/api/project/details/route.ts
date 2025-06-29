@@ -8,7 +8,7 @@ import User from "../../../../../models/User"
 import Deployment from "../../../../../models/Deployment"
 import { cookies } from "next/headers"
 import CryptoJS from "crypto-js"
-export const GET = async(req:NextRequest,res:NextResponse) => {
+export const GET = async(req:NextRequest) => {
     const { searchParams } = new URL(req.url);
     try{
      await ConnectDb();

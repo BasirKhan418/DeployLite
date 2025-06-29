@@ -4,7 +4,7 @@ import User from "../../../../../models/User";
 import CheckAuth from "@/actions/CheckAuth";
 import CryptoJS from "crypto-js";
 import { Accountzod,AccountTogglezod } from "@/zod/settings/AccountZod";
-export const POST = async (req: NextRequest,res:NextResponse) => {
+export const POST = async (req: NextRequest) => {
     try{
     let data = await req.json();
     await ConnectDb();
@@ -43,7 +43,7 @@ export const POST = async (req: NextRequest,res:NextResponse) => {
     }
 }
 
-export const PUT = async(req: NextRequest,res:NextResponse) => {
+export const PUT = async(req: NextRequest) => {
     try{
     await ConnectDb();
     let data = await req.json();

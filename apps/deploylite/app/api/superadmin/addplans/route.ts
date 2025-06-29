@@ -1,7 +1,7 @@
 import { NextRequest,NextResponse } from "next/server";
 import ConnectDb from "../../../../../middleware/connectdb";
 import PricingPlan from "../../../../../models/PricingPlan";
-export const GET = async(req:NextRequest)=>{
+export const GET = async()=>{
     return NextResponse.json({message:"hello how are you i am from pricing plans every thing is up and running"})
 }
 export const POST = async(req:NextRequest)=>{

@@ -5,7 +5,7 @@ import CheckAuth from "@/actions/CheckAuth";
 import User from "../../../../../models/User";
 import CryptoJS from "crypto-js";
 import { CreateSchema } from "@/zod/aws/CreateSchema";
-export const GET = async (req: NextRequest, res: NextResponse) => {
+export const GET = async () => {
     try {
         await ConnectDb();
         const result = await CheckAuth();
@@ -32,7 +32,7 @@ export const GET = async (req: NextRequest, res: NextResponse) => {
     }
 }
 //post for connecting aws account
-export const POST = async (req: NextRequest, res: NextResponse) => {
+export const POST = async (req: NextRequest) => {
     try {
         await ConnectDb();
         let data = await req.json();
@@ -77,7 +77,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
 
 }
 //update aws configuration
-export const PUT = async (req: NextRequest, res: NextResponse) => {
+export const PUT = async (req: NextRequest) => {
     try{
 await ConnectDb();
 let data = await req.json();
@@ -127,7 +127,7 @@ return NextResponse.json({success:true,message:"Your aws services updated succes
 
 }
 //delete handler for disconnecting aws account
-export const DELETE = async (req: NextRequest, res: NextResponse) => {
+export const DELETE = async () => {
     try{
      await ConnectDb();
      let result = await CheckAuth();

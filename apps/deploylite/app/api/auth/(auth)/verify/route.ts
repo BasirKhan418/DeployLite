@@ -5,7 +5,7 @@ import ErrorTemplate from "@/html/ErrorTemplate";
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import User from "../../../../../../models/User";
 import SendVeriyEmail from "@/emails/auth/SendVerifyEmail";
-export const GET = async(req:NextRequest,res:NextResponse)=>{
+export const GET = async(req:NextRequest)=>{
   
     try{
         let token = req.url.split("token=")[1];
@@ -28,7 +28,7 @@ export const GET = async(req:NextRequest,res:NextResponse)=>{
           });
     }
 }
-export const POST = async(req:NextRequest,res:NextResponse)=>{
+export const POST = async(req:NextRequest)=>{
 
   let data = await req.json()
   console.log(data)

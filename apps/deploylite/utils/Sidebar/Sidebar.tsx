@@ -146,7 +146,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             isActiveRoute("/ai") ? "text-pink-400" : "text-gray-400 group-hover:text-pink-300"
           )} />
           {(!isSidebarCollapsed || isMobile) && (
-            <span className="ml-3 transition-all duration-300">AI Workflows</span>
+            <span className="ml-3 transition-all duration-300">AI Agent</span>
           )}
           {isActiveRoute("/ai") && (
             <div className="absolute right-2 w-1 h-6 bg-gradient-to-b from-pink-400 to-purple-400 rounded-full" />
@@ -175,7 +175,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             isActiveRoute("/mlmodel") ? "text-pink-400" : "text-gray-400 group-hover:text-pink-300"
           )} />
           {(!isSidebarCollapsed || isMobile) && (
-            <span className="ml-3 transition-all duration-300">ML Models</span>
+            <span className="ml-3 transition-all duration-300">Virtual Space </span>
           )}
           {isActiveRoute("/mlmodel") && (
             <div className="absolute right-2 w-1 h-6 bg-gradient-to-b from-pink-400 to-purple-400 rounded-full" />

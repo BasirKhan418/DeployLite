@@ -270,7 +270,8 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
         }
       } catch (err) {
         console.error('Error handling message:', err);
-        setMessages(prev => [...prev, createLogMessage(`Error processing log message: ${err.message}`, 'error')]);
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+        setMessages(prev => [...prev, createLogMessage(`Error processing log message: ${errorMessage}`, 'error')]);
       }
     };
 

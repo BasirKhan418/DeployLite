@@ -533,6 +533,11 @@ const DashboardHero = () => {
 
   const trend = calculateTrend();
 
+  // Function to render icon safely
+  const renderIcon = (IconComponent: React.ComponentType<any>, className: string) => {
+    return <IconComponent className={className} />;
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -1000,31 +1005,31 @@ const DashboardHero = () => {
             </motion.div>
           </div>
 
-          {/* Additional Stats Row */}
+          {/* Additional Stats Row - FIXED: Use proper icon rendering */}
           <motion.div variants={fadeIn} className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               {
                 value: activeProjects.filter(p => p.techused?.toLowerCase() === 'react').length,
                 label: "React Apps",
-                icon: Code,
+                iconName: "Code",
                 gradient: "from-cyan-400 to-blue-400"
               },
               {
                 value: activeProjects.filter(p => p.projectstatus === 'live').length,
                 label: "Live Projects",
-                icon: Server,
+                iconName: "Server",
                 gradient: "from-emerald-400 to-green-400"
               },
               {
                 value: deploymentStats.chartData.reduce((sum, month) => sum + month.deployments, 0),
                 label: "Total This Year",
-                icon: BarChart3,
+                iconName: "BarChart3",
                 gradient: "from-purple-400 to-pink-400"
               },
               {
                 value: Math.round((activeProjects.filter(p => p.projectstatus === 'live').length / Math.max(activeProjects.length, 1)) * 100),
                 label: "Success Rate",
-                icon: Activity,
+                iconName: "Activity",
                 gradient: "from-yellow-400 to-orange-400",
                 suffix: "%"
               }
@@ -1040,7 +1045,10 @@ const DashboardHero = () => {
                   <div className="relative">
                     <div className="flex items-center justify-center mb-3">
                       <div className="p-2 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-lg">
-                        <stat.icon className="w-5 h-5 text-pink-400" />
+                        {stat.iconName === "Code" && <Code className="w-5 h-5 text-pink-400" />}
+                        {stat.iconName === "Server" && <Server className="w-5 h-5 text-pink-400" />}
+                        {stat.iconName === "BarChart3" && <BarChart3 className="w-5 h-5 text-pink-400" />}
+                        {stat.iconName === "Activity" && <Activity className="w-5 h-5 text-pink-400" />}
                       </div>
                     </div>
                     <div className={`text-2xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent mb-1`}>

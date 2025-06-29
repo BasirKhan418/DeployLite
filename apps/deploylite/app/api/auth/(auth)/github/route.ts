@@ -3,7 +3,7 @@ import CheckAuth from "@/actions/CheckAuth";
 import User from "../../../../../../models/User";
 import ConnectDb from "../../../../../../middleware/connectdb";
 import CryptoJS from "crypto-js";
-export const GET = async (req: NextRequest,res:NextResponse) => {
+export const GET = async (req: NextRequest) => {
     
     try{
         await ConnectDb();

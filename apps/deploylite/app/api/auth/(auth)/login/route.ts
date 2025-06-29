@@ -11,7 +11,7 @@ import { isGenerator } from "framer-motion";
 export const GET = async()=>{
     return NextResponse.json({status: 'success'})
 }
-export const POST = async(req:NextRequest,res:NextResponse)=>{
+export const POST = async(req:NextRequest)=>{
     const cookie = cookies()
 try{
 await ConnectDb()
