@@ -568,9 +568,7 @@ export default function CreateProject({ name }: { name: string }) {
           {/* Header */}
           <motion.div variants={itemVariants} className="text-center mb-12">
             <div className="flex items-center justify-center mb-6">
-              <div className="p-4 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-2xl">
-                <Rocket className="h-12 w-12 text-pink-400" />
-              </div>
+              
             </div>
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent mb-4">
               Create Your Project
