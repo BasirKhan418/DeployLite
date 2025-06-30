@@ -1,14 +1,14 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Plus, Rocket, Code, Globe, Server, Cloud, Database, Moon, Sun } from 'lucide-react'
+import { Plus, Rocket, Code, Globe, Server, Cloud, Database } from 'lucide-react'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {useTheme} from 'next-themes'
 
 export default function NoProject({name}:{name:string}) {
   const [isHovered, setIsHovered] = useState(false)
-  const { theme, setTheme } = useTheme()
+  const { theme } = useTheme()
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${theme=="dark"? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
@@ -39,7 +39,7 @@ export default function NoProject({name}:{name:string}) {
             >
               <h2 className="text-2xl font-semibold mb-4">No {name.slice(0,1).toUpperCase()+name.slice(1)} Projects Yet</h2>
               <p className={`mb-6 ${theme=="dark" ? 'text-gray-400' : 'text-gray-600'}`}>
-                You haven't created any projects. Let's get started on your first deployment!
+                You haven&apos;t created any projects. Let&apos;s get started on your first deployment!
               </p>
               <motion.div
                 className="relative h-40 mb-6"

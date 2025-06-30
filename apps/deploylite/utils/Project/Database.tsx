@@ -2,17 +2,13 @@
 import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { AlertCircle,  MoreVertical, Plus, Server, Settings, Trash2 ,Database} from 'lucide-react'
+import {MoreVertical, Plus, Server, Settings, Trash2 ,Database} from 'lucide-react'
 import { Progress } from "@/components/ui/progress"
 import CreateDatabase from '../modals/CreateDatabase'
 // Constants
+
 const DATABASE_TYPES = {
   POSTGRESQL: 'PostgreSQL',
   MYSQL: 'MySQL',
@@ -36,28 +32,10 @@ const mockDatabases = [
 
 export default function DatabaseComp() {
   const [databases, setDatabases] = useState(mockDatabases)
-  const [newDbName, setNewDbName] = useState('')
-  const [newDbType, setNewDbType] = useState('')
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+
   const [open,setOpen] = useState(false)
-  const addNewDatabase = () => {
-    if (newDbName && newDbType) {
-      const newDb = {
-        id: databases.length + 1,
-        name: newDbName,
-        type: newDbType,
-        status: DATABASE_STATUS.ACTIVE,
-        size: 0,
-        maxSize: 1024,
-        connections: 0,
-        uptime: '100%',
-      }
-      setDatabases([...databases, newDb])
-      setNewDbName('')
-      setNewDbType('')
-      setIsDialogOpen(false)
-    }
-  }
+ 
+  
 
   const deleteDatabase = (id: number) => {
     setDatabases(databases.filter(db => db.id !== id))
@@ -65,7 +43,7 @@ export default function DatabaseComp() {
 
   return (
     <div className="min-h-screen  p-8">
-      <CreateDatabase open={open} setOpen={setOpen}/>
+      <CreateDatabase open={open} setOpen={setOpen} />
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex"> <Database className="h-8 w-8 text-blue-500 mx-2"/>Database Management</h1>

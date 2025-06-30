@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { GitBranch, GitFork, Rocket, Server, Cloud, Zap, Shield, Users, Code, Globe, ChevronRight, Check, X, AlertTriangle, Terminal, Coffee, DollarSign, Layout } from 'lucide-react'
+import Image from 'next/image'
 
 export default function CreateWebbuilder() {
   const [stage, setStage] = useState(1)
@@ -23,13 +24,14 @@ export default function CreateWebbuilder() {
   const [selectedPlan, setSelectedPlan] = useState('hobby')
   const [selectedBuilder, setSelectedBuilder] = useState('')
 
-  const handleProjectDetailsChange = (e:any) => {
+  const handleProjectDetailsChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setProjectDetails({ ...projectDetails, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = (e:any) => {
-    e.preventDefault()
-    // Handle form submission here
+  
+
+  const handleCreateProject = () => {
+    // Handle project creation here
     console.log('Project Details:', projectDetails)
     console.log('Selected Plan:', selectedPlan)
     console.log('Selected Builder:', selectedBuilder)
@@ -345,7 +347,7 @@ export default function CreateWebbuilder() {
                       <ChevronRight className="h-4 w-4 mr-2 rotate-180" />
                       Back to Plans
                     </Button>
-                    <Button onClick={handleSubmit} className="bg-green-600 hover:bg-green-700">
+                    <Button onClick={handleCreateProject} className="bg-green-600 hover:bg-green-700">
                       Create Project
                       <Rocket className="ml-2 h-4 w-4" />
                     </Button>
@@ -484,11 +486,11 @@ export default function CreateWebbuilder() {
         <div className="mt-16 text-center">
           <h2 className="text-3xl font-extrabold text-gray-900 dark:text-gray-200">Trusted by developers worldwide</h2>
           <div className="mt-8 flex justify-center space-x-6">
-            <img className="h-8" src="https://tailwindui.com/img/logos/tuple-logo-gray-400.svg" alt="Tuple" />
-            <img className="h-8" src="https://tailwindui.com/img/logos/mirage-logo-gray-400.svg" alt="Mirage" />
-            <img className="h-8" src="https://tailwindui.com/img/logos/statickit-logo-gray-400.svg" alt="StaticKit" />
-            <img className="h-8" src="https://tailwindui.com/img/logos/transistor-logo-gray-400.svg" alt="Transistor" />
-            <img className="h-8" src="https://tailwindui.com/img/logos/workcation-logo-gray-400.svg" alt="Workcation" />
+            <Image height={50} width={50} src="https://tailwindui.com/img/logos/tuple-logo-gray-400.svg" alt="Tuple" />
+            <Image height={50} width={50} src="https://tailwindui.com/img/logos/mirage-logo-gray-400.svg" alt="Mirage" />
+            <Image height={50} width={50} src="https://tailwindui.com/img/logos/statickit-logo-gray-400.svg" alt="StaticKit" />
+            <Image height={50} width={50} src="https://tailwindui.com/img/logos/transistor-logo-gray-400.svg" alt="Transistor" />
+            <Image height={50} width={50} src="https://tailwindui.com/img/logos/workcation-logo-gray-400.svg" alt="Workcation" />
           </div>
         </div>
       </div>

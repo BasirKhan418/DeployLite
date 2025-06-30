@@ -1,19 +1,17 @@
 "use client"
+
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { FaWordpress } from "react-icons/fa";
-import { SiPrestashop } from "react-icons/si";
 import { FaUsers } from "react-icons/fa";
-import { FaDrupal } from "react-icons/fa";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
-import { PlusCircle, Search, MoreHorizontal ,ExternalLink, Layers, Cpu, Eye, BarChart2, Edit, Trash2, Play, Pause, RefreshCw, Settings,Globe } from 'lucide-react'
+import { PlusCircle, Search, MoreHorizontal , Layers, Eye, BarChart2, Edit, Trash2, Play, Pause, RefreshCw, Globe } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
-import Image from 'next/image'
 import { useRouter } from 'next/navigation';
+
 export default function WebBuilder() {
-  const [open,setOpen] = useState(false)
+
   const [sites, setSites] = useState([
     { id: 1, name: 'My Portfolio', url: 'myportfolio.com', lastUpdated: '2 hours ago', template: 'Custom', status: 'Live', visitors: 152, logo: '/placeholder.svg?height=40&width=40' },
     { id: 2, name: 'Coffee Shop', url: 'bestcoffee.com', lastUpdated: '1 day ago', template: 'E-commerce', status: 'Updating', visitors: 1089, logo: '/placeholder.svg?height=40&width=40' },
@@ -22,7 +20,17 @@ export default function WebBuilder() {
     { id: 5, name: 'Art Gallery', url: 'modernart.com', lastUpdated: '3 days ago', template: 'Portfolio', status: 'Maintenance', visitors: 0, logo: '/placeholder.svg?height=40&width=40' },
     { id: 6, name: 'Local Restaurant', url: 'tasteofitaly.com', lastUpdated: '12 hours ago', template: 'Restaurant', status: 'Live', visitors: 789, logo: '/placeholder.svg?height=40&width=40' },
   ])
+  const [searchTerm, setSearchTerm] = useState('')
   const router = useRouter()
+
+  const handleDeleteSite = (siteId: number) => {
+    setSites(sites.filter(site => site.id !== siteId))
+  }
+
+  const filteredSites = sites.filter(site => 
+    site.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    site.url.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-background via-background to-background/90">
@@ -40,6 +48,8 @@ export default function WebBuilder() {
                   type="search"
                   placeholder="Search sites..."
                   className="w-full sm:w-[300px] pl-8 pr-4 py-2 bg-background"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </form>
               <Button onClick={()=>{
@@ -51,7 +61,7 @@ export default function WebBuilder() {
             </div>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {sites.map((site) => (
+            {filteredSites.map((site) => (
               <Card key={site.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <div className="flex items-center space-x-2">
@@ -98,7 +108,7 @@ export default function WebBuilder() {
                           <span>Rebuild</span>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-600">
+                        <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteSite(site.id)}>
                           <Trash2 className="mr-2 h-4 w-4" />
                           <span>Delete site</span>
                         </DropdownMenuItem>

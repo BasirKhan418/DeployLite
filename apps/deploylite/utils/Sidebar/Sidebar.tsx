@@ -19,15 +19,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { useAppSelector } from "@/lib/hook";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
   MenuIcon,
   HomeIcon,
   Bot,
-  LayersIcon,
   Brain,
   SettingsIcon,
   PlusIcon,
@@ -47,25 +41,21 @@ import {
   CloudLightning,
   ChevronLeftIcon,
   ChevronRightIcon,
-  X as XIcon,
-  Sparkles,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+
 import LogoutModal from "../modals/LogoutModal";
 import LottieAnimation from "@/components/ui/LottieAnimation";
 
-// A small helper for conditionally combining classes
 function cn(...classes: (string | boolean | undefined)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
+
   const pathname = usePathname();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(3);
-  const [isProjectsOpen, setIsProjectsOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -76,6 +66,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // Close mobile sidebar when switching to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) { // md breakpoint
+        setIsSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const toggleTheme = () => {
@@ -91,7 +93,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }
 
   function isActiveSubRoute(route: string) {
-    return pathname.startsWith(route);
+    return pathname?.startsWith(route) ?? false;
   }
 
   const NavItems = ({ isMobile = false }: { isMobile?: boolean }) => (
@@ -175,7 +177,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             isActiveRoute("/mlmodel") ? "text-pink-400" : "text-gray-400 group-hover:text-pink-300"
           )} />
           {(!isSidebarCollapsed || isMobile) && (
-            <span className="ml-3 transition-all duration-300">Virtual Space </span>
+            <span className="ml-3 transition-all duration-300">Virtual Space</span>
           )}
           {isActiveRoute("/mlmodel") && (
             <div className="absolute right-2 w-1 h-6 bg-gradient-to-b from-pink-400 to-purple-400 rounded-full" />
@@ -183,128 +185,121 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </Button>
       </Link>
 
-      {/* Projects (Collapsible) */}
-      <Collapsible
-        open={isProjectsOpen}
-        onOpenChange={setIsProjectsOpen}
-        className="w-full"
-      >
-        <CollapsibleTrigger asChild>
-          <Button
-            variant="ghost"
-            className={cn(
-              "w-full justify-start rounded-xl transition-all duration-300 group relative overflow-hidden",
-              "h-12 text-sm font-medium",
-              isMobile ? "h-14 text-base" : "",
-              isActiveSubRoute("/project")
-                ? "bg-gradient-to-r from-pink-500/20 to-purple-500/20 text-pink-400 border border-pink-500/30"
-                : "text-gray-300 hover:text-pink-300 hover:bg-gradient-to-r hover:from-pink-500/10 hover:to-purple-500/10 hover:border-pink-500/20 border border-transparent",
-              !isSidebarCollapsed || isMobile ? "px-4" : "px-2"
-            )}
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-pink-600/0 to-purple-600/0 group-hover:from-pink-600/5 group-hover:to-purple-600/5 transition-all duration-300" />
-            <LayersIcon className={cn("shrink-0 transition-all duration-300", 
-              isMobile ? "h-6 w-6" : "h-5 w-5",
-              isActiveSubRoute("/project") ? "text-pink-400" : "text-gray-400 group-hover:text-pink-300"
-            )} />
-            {(!isSidebarCollapsed || isMobile) && (
-              <span className="ml-3 transition-all duration-300">Projects</span>
-            )}
-            {(!isSidebarCollapsed || isMobile) && (
-              <ChevronDownIcon
-                className={cn(
-                  "ml-auto h-4 w-4 transition-all duration-300",
-                  isProjectsOpen && "rotate-180"
-                )}
-              />
-            )}
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-1 mt-2">
-          <div className="ml-4 border-l border-pink-500/20 pl-4 space-y-1">
-            <Link href="/project/app-platform">
-              <Button
-                variant="ghost"
-                className={cn(
-                  "w-full justify-start rounded-lg transition-all duration-300 group",
-                  "h-10 text-sm",
-                  isMobile ? "h-12 text-base" : "",
-                  isActiveSubRoute("/project/app-platform")
-                    ? "bg-pink-500/10 text-pink-300 border-l-2 border-pink-400"
-                    : "text-gray-400 hover:text-pink-300 hover:bg-pink-500/5",
-                  !isSidebarCollapsed || isMobile ? "px-3" : "px-2"
-                )}
-                onClick={() => isMobile && setIsSidebarOpen(false)}
-              >
-                <CodeIcon className={cn("shrink-0", isMobile ? "h-5 w-5" : "h-4 w-4")} />
-                {(!isSidebarCollapsed || isMobile) && (
-                  <span className="ml-3">App Platform</span>
-                )}
-              </Button>
-            </Link>
-            <Link href="/project/webbuilder">
-              <Button
-                variant="ghost"
-                className={cn(
-                  "w-full justify-start rounded-lg transition-all duration-300 group",
-                  "h-10 text-sm",
-                  isMobile ? "h-12 text-base" : "",
-                  isActiveSubRoute("/project/webbuilder")
-                    ? "bg-pink-500/10 text-pink-300 border-l-2 border-pink-400"
-                    : "text-gray-400 hover:text-pink-300 hover:bg-pink-500/5",
-                  !isSidebarCollapsed || isMobile ? "px-3" : "px-2"
-                )}
-                onClick={() => isMobile && setIsSidebarOpen(false)}
-              >
-                <GlobeIcon className={cn("shrink-0", isMobile ? "h-5 w-5" : "h-4 w-4")} />
-                {(!isSidebarCollapsed || isMobile) && (
-                  <span className="ml-3">Web Builder</span>
-                )}
-              </Button>
-            </Link>
-            <Link href="/project/database">
-              <Button
-                variant="ghost"
-                className={cn(
-                  "w-full justify-start rounded-lg transition-all duration-300 group",
-                  "h-10 text-sm",
-                  isMobile ? "h-12 text-base" : "",
-                  isActiveSubRoute("/project/database")
-                    ? "bg-pink-500/10 text-pink-300 border-l-2 border-pink-400"
-                    : "text-gray-400 hover:text-pink-300 hover:bg-pink-500/5",
-                  !isSidebarCollapsed || isMobile ? "px-3" : "px-2"
-                )}
-                onClick={() => isMobile && setIsSidebarOpen(false)}
-              >
-                <DatabaseIcon className={cn("shrink-0", isMobile ? "h-5 w-5" : "h-4 w-4")} />
-                {(!isSidebarCollapsed || isMobile) && (
-                  <span className="ml-3">Database</span>
-                )}
-              </Button>
-            </Link>
-            <Link href="/project/storage">
-              <Button
-                variant="ghost"
-                className={cn(
-                  "w-full justify-start rounded-lg transition-all duration-300 group",
-                  "h-10 text-sm",
-                  isMobile ? "h-12 text-base" : "",
-                  isActiveSubRoute("/project/storage")
-                    ? "bg-pink-500/10 text-pink-300 border-l-2 border-pink-400"
-                    : "text-gray-400 hover:text-pink-300 hover:bg-pink-500/5",
-                  !isSidebarCollapsed || isMobile ? "px-3" : "px-2"
-                )}
-                onClick={() => isMobile && setIsSidebarOpen(false)}
-              >
-                <HardDrive className={cn("shrink-0", isMobile ? "h-5 w-5" : "h-4 w-4")} />
-                {(!isSidebarCollapsed || isMobile) && (
-                  <span className="ml-3">Storage</span>
-                )}
-              </Button>
-            </Link>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
+      {/* App Platform */}
+      <Link href="/project/app-platform" passHref>
+        <Button
+          variant="ghost"
+          className={cn(
+            "w-full justify-start rounded-xl transition-all duration-300 group relative overflow-hidden",
+            "h-12 text-sm font-medium",
+            isMobile ? "h-14 text-base" : "",
+            isActiveSubRoute("/project/app-platform")
+              ? "bg-gradient-to-r from-pink-500/20 to-purple-500/20 text-pink-400 border border-pink-500/30 shadow-lg shadow-pink-500/10"
+              : "text-gray-300 hover:text-pink-300 hover:bg-gradient-to-r hover:from-pink-500/10 hover:to-purple-500/10 hover:border-pink-500/20 border border-transparent",
+            !isSidebarCollapsed || isMobile ? "px-4" : "px-2"
+          )}
+          onClick={() => isMobile && setIsSidebarOpen(false)}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-pink-600/0 to-purple-600/0 group-hover:from-pink-600/5 group-hover:to-purple-600/5 transition-all duration-300" />
+          <CodeIcon className={cn("shrink-0 transition-all duration-300", 
+            isMobile ? "h-6 w-6" : "h-5 w-5",
+            isActiveSubRoute("/project/app-platform") ? "text-pink-400" : "text-gray-400 group-hover:text-pink-300"
+          )} />
+          {(!isSidebarCollapsed || isMobile) && (
+            <span className="ml-3 transition-all duration-300">App Platform</span>
+          )}
+          {isActiveSubRoute("/project/app-platform") && (
+            <div className="absolute right-2 w-1 h-6 bg-gradient-to-b from-pink-400 to-purple-400 rounded-full" />
+          )}
+        </Button>
+      </Link>
+
+      {/* Web Builder */}
+      <Link href="/project/webbuilder" passHref>
+        <Button
+          variant="ghost"
+          className={cn(
+            "w-full justify-start rounded-xl transition-all duration-300 group relative overflow-hidden",
+            "h-12 text-sm font-medium",
+            isMobile ? "h-14 text-base" : "",
+            isActiveSubRoute("/project/webbuilder")
+              ? "bg-gradient-to-r from-pink-500/20 to-purple-500/20 text-pink-400 border border-pink-500/30 shadow-lg shadow-pink-500/10"
+              : "text-gray-300 hover:text-pink-300 hover:bg-gradient-to-r hover:from-pink-500/10 hover:to-purple-500/10 hover:border-pink-500/20 border border-transparent",
+            !isSidebarCollapsed || isMobile ? "px-4" : "px-2"
+          )}
+          onClick={() => isMobile && setIsSidebarOpen(false)}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-pink-600/0 to-purple-600/0 group-hover:from-pink-600/5 group-hover:to-purple-600/5 transition-all duration-300" />
+          <GlobeIcon className={cn("shrink-0 transition-all duration-300", 
+            isMobile ? "h-6 w-6" : "h-5 w-5",
+            isActiveSubRoute("/project/webbuilder") ? "text-pink-400" : "text-gray-400 group-hover:text-pink-300"
+          )} />
+          {(!isSidebarCollapsed || isMobile) && (
+            <span className="ml-3 transition-all duration-300">Web Builder</span>
+          )}
+          {isActiveSubRoute("/project/webbuilder") && (
+            <div className="absolute right-2 w-1 h-6 bg-gradient-to-b from-pink-400 to-purple-400 rounded-full" />
+          )}
+        </Button>
+      </Link>
+
+      {/* Database */}
+      <Link href="/project/database" passHref>
+        <Button
+          variant="ghost"
+          className={cn(
+            "w-full justify-start rounded-xl transition-all duration-300 group relative overflow-hidden",
+            "h-12 text-sm font-medium",
+            isMobile ? "h-14 text-base" : "",
+            isActiveSubRoute("/project/database")
+              ? "bg-gradient-to-r from-pink-500/20 to-purple-500/20 text-pink-400 border border-pink-500/30 shadow-lg shadow-pink-500/10"
+              : "text-gray-300 hover:text-pink-300 hover:bg-gradient-to-r hover:from-pink-500/10 hover:to-purple-500/10 hover:border-pink-500/20 border border-transparent",
+            !isSidebarCollapsed || isMobile ? "px-4" : "px-2"
+          )}
+          onClick={() => isMobile && setIsSidebarOpen(false)}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-pink-600/0 to-purple-600/0 group-hover:from-pink-600/5 group-hover:to-purple-600/5 transition-all duration-300" />
+          <DatabaseIcon className={cn("shrink-0 transition-all duration-300", 
+            isMobile ? "h-6 w-6" : "h-5 w-5",
+            isActiveSubRoute("/project/database") ? "text-pink-400" : "text-gray-400 group-hover:text-pink-300"
+          )} />
+          {(!isSidebarCollapsed || isMobile) && (
+            <span className="ml-3 transition-all duration-300">Database</span>
+          )}
+          {isActiveSubRoute("/project/database") && (
+            <div className="absolute right-2 w-1 h-6 bg-gradient-to-b from-pink-400 to-purple-400 rounded-full" />
+          )}
+        </Button>
+      </Link>
+
+      {/* Storage */}
+      <Link href="/project/storage" passHref>
+        <Button
+          variant="ghost"
+          className={cn(
+            "w-full justify-start rounded-xl transition-all duration-300 group relative overflow-hidden",
+            "h-12 text-sm font-medium",
+            isMobile ? "h-14 text-base" : "",
+            isActiveSubRoute("/project/storage")
+              ? "bg-gradient-to-r from-pink-500/20 to-purple-500/20 text-pink-400 border border-pink-500/30 shadow-lg shadow-pink-500/10"
+              : "text-gray-300 hover:text-pink-300 hover:bg-gradient-to-r hover:from-pink-500/10 hover:to-purple-500/10 hover:border-pink-500/20 border border-transparent",
+            !isSidebarCollapsed || isMobile ? "px-4" : "px-2"
+          )}
+          onClick={() => isMobile && setIsSidebarOpen(false)}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-pink-600/0 to-purple-600/0 group-hover:from-pink-600/5 group-hover:to-purple-600/5 transition-all duration-300" />
+          <HardDrive className={cn("shrink-0 transition-all duration-300", 
+            isMobile ? "h-6 w-6" : "h-5 w-5",
+            isActiveSubRoute("/project/storage") ? "text-pink-400" : "text-gray-400 group-hover:text-pink-300"
+          )} />
+          {(!isSidebarCollapsed || isMobile) && (
+            <span className="ml-3 transition-all duration-300">Storage</span>
+          )}
+          {isActiveSubRoute("/project/storage") && (
+            <div className="absolute right-2 w-1 h-6 bg-gradient-to-b from-pink-400 to-purple-400 rounded-full" />
+          )}
+        </Button>
+      </Link>
 
       {/* Cloud Customization */}
       <Link href="/customization" passHref>
@@ -490,24 +485,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               >
                 {/* Mobile Header */}
                 <div className="p-6 border-b border-pink-500/20 bg-gradient-to-r from-pink-500/5 to-purple-500/5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <LottieAnimation width={42} height={42} />
-                      <div className="ml-3">
-                        <h1 className="text-xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
-                          DeployLite
-                        </h1>
-                        <p className="text-xs text-gray-400 font-medium">Cloud Platform</p>
-                      </div>
+                  <div className="flex items-center">
+                    <LottieAnimation width={42} height={42} />
+                    <div className="ml-3">
+                      <h1 className="text-xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
+                        DeployLite
+                      </h1>
+                      <p className="text-xs text-gray-400 font-medium">Cloud Platform</p>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setIsSidebarOpen(false)}
-                      className="h-8 w-8 rounded-lg hover:bg-pink-500/10 hover:text-pink-300"
-                    >
-                      <XIcon className="h-4 w-4" />
-                    </Button>
                   </div>
                 </div>
                 
@@ -538,14 +523,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </h1>
           </div>
 
-          <div className="flex items-center space-x-3">
-            {/* Create Button */}
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            {/* Create Button - smaller on mobile */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white border-0 rounded-xl px-4 h-10 font-medium shadow-lg shadow-pink-500/25 transition-all duration-300">
-                  <PlusIcon className="mr-2 h-4 w-4" />
-                  Create
-                  <ChevronDownIcon className="ml-2 h-4 w-4" />
+                <Button className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white border-0 rounded-xl font-medium shadow-lg shadow-pink-500/25 transition-all duration-300 px-3 sm:px-4 h-9 sm:h-10 text-sm">
+                  <PlusIcon className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Create</span>
+                  <ChevronDownIcon className="h-4 w-4 sm:ml-2 ml-1" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-72 bg-black/95 backdrop-blur-xl border-pink-500/20">
@@ -580,7 +565,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </Link>
                 <Link href="/project/webbuilder">
                   <DropdownMenuItem className="hover:bg-pink-500/10 hover:text-pink-300 transition-all duration-300 rounded-lg m-1">
-                    <LayersIcon className="mr-3 h-5 w-5 text-green-400" />
+                    <GlobeIcon className="mr-3 h-5 w-5 text-green-400" />
                     <div className="flex flex-col">
                       <span className="font-medium">Web Builder</span>
                       <span className="text-xs text-gray-400">No-code solution</span>
@@ -644,9 +629,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="relative h-10 w-10 rounded-xl hover:bg-pink-500/10 hover:text-pink-300 transition-all duration-300"
+                  className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-xl hover:bg-pink-500/10 hover:text-pink-300 transition-all duration-300"
                 >
-                  <BellIcon className="h-5 w-5" />
+                  <BellIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                   {unreadNotifications > 0 && (
                     <Badge
                       variant="destructive"
@@ -727,19 +712,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="h-10 w-10 rounded-xl hover:bg-pink-500/10 hover:text-pink-300 transition-all duration-300"
+              className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl hover:bg-pink-500/10 hover:text-pink-300 transition-all duration-300"
             >
               {theme === "light" ? (
-                <MoonIcon className="h-5 w-5" />
+                <MoonIcon className="h-4 w-4 sm:h-5 sm:w-5" />
               ) : (
-                <SunIcon className="h-5 w-5" />
+                <SunIcon className="h-4 w-4 sm:h-5 sm:w-5" />
               )}
             </Button>
 
             {/* Avatar Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Avatar className="cursor-pointer h-10 w-10 ring-2 ring-pink-500/30 hover:ring-pink-500/50 transition-all duration-300">
+                <Avatar className="cursor-pointer h-9 w-9 sm:h-10 sm:w-10 ring-2 ring-pink-500/30 hover:ring-pink-500/50 transition-all duration-300">
                   <AvatarImage src={user?.img} alt="User" />
                   <AvatarFallback className="bg-gradient-to-br from-pink-500 to-purple-500 text-white font-semibold">
                     {user?.name?.[0]}
