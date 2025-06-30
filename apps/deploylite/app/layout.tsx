@@ -5,7 +5,7 @@ import "./globals.css";
 import StoreProvider from "./StoreProvider";
 import ClientLayout from "@/components/ClientLayout";
 import ThemeWrapper from "@/components/ThemeWrapper";
-import { Toaster } from "sonner";
+
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -54,7 +54,6 @@ export default function RootLayout({ children }) {
             />
             <ClientLayout>{children}</ClientLayout>
           </ThemeWrapper>
-          <Toaster position="top-right" />
         </StoreProvider>
       </body>
     </html>
