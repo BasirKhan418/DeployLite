@@ -1,4 +1,5 @@
 "use client"
+
 import React, { useEffect, useState } from 'react'
 import { Suspense } from 'react'
 import ProjectOverview from '@/utils/Project/details/ProjectOverview'
@@ -10,12 +11,16 @@ const page = () => {
   const [loading,setLoading]=useState(false)
   const[projectdata,setProjectData]=useState({})
   const [deploymentdata,setDeploymentdata]=useState([])
-  const id = params.get("id");
+  const id = params?.get("id");
+  
   useEffect(()=>{
-   fetchdata(id);
-  },[params.get("id")])
-  //fetching data from the server
-  const fetchdata =async(id:any)=>{
+   if (id) {
+     fetchdata(id);
+   }
+  },[id])
+  
+
+  const fetchdata =async(id: string)=>{
    try{
     setLoading(true)
  let data = await fetch(`/api/project/details?id=${id}`)
@@ -54,4 +59,4 @@ export default page
 function SearchBarFallback() {
   return <>Loading your content...</>
 }
- 
+
