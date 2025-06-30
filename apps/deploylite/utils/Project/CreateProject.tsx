@@ -61,7 +61,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { FaReact, FaAngular, FaHtml5, FaNodeJs, FaVuejs, FaJava, FaPhp, FaGithub } from "react-icons/fa";
 import { RiNextjsFill } from "react-icons/ri";
-import { SiFlask, SiSpringboot, SiVite, SiNuxtdotjs,  SiTypescript, SiPython } from "react-icons/si";
+import { SiFlask, SiSpringboot, SiVite, SiNuxtdotjs, SiTypescript, SiPython } from "react-icons/si";
 import { DiDjango } from "react-icons/di";
 import { VscWorkspaceUnknown } from "react-icons/vsc";
 import { Switch } from "@/components/ui/switch";
@@ -114,7 +114,7 @@ const slideIn = {
 // Tech icon mapping
 const getTechIcon = (tech: string) => {
   const techLower = tech?.toLowerCase() || '';
-  
+
   if (techLower.includes('react')) return <FaReact className="w-5 h-5 text-blue-400" />;
   if (techLower.includes('next')) return <RiNextjsFill className="w-5 h-5 text-white" />;
   if (techLower.includes('angular')) return <FaAngular className="w-5 h-5 text-red-500" />;
@@ -130,7 +130,7 @@ const getTechIcon = (tech: string) => {
   if (techLower.includes('php')) return <FaPhp className="w-5 h-5 text-purple-500" />;
   if (techLower.includes('html')) return <FaHtml5 className="w-5 h-5 text-orange-500" />;
   if (techLower.includes('typescript')) return <SiTypescript className="w-5 h-5 text-blue-500" />;
-  
+
   return <VscWorkspaceUnknown className="w-5 h-5 text-gray-400" />;
 };
 
@@ -140,7 +140,7 @@ export default function CreateProject({ name }: { name: string }) {
 
   const [stage, setStage] = useState(1);
   const [buildScore, setBuildScore] = useState("");
-  const [buildText, setBuildText] = useState(""); 
+  const [buildText, setBuildText] = useState("");
   const [projectDetails, setProjectDetails] = useState({
     name: "",
     tech: "",
@@ -170,37 +170,37 @@ export default function CreateProject({ name }: { name: string }) {
 
   async function queryAiAgent(message: string) {
     const API_URL = 'https://agent-9bce58c1b5878cb58d14-brwoz.ondigitalocean.app/api/v1/chat/completions';
-    
+
     const payload = {
-        messages: [{ role: 'user', content: message }],
-        temperature: 0.7,
-        stream: false
+      messages: [{ role: 'user', content: message }],
+      temperature: 0.7,
+      stream: false
     };
 
     try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.NEXT_PUBLIC_DG1}`
-            },
-            body: JSON.stringify(payload)
-        });
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_DG1}`
+        },
+        body: JSON.stringify(payload)
+      });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-        const data = await response.json();
-        
-        if (data.choices && data.choices.length > 0) {
-            return data.choices[0]?.message?.content || 'No content found';
-        }
-        return 'No response generated';
+      const data = await response.json();
+
+      if (data.choices && data.choices.length > 0) {
+        return data.choices[0]?.message?.content || 'No content found';
+      }
+      return 'No response generated';
 
     } catch (error) {
-        console.error('Error:', error);
-        return 'Error occurred while analyzing code';
+      console.error('Error:', error);
+      return 'Error occurred while analyzing code';
     }
   }
 
@@ -210,14 +210,14 @@ export default function CreateProject({ name }: { name: string }) {
     const buildScore = buildScoreMatch ? parseInt(buildScoreMatch[1]) : null;
     let processedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
     processedText = processedText.replace(/[']/g, '"');
-    
+
     return { buildScore, processedText };
   }
 
   const [isAnalyze, setIsAnalyze] = useState(false);
 
 
-  const handleAnalyze = async(repourl: string) => {
+  const handleAnalyze = async (repourl: string) => {
     setIsAnalyze(true);
     try {
       const response = await fetch('/api/repo', {
@@ -226,10 +226,10 @@ export default function CreateProject({ name }: { name: string }) {
         body: JSON.stringify({ repoUrl: repourl, authToken: user.githubtoken }),
       });
       const data = await response.json();
-      
+
       const testMessage = `Analyze this repository code and provide a build score (0-100) and detailed feedback: ${JSON.stringify(data)}`;
       const response2 = await queryAiAgent(testMessage);
-      
+
       const { buildScore, processedText } = processText(response2);
       setBuildScore(buildScore?.toString() || '85');
       setBuildText(processedText);
@@ -244,27 +244,27 @@ export default function CreateProject({ name }: { name: string }) {
 
 
   const fetchExistingProjects = async () => {
-    
+
     if (!user?.email) return;
-    
+
     try {
-  
+
       const response = await fetch(`/api/project/crud?email=${user.email}`);
       const data = await response.json();
-      
+
       if (data.success && data.projectdata) {
-        setExistingProjects(data.projectdata.slice(0, 6)); 
-        
+        setExistingProjects(data.projectdata.slice(0, 6));
+
         // Calculate platform stats
         const total = data.projectdata.length;
         const active = data.projectdata.filter((p: any) => p.projectstatus === 'live').length;
         const success = total > 0 ? Math.round((active / total) * 100) : 0;
-        
+
         setPlatformStats({
           totalProjects: total,
           activeDeployments: active,
           successRate: success,
-          totalUsers: 1250 
+          totalUsers: 1250
         });
       }
     } catch (error) {
@@ -308,7 +308,7 @@ export default function CreateProject({ name }: { name: string }) {
         headers: { Authorization: `token ${user.githubtoken}` },
       });
       const res = await repodata.json();
-      
+
       if (res.status == "401") {
         toast.error(res.message);
         setreposdata([{ full_name: res.message, private: true }]);
@@ -348,13 +348,19 @@ export default function CreateProject({ name }: { name: string }) {
         });
       }
     });
-    
+
     // Determine project type and set pricing
-    if (["React", "HTML,CSS,JS", "Vue.js", "Angular", "Vite", "Next.js", "Nuxt.js"].includes(projectDetails.tech)) {
+    if (["React", "HTML,CSS,JS", "Vue.js", "Angular", "Vite"].includes(projectDetails.tech)) {
       let frontend = pricingplans.filter((item: any) => item.pcategory == "frontend");
       setType("frontend");
       setDisplayPricing(frontend);
-    } else {
+    }
+    else if (["Next.js", "Nuxt.js"].includes(projectDetails.tech)) {
+      setType("fullstack");
+      let backend = pricingplans.filter((item: any) => item.pcategory == "backend");
+      setDisplayPricing(backend);
+    }
+    else {
       let backend = pricingplans.filter((item: any) => item.pcategory == "backend");
       setDisplayPricing(backend);
       setType("backend");
@@ -377,12 +383,12 @@ export default function CreateProject({ name }: { name: string }) {
     }
   };
 
- 
+
   const onRepoChanges = (value: any) => {
     if (value == null) return;
-    
+
     detectedbranchfunc(value.branches_url);
-    
+
     const baseUrl = `https://api.github.com/repos/${value.owner.login}/${value.name}/contents`;
     const rootDir = projectDetails.rootDirectory === "/" ? "" : projectDetails.rootDirectory;
     const packageJsonUrl = `${baseUrl}${rootDir}/package.json`;
@@ -394,17 +400,17 @@ export default function CreateProject({ name }: { name: string }) {
     const detectFramework = async () => {
       try {
         setRepoLoading(true);
-        
-     
+
+
         const response = await fetch(packageJsonUrl, {
           headers: { Authorization: `token ${user.githubtoken}` },
         });
-        
+
         if (response.ok) {
           const data = await response.json();
           const content = Buffer.from(data.content, "base64").toString("utf-8");
           const packageJson = JSON.parse(content);
-          
+
           const dependencies = packageJson.dependencies || {};
           const devDependencies = packageJson.devDependencies || {};
 
@@ -437,7 +443,7 @@ export default function CreateProject({ name }: { name: string }) {
             headers: { Authorization: `token ${user.githubtoken}` },
           });
           const languages = await langResponse.json();
-          
+
           if (languages.PHP) {
             setProjectDetails({ ...projectDetails, tech: "PHP" });
           } else if (languages.Python) {
@@ -471,7 +477,7 @@ export default function CreateProject({ name }: { name: string }) {
             setProjectDetails({ ...projectDetails, tech: "Other" });
           }
         }
-        
+
         setRepoLoading(false);
       } catch (error) {
         console.error('Error detecting framework:', error);
@@ -510,7 +516,7 @@ export default function CreateProject({ name }: { name: string }) {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       const data = {
         name: projectDetails.name,
@@ -526,16 +532,16 @@ export default function CreateProject({ name }: { name: string }) {
         env: projectDetails.envVariables,
         planid: selectedPlan.id,
       };
-      
+
       const createproject = await fetch("/api/project/crud", {
         headers: { "Content-Type": "application/json" },
         method: "POST",
         body: JSON.stringify(data),
       });
-      
+
       const res = await createproject.json();
       setLoading(false);
-      
+
       if (res.success) {
         toast.success(res.message);
         router.push(`/project/overview?id=${res.project._id}`);
@@ -557,7 +563,7 @@ export default function CreateProject({ name }: { name: string }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900/50 to-black">
       <Toaster position="top-right" />
-      
+
       <motion.div
         initial="hidden"
         animate="visible"
@@ -568,7 +574,7 @@ export default function CreateProject({ name }: { name: string }) {
           {/* Header */}
           <motion.div variants={itemVariants} className="text-center mb-12">
             <div className="flex items-center justify-center mb-6">
-              
+
             </div>
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent mb-4">
               Create Your Project
@@ -588,27 +594,24 @@ export default function CreateProject({ name }: { name: string }) {
               ].map((step, index) => (
                 <div key={step.num} className="flex items-center">
                   <div className="flex flex-col items-center">
-                    <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                      stage >= step.num 
-                        ? "bg-gradient-to-r from-pink-500 to-purple-500 border-pink-500 text-white" 
+                    <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${stage >= step.num
+                        ? "bg-gradient-to-r from-pink-500 to-purple-500 border-pink-500 text-white"
                         : "border-gray-600 text-gray-400"
-                    }`}>
+                      }`}>
                       {stage > step.num ? (
                         <CheckCircle className="w-5 h-5 md:w-6 md:h-6" />
                       ) : (
                         <step.icon className="w-4 h-4 md:w-6 md:h-6" />
                       )}
                     </div>
-                    <span className={`text-xs md:text-sm mt-2 font-medium text-center ${
-                      stage >= step.num ? "text-pink-400" : "text-gray-400"
-                    }`}>
+                    <span className={`text-xs md:text-sm mt-2 font-medium text-center ${stage >= step.num ? "text-pink-400" : "text-gray-400"
+                      }`}>
                       {step.title}
                     </span>
                   </div>
                   {index < 2 && (
-                    <div className={`w-12 md:w-20 h-0.5 mx-2 md:mx-4 transition-colors duration-300 ${
-                      stage > step.num ? "bg-gradient-to-r from-pink-500 to-purple-500" : "bg-gray-600"
-                    }`} />
+                    <div className={`w-12 md:w-20 h-0.5 mx-2 md:mx-4 transition-colors duration-300 ${stage > step.num ? "bg-gradient-to-r from-pink-500 to-purple-500" : "bg-gray-600"
+                      }`} />
                   )}
                 </div>
               ))}
@@ -990,13 +993,12 @@ export default function CreateProject({ name }: { name: string }) {
                                     })
                                   }
                                 >
-                                  <div className={`relative p-6 rounded-2xl border-2 transition-all duration-300 bg-gradient-to-br from-gray-900/50 to-black/50 backdrop-blur-sm ${
-                                    selectedPlan.name === plan.name 
-                                      ? "border-pink-500 shadow-lg shadow-pink-500/20" 
+                                  <div className={`relative p-6 rounded-2xl border-2 transition-all duration-300 bg-gradient-to-br from-gray-900/50 to-black/50 backdrop-blur-sm ${selectedPlan.name === plan.name
+                                      ? "border-pink-500 shadow-lg shadow-pink-500/20"
                                       : "border-gray-700 hover:border-pink-500/50"
-                                  }`}>
+                                    }`}>
                                     <RadioGroupItem value={plan.name} id={plan.name} className="sr-only" />
-                                    
+
                                     {selectedPlan.name === plan.name && (
                                       <div className="absolute top-4 right-4">
                                         <CheckCircle className="w-6 h-6 text-pink-400" />
@@ -1236,9 +1238,8 @@ export default function CreateProject({ name }: { name: string }) {
                                   AI Code Analysis
                                 </CardTitle>
                                 <ChevronDown
-                                  className={`w-5 h-5 text-pink-400 transition-transform duration-200 ${
-                                    isOpen ? "rotate-180" : ""
-                                  }`}
+                                  className={`w-5 h-5 text-pink-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+                                    }`}
                                 />
                               </div>
                             </CardHeader>
@@ -1372,11 +1373,10 @@ export default function CreateProject({ name }: { name: string }) {
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
-                              <div className={`w-2 h-2 rounded-full ${
-                                project.projectstatus === 'live' ? 'bg-green-400' :
-                                project.projectstatus === 'building' ? 'bg-yellow-400' :
-                                project.projectstatus === 'failed' ? 'bg-red-400' : 'bg-gray-400'
-                              }`} />
+                              <div className={`w-2 h-2 rounded-full ${project.projectstatus === 'live' ? 'bg-green-400' :
+                                  project.projectstatus === 'building' ? 'bg-yellow-400' :
+                                    project.projectstatus === 'failed' ? 'bg-red-400' : 'bg-gray-400'
+                                }`} />
                               <ExternalLink className="w-3 h-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                             </div>
                           </div>
@@ -1477,7 +1477,7 @@ export default function CreateProject({ name }: { name: string }) {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-lg border border-green-500/20">
                       <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
                       <div>
@@ -1487,7 +1487,7 @@ export default function CreateProject({ name }: { name: string }) {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-lg border border-purple-500/20">
                       <CheckCircle className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
                       <div>
@@ -1546,33 +1546,33 @@ export default function CreateProject({ name }: { name: string }) {
           <motion.div variants={itemVariants} className="mt-16">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               {[
-                { 
-                  title: "Deploy Speed", 
-                  value: "< 30s", 
+                {
+                  title: "Deploy Speed",
+                  value: "< 30s",
                   description: "Average deployment time",
                   icon: <Rocket className="w-6 h-6 text-pink-400" />,
                   color: "from-pink-500/10 to-purple-500/10",
                   border: "border-pink-500/20"
                 },
-                { 
-                  title: "Uptime", 
-                  value: "99.9%", 
+                {
+                  title: "Uptime",
+                  value: "99.9%",
                   description: "Platform reliability",
                   icon: <Shield className="w-6 h-6 text-green-400" />,
                   color: "from-green-500/10 to-emerald-500/10",
                   border: "border-green-500/20"
                 },
-                { 
-                  title: "Global CDN", 
-                  value: "180+", 
+                {
+                  title: "Global CDN",
+                  value: "180+",
                   description: "Edge locations worldwide",
                   icon: <Globe className="w-6 h-6 text-blue-400" />,
                   color: "from-blue-500/10 to-cyan-500/10",
                   border: "border-blue-500/20"
                 },
-                { 
-                  title: "Free SSL", 
-                  value: "Auto", 
+                {
+                  title: "Free SSL",
+                  value: "Auto",
                   description: "Certificates included",
                   icon: <Lock className="w-6 h-6 text-purple-400" />,
                   color: "from-purple-500/10 to-indigo-500/10",
@@ -1618,7 +1618,7 @@ const FormattedBuildText = ({ text }: { text: string }) => {
   }
 
   const parts = text.split(/(<b>.*?<\/b>)/g);
-  
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-4">
@@ -1628,7 +1628,7 @@ const FormattedBuildText = ({ text }: { text: string }) => {
           Beta
         </Badge>
       </div>
-      
+
       <div className="bg-black/50 border border-gray-700 rounded-lg p-4">
         <div className="prose prose-invert prose-sm max-w-none">
           <div className="text-gray-300 leading-relaxed">
@@ -1646,7 +1646,7 @@ const FormattedBuildText = ({ text }: { text: string }) => {
           </div>
         </div>
       </div>
-      
+
       <div className="flex items-center gap-2 text-xs text-gray-400">
         <Info className="w-3 h-3" />
         <span>AI analysis helps optimize your deployment • Results may vary based on code complexity</span>

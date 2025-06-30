@@ -223,6 +223,7 @@ export const POST = async (req: NextRequest) => {
 
 export const DELETE = async (req: NextRequest) => {
     try {
+         const getcookie = await cookies();
         const data = await req.json();
         await ConnectDb();
         
@@ -237,7 +238,24 @@ export const DELETE = async (req: NextRequest) => {
         }
         
         const projectdelete = await Project.findOneAndDelete({ _id: data.id });
+        console.log("Project to delete:", projectdelete);
+        if(projectdelete == null && projectdelete.arn == null || projectdelete.arn == undefined|| projectdelete.arn == ""){ {
         
+         const createdep = await fetch(`${process.env.DEPLOYMENT_API}/deploy/delete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': getcookie.get("token")?.value || '',
+            },
+            body: JSON.stringify({
+              task:projectdelete.arn
+            })
+        });
+    
+        
+        const result = await createdep.json();
+        console.log(result);
+    }
         if (projectdelete == null) {
             return NextResponse.json({
                 success: false,
@@ -249,6 +267,7 @@ export const DELETE = async (req: NextRequest) => {
             success: true,
             message: "Project Deleted Successfully"
         });
+    }
         
     } catch (err) {
         console.error("Error deleting project:", err);
