@@ -147,7 +147,7 @@ export default function CreateProject({ name }: { name: string }) {
     buildCommand: "npm run build",
     envVariables: "",
     rootDirectory: "/",
-    outputDirectory: "/dist",
+    outputDirectory: "dist",
     install: "npm install",
     start: "npm run start",
   });

@@ -2,15 +2,18 @@ import { RunTaskCommand } from "@aws-sdk/client-ecs";
 import client from "../../client/client.js";
 const reactHost = async (req, res) => {
   //task config
-  let varablec=1;
-  console.log("react hosting started calling ",varablec++);
+  let varablec = 1;
+  console.log("react hosting started calling ", varablec++);
   const config = {
     cluster: process.env.cluster,
     task: process.env.task,
   };
   //getting the giturl and projectid
-  const { giturl, projectid,techused } = req.body;
-  console.log(giturl, projectid);
+  const { giturl, projectid, techused, installcommand,
+    buildcommand,
+    buildfolder,env } = req.body;
+
+  console.log(giturl, projectid,env);
   const cmd = new RunTaskCommand({
     cluster: config.cluster,
     taskDefinition: config.task,
@@ -20,7 +23,7 @@ const reactHost = async (req, res) => {
       awsvpcConfiguration: {
         assignPublicIp: "ENABLED",
         subnets: [
-         "subnet-0f778bd1773b9fecd","subnet-00a124fa13c6797c9","subnet-0581f546c68a5ad8d"
+          "subnet-0f778bd1773b9fecd", "subnet-00a124fa13c6797c9", "subnet-0581f546c68a5ad8d"
         ],
         securityGroups: ["sg-09cd52a2ed850a619"],
       },
@@ -38,7 +41,7 @@ const reactHost = async (req, res) => {
               name: "projectid",
               value: projectid,
             },
-             {
+            {
               name: "techused",
               value: techused,
             },
@@ -58,6 +61,22 @@ const reactHost = async (req, res) => {
               name: "bucket",
               value: "deploylite.tech.prod",
             },
+            {
+              name: "installcommand",
+              value: installcommand ,
+            },
+             {
+              name: "buildcommand",
+              value: buildcommand ,
+            },
+             {
+              name: "buildfolder",
+              value: buildfolder ,
+            },
+            {
+              name: "env",
+              value: env
+            },
           ],
         },
       ],
@@ -67,9 +86,9 @@ const reactHost = async (req, res) => {
     const data = await client.send(cmd);
     console.log(data);
     return res.status(200).json({
-      success:true,
-      data:data,
-      message:"Deployment started"
+      success: true,
+      data: data,
+      message: "Deployment started"
     })
   } catch (err) {
     console.log(err);
