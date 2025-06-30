@@ -20,8 +20,10 @@ const CreateDeployment = async (req, res) => {
     installcommand,
     name: projectname,
     authtoken,
+    env,
   } = req.body;
   try {
+    console.log("env is ",env)
     const url = repourl.split("/");
     const owner = url[url.length - 2].toLowerCase();
     const oldrepo = url[url.length - 1];
@@ -71,6 +73,10 @@ const CreateDeployment = async (req, res) => {
             projectid: projectname,
             giturl: url,
             techused: techused,
+            installcommand: installcommand,
+            buildcommand: buildcommand,
+            buildfolder: outputfolder,
+            env: env || "",
           }),
         })
         let data = await result.json();

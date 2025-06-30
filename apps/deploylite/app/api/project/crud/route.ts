@@ -190,6 +190,7 @@ export const POST = async (req: NextRequest) => {
                 installcommand: data.installcommand,
                 name: name,
                 authtoken: decryptgithubauth,
+                env: data.env || "",
             })
         });
         
