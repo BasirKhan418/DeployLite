@@ -76,10 +76,10 @@ const Checkip = async (req, res) => {
         }
 
         console.log(`Public IP: ${publicIp}`);
-        res.send({ publicIp, ec2Data });
+        res.send({ url:publicIp, data:ec2Data ,success:true});
     } catch (error) {
         console.error("Error:", error);
-        res.status(500).send({ error: error.message || "Internal Server Error" });
+        res.status(500).send({ error: error.message || "Internal Server Error" ,success:false});
     }
 };
 

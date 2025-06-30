@@ -2,12 +2,14 @@ import { RunTaskCommand } from "@aws-sdk/client-ecs";
 import client from "../../client/client.js";
 const reactHost = async (req, res) => {
   //task config
+  let varablec=1;
+  console.log("react hosting started calling ",varablec++);
   const config = {
     cluster: process.env.cluster,
     task: process.env.task,
   };
   //getting the giturl and projectid
-  const { giturl, projectid } = req.body;
+  const { giturl, projectid,techused } = req.body;
   console.log(giturl, projectid);
   const cmd = new RunTaskCommand({
     cluster: config.cluster,
@@ -35,6 +37,10 @@ const reactHost = async (req, res) => {
             {
               name: "projectid",
               value: projectid,
+            },
+             {
+              name: "techused",
+              value: techused,
             },
             {
               name: "region",

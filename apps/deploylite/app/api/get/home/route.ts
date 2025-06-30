@@ -6,18 +6,15 @@ import Wallet from "../../../../../models/Wallet";
 import Crypto from "crypto-js";
 import { cookies } from "next/headers";
 export const GET = async()=>{
-    console.log("entering to home auth")
     const cook = await cookies()
     try{
         await ConnectDb();
     let result = await CheckAuth() 
     if(!result.result){
-        console.log('result',result)
-        console.log("not authenticated")
+        
         console.log(cook.get('token'))
     }
     let user = await User.findOne({ email: result.email }).select('-password');
-    console.log(result.email)
     //decrypting the github token
     let decrypttoken = null;
     if(user.githubtoken!=null){
@@ -28,7 +25,7 @@ export const GET = async()=>{
     
     
     let wallet = await Wallet.findOne({userid:user._id});
-    console.log("data is ",data,"wallet is ",wallet)
+   
     return NextResponse.json({status: 'success',user:data,wallet,success:true})
 }
 catch(err){

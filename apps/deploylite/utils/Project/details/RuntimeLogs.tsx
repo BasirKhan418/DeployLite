@@ -232,7 +232,7 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
       setDeploymentTime(Math.floor((Date.now() - startTime) / 1000));
     }, 1000);
     
-    const newSocket: Socket = io("https://socket.deploylite.tech", {
+    const newSocket: Socket = io(`${process.env.NEXT_PUBLIC_SOCKET_SERVER_URL}`, {
       transports: ['websocket'],
       reconnection: true,
       reconnectionAttempts: 5,

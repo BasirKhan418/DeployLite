@@ -23,7 +23,12 @@ const redisConfig = {
 };
 
 const publisher = new Redis(redisConfig);
-const { region, accesskeyid, accesskeysecret, projectid, bucket } = process.env;
+const { region, accesskeyid, accesskeysecret, projectid, bucket,techused } = process.env;
+
+if(techused !== "React" && techused !== "Vite" && techused !== "HTML,CSS,JS") {
+    console.error("Invalid tech stack specified. Supported stacks are: React, Vite, HTML,CSS,JS");
+    process.exit(1);
+}
 
 // Setting up the AWS client
 const s3client = new S3Client({

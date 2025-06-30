@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: false, // 🔴 ADD THIS LINE
   serverExternalPackages: ["pdfkit"],
   eslint: {
     ignoreDuringBuilds: true,
@@ -11,6 +12,5 @@ const nextConfig = {
     unoptimized: true,
   },
 };
-
 
 export default nextConfig;
