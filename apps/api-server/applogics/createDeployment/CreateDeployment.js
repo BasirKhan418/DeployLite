@@ -1,4 +1,4 @@
-import { set } from "mongoose";
+
 import Deployment from "../../../models/Deployment.js"
 import Project from "../../../models/Project.js";
 const CreateDeployment = async (req, res) => {
@@ -174,7 +174,42 @@ const CreateDeployment = async (req, res) => {
           })
         }
       } else if (techused == "Angular") {
-        //start deployment for angular
+        console.log("angular deployment started");
+        let depdata = await Deployment.findOneAndUpdate({
+          projectid: projectid
+        }, { status: "started", deploymentdate: new Date(), commit_message: "Deployment Created By Deploylite", author_name: "DeployLite" })
+        let updateproject = await Project.findOneAndUpdate({ _id: projectid }, { projecturl: `${projectname}.cloud.deploylite.tech`, memoryusage: 0, cpuusage: 0, storageusage: 0 })
+        const result = await fetch(`${process.env.DEPLOYMENT_API}/deploy/angular`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+          body: JSON.stringify({
+            projectid: projectname,
+            giturl: url,
+            techused: techused,
+            installcommand: installcommand,
+            buildcommand: buildcommand,
+            buildfolder: outputfolder,
+            env: env || "",
+          }),
+        })
+        console.log("tech used is ", techused);
+        let data = await result.json();
+        if (data.success) {
+
+          return res.status(201).json({
+            success: true,
+            message: "Deployment Started",
+          })
+        }
+        else {
+          return res.status(400).json({
+            success: false,
+            message: "Error occcured during deployment"
+          })
+        }
       } else if (techused == "Vue.js") {
         //start deployment for vue.js
       } else if (techused == "Flask") {

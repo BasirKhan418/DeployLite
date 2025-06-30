@@ -20,7 +20,7 @@
       "root_dir": "/",
       "outdir": "dist",
       "install_command": "npm install",
-      "build_command": "ng build",
+      "build_command": "ng build --configuration production --output-path=dist",
       "start_command": "ng serve"
     },
     {

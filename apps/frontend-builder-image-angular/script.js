@@ -25,7 +25,7 @@ const redisConfig = {
 const publisher = new Redis(redisConfig);
 const { region, accesskeyid, accesskeysecret, projectid, bucket,techused,installcommand,buildcommand,buildfolder,env} = process.env;
 
-if(techused !== "React" && techused !== "Vite" ) {
+if(techused !== "Angular") {
     console.error("Invalid tech stack specified. Supported stacks are: React, Vite, HTML,CSS,JS");
     process.exit(1);
 }
@@ -83,7 +83,7 @@ const handleBuild = async (outDirPath) => {
         }
 
         publishLog("Initiating build process...", LOG_TYPES.INFO);
-        const p = exec(`cd ${outDirPath} && ${installcommand || "npm install"} && ${buildcommand || 'npm run build'}`);
+        const p = exec(`cd ${outDirPath} && ${installcommand || "npm install"} && ${buildcommand || 'ng build --configuration production --output-path=dist'}`);
 
         p.stdout.on('data', (data) => {
             publishLog(data.toString().trim(), LOG_TYPES.INFO);
@@ -139,7 +139,7 @@ const init = async () => {
     try {
         publishLog("🚀 Starting deployment process", LOG_TYPES.INFO);
         const outDirPath = path.join(__dirname, 'output');
-        const distFolderPATH = path.join(outDirPath, `${buildfolder || 'dist'}`);
+        const distFolderPATH = path.join(outDirPath, buildfolder || 'dist', 'browser');
 
         // Build Phase
         await handleBuild(outDirPath);

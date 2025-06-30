@@ -1,6 +1,7 @@
 import express from "express";
 
 import { reactHost } from "../applogics/host/reacthost.js";
+import { angularHost } from "../applogics/host/angularhost.js";
 import { frontendHost } from "../applogics/host/frontendhost.js";
 import { Checkip } from "../applogics/enquiry/Checkip.js";
 import { FullStackHost } from "../applogics/host/FullStackHost.js";
@@ -12,6 +13,7 @@ router.get('/', (req, res) => {
 });
 
 router.post('/react',reactHost);
+router.post('/angular',angularHost);
 router.post('/frontend',frontendHost);
 router.post('/fullstack',FullStackHost);
 router.post('/checkip',Checkip);
