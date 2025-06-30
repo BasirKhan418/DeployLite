@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 
-// Icons
+
 import {
   PlusCircle,
   MoreHorizontal,
@@ -31,7 +31,6 @@ import {
   HardDrive,
   Eye,
   BarChart2,
-  Edit,
   Trash2,
   Play,
   Pause,
@@ -39,12 +38,10 @@ import {
   CloudUpload,
   Loader2,
   Search,
-  Filter,
   Grid3X3,
   List,
   Calendar,
   Activity,
-  TrendingUp,
   Code,
   Database,
   Globe,
@@ -139,7 +136,7 @@ const Projecthome = ({ name }: { name: string }) => {
     console.log('Fetching project details for user:', user.email);
     
     try {
-      const result = await fetch(`/api/project/crud?id=${user._id}`);
+      const result = await fetch(`/api/project/crud?email=${user.email}`);
       const data = await result.json();
       
       console.log('Project API Response:', data);
@@ -170,7 +167,7 @@ const Projecthome = ({ name }: { name: string }) => {
   };
 
   useEffect(() => {
-    if (user?._id) {
+    if (user?.email) {
       getDetails();
     }
   }, [user]);
@@ -374,7 +371,7 @@ const Projecthome = ({ name }: { name: string }) => {
                     { label: "Live", value: stats.live, icon: CheckCircle, color: "from-emerald-400 to-green-400" },
                     { label: "Building", value: stats.building, icon: Zap, color: "from-amber-400 to-orange-400" },
                     { label: "Failed", value: stats.failed, icon: XCircle, color: "from-red-400 to-pink-400" },
-                  ].map((stat, index) => (
+                  ].map((stat) => (
                     <motion.div
                       key={stat.label}
                       variants={itemVariants}
@@ -822,7 +819,7 @@ const Projecthome = ({ name }: { name: string }) => {
                       <div className="text-6xl opacity-20 mb-6">🔍</div>
                       <h3 className="text-xl font-semibold text-gray-200 mb-2">No projects found</h3>
                       <p className="text-gray-400 mb-6">
-                        Try adjusting your search or filter criteria to find what you're looking for.
+                        Try adjusting your search or filter criteria to find what you&apos;re looking for.
                       </p>
                       <Button
                         variant="ghost"

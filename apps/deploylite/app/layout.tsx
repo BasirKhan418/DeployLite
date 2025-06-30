@@ -33,11 +33,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
@@ -57,8 +53,8 @@ export default function RootLayout({
               showAtBottom={false}
             />
             <ClientLayout>{children}</ClientLayout>
-            <Toaster position="top-right" />
           </ThemeWrapper>
+          <Toaster position="top-right" />
         </StoreProvider>
       </body>
     </html>
