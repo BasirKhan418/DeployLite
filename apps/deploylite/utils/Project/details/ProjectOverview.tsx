@@ -169,7 +169,10 @@ export default function ProjectOverview({ projectdata, deploymentdata }: Project
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={copyUrl}
+                        onClick={() => {
+                          copyUrl();
+                          window.open(`https://${currentData.projecturl}`, '_blank');
+                        }}
                         className="p-0 h-auto hover:text-pink-400 transition-colors"
                       >
                         <ExternalLink className="w-4 h-4 mr-2" />
