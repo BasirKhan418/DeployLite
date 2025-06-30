@@ -239,8 +239,9 @@ export const DELETE = async (req: NextRequest) => {
         
         const projectdelete = await Project.findOneAndDelete({ _id: data.id });
         console.log("Project to delete:", projectdelete);
-        if(projectdelete == null && projectdelete.arn == null || projectdelete.arn == undefined|| projectdelete.arn == ""){ {
-        
+        if(projectdelete !== null && projectdelete.arn !== null || projectdelete.arn !== undefined|| projectdelete.arn !== ""){ {
+            console.log("inside ")
+        console.log("Project not found or ARN is missing",projectdelete.arn);
          const createdep = await fetch(`${process.env.DEPLOYMENT_API}/deploy/delete`, {
             method: 'POST',
             headers: {
@@ -255,6 +256,10 @@ export const DELETE = async (req: NextRequest) => {
         
         const result = await createdep.json();
         console.log(result);
+          return NextResponse.json({
+            success: true,
+            message: "Project Deleted Successfully"
+        });
     }
         if (projectdelete == null) {
             return NextResponse.json({

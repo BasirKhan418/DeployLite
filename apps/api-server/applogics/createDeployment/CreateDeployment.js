@@ -182,10 +182,38 @@ const CreateDeployment = async (req, res) => {
       } else if (techused == "Django") {
         //start deployment for django
       } else if (techused == "HTML,CSS,JS") {
-        console.log("html css js deployment started")
-        return res.status(201).json({
-          success: true, message: "done html css deployment"
+      console.log("frontend deployment started");
+        let depdata = await Deployment.findOneAndUpdate({
+          projectid: projectid
+        }, { status: "started", deploymentdate: new Date(), commit_message: "Deployment Created By Deploylite", author_name: "DeployLite" })
+        let updateproject = await Project.findOneAndUpdate({ _id: projectid }, { projecturl: `${projectname}.cloud.deploylite.tech`, memoryusage: 0, cpuusage: 0, storageusage: 0 })
+        const result = await fetch(`${process.env.DEPLOYMENT_API}/deploy/frontend`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+          body: JSON.stringify({
+            projectid: projectname,
+            giturl: url,
+            techused: techused,
+          }),
         })
+        console.log("tech used is ", techused);
+        let data = await result.json();
+        if (data.success) {
+
+          return res.status(201).json({
+            success: true,
+            message: "Deployment Started",
+          })
+        }
+        else {
+          return res.status(400).json({
+            success: false,
+            message: "Error occcured during deployment"
+          })
+        }
         //START DEPLOYMENT FROM HERE
       } else if (techused == "Springboot") {
         //start deployment for springboot
