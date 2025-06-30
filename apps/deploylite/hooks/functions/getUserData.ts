@@ -1,7 +1,7 @@
 const getUserData = async()=>{
     try{
         const fetchdata= await fetch(`${process.env.NEXT_PUBLIC_URL}/api/get/home`);
-        let res = fetchdata.json();
+        let res = await fetchdata.json();
         console.log("res is ",res)
         return res;
     }

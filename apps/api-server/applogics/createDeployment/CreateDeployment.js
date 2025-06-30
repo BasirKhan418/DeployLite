@@ -1,3 +1,4 @@
+import { set } from "mongoose";
 import Deployment from "../../../models/Deployment.js"
 import Project from "../../../models/Project.js";
 const CreateDeployment = async (req, res) => {
@@ -56,39 +57,109 @@ const CreateDeployment = async (req, res) => {
       //analyze all the deployments startegies here and call the respective deployment strategy
       if (techused == "React" || techused == "Vite") {
         let depdata = await Deployment.findOneAndUpdate({
-          projectid:projectid
-        },{status:"started",deploymentdate:new Date(),commit_message:"Deployment Created By Deploylite",author_name:"DeployLite"})
-        let updateproject = await Project.findOneAndUpdate({_id:projectid},{projecturl:`${projectname}.cloud.deploylite.tech`,memoryusage:0,cpuusage:0,storageusage:0})
+          projectid: projectid
+        }, { status: "started", deploymentdate: new Date(), commit_message: "Deployment Created By Deploylite", author_name: "DeployLite" })
+        let updateproject = await Project.findOneAndUpdate({ _id: projectid }, { projecturl: `${projectname}.cloud.deploylite.tech`, memoryusage: 0, cpuusage: 0, storageusage: 0 })
         //start deployment for react
         console.log("react deployment started")
-        const result = await fetch(`${process.env.DEPLOYMENT_API}/deploy/react`,{
+        const result = await fetch(`${process.env.DEPLOYMENT_API}/deploy/react`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: token,
           },
           body: JSON.stringify({
-            projectid:projectname,
-            giturl:url
+            projectid: projectname,
+            giturl: url
           }),
         })
         let data = await result.json();
-        if(data.success){
-        
+        if (data.success) {
+
           return res.status(201).json({
-            success:true,
-            message:"Deployment Started",
+            success: true,
+            message: "Deployment Started",
           })
         }
-        else{
+        else {
           return res.status(400).json({
-            success:false,
-            message:"Error occcured during deployment"
+            success: false,
+            message: "Error occcured during deployment"
           })
         }
-        
+
       } else if (techused == "Next.js" || techused == "Node.js") {
-        //start deployment
+        let depdata = await Deployment.findOneAndUpdate({
+          projectid: projectid
+        }, { status: "started", deploymentdate: new Date(), commit_message: "Deployment Created By Deploylite", author_name: "DeployLite" })
+        let updateproject = await Project.findOneAndUpdate({ _id: projectid }, { projecturl: `${projectname}.host.deploylite.tech`, memoryusage: 0, cpuusage: 0, storageusage: 0 })
+        //start deployment for react
+        console.log("nextjs deployment started")
+        const result = await fetch(`${process.env.DEPLOYMENT_API}/deploy/fullstack`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+          body: JSON.stringify({
+            projectid: projectname,
+            giturl: url
+          }),
+        })
+        let data = await result.json();
+
+        console.log("data is ", data)
+        if (data.success) {
+          console.log("checking ip ");
+          console.log(data.data.tasks[0].taskArn)
+          //check ip and update in the db 
+          const new_func = async () => {
+            const result2 = await fetch(`${process.env.DEPLOYMENT_API}/deploy/checkip`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: token,
+              },
+              body: JSON.stringify({
+                taskArn: data.data.tasks[0].taskArn,
+              }),
+            })
+            let data2 = await result2.json();
+            return data2;
+          }
+
+          const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+          await sleep(5000);
+          console.log("checking ip after 5 seconds");
+
+          const data2 = await new_func();
+          console.log("data2 is ", data2);
+
+          if (data2.success) {
+            //update the project with the url
+            let updateproject = await Project.findOneAndUpdate({ _id: projectid }, { url: data2.url })
+            return res.status(201).json({
+              success: true,
+              message: "Deployment Started",
+            })
+          }
+          else {
+            console.log("error in getting ip")
+            console.log(data2)
+            return res.status(400).json({
+              success: false,
+              message: "Error occcured during deployment phase 2"
+            })
+          }
+
+        }
+        else {
+          return res.status(400).json({
+            success: false,
+            message: "Error occcured during deployment"
+          })
+        }
       } else if (techused == "Angular") {
         //start deployment for angular
       } else if (techused == "Vue.js") {
@@ -100,7 +171,8 @@ const CreateDeployment = async (req, res) => {
       } else if (techused == "HTML,CSS,JS") {
         console.log("html css js deployment started")
         return res.status(201).json({
-       success:true,message:"done html css deployment" })
+          success: true, message: "done html css deployment"
+        })
         //START DEPLOYMENT FROM HERE
       } else if (techused == "Springboot") {
         //start deployment for springboot
@@ -111,14 +183,14 @@ const CreateDeployment = async (req, res) => {
       } else if (techused == "PHP") {
         //start deployment from here
       } else {
-        let project = await Project.deleteOne({_id:projectid})
+        let project = await Project.deleteOne({ _id: projectid })
         return res.status(400).json({
           message: "Invalid tech stack no deployments supported",
           success: false,
         });
       }
     } else {
-      let project = await Project.deleteOne({_id:projectid})
+      let project = await Project.deleteOne({ _id: projectid })
       return res.status(401).json({
         message: "Webhook creation failed",
         success: false,
@@ -127,7 +199,7 @@ const CreateDeployment = async (req, res) => {
     //end of try block
   } catch (err) {
     console.log(err);
-    let project = await Project.deleteOne({_id:projectid})
+    let project = await Project.deleteOne({ _id: projectid })
     return res.status(400).json({
       message: "Error in creating deployment",
       success: false,

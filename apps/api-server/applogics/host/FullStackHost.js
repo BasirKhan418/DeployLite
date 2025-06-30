@@ -45,10 +45,10 @@ const FullStackHost = async (req, res) => {
   try {
     const data = await client.send(cmd);
     console.log(data);
-    return res.send(data);
+    return res.send({success:true, message: "Hosting started successfully", data: data});
   } catch (err) {
     console.log(err);
-    res.status(500).send("Something went wrong");
+    return res.status(500).send({success:false, message: "Error starting hosting", error: err.message});
   }
 };
 export { FullStackHost };
