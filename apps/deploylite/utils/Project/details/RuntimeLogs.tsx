@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Download, RefreshCw, XCircle, Rocket,Copy, Play, Pause, Terminal, Filter, ChevronDown, Code, AlertCircle, CheckCircle2, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -324,6 +324,12 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [autoScroll, setAutoScroll] = useState<boolean>(true);
 
+  // Refs for auto-scroll functionality
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const logsContainerRef = useRef<HTMLDivElement>(null);
+  const formattedLogsContainerRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab] = useState<string>("logs");
+
   // Enhanced message parsing
   const parseLogMessage = (content: any): LogMessage => {
     let message = '';
@@ -386,6 +392,35 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
       setError("Service temporarily unavailable");
     }
   };
+
+  // Auto-scroll functionality
+  const scrollToBottom = () => {
+    if (!autoScroll) return;
+
+    const currentContainer = activeTab === 'logs' ? logsContainerRef.current : formattedLogsContainerRef.current;
+    
+    if (currentContainer) {
+      // Use setTimeout to ensure DOM has updated
+      setTimeout(() => {
+        currentContainer.scrollTo({
+          top: currentContainer.scrollHeight,
+          behavior: 'smooth'
+        });
+      }, 100);
+    }
+  };
+
+  // Auto-scroll when new messages are added
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, activeTab, autoScroll]);
+
+  // Auto-scroll when filtered logs change (for search/filter)
+  useEffect(() => {
+    if (autoScroll) {
+      scrollToBottom();
+    }
+  }, [searchQuery, filterType]);
 
   // Socket connection and message handling
   useEffect(() => {
@@ -585,6 +620,15 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
                 <Button
                   variant="outline"
                   size="sm"
+                  onClick={() => setAutoScroll(!autoScroll)}
+                  className={`bg-black/50 border-pink-500/30 hover:bg-pink-500/10 text-gray-200 ${autoScroll ? 'bg-pink-500/20' : ''}`}
+                >
+                  <Terminal className="w-4 h-4 mr-2" />
+                  Auto-scroll {autoScroll ? 'ON' : 'OFF'}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => setIsPaused(!isPaused)}
                   className="bg-black/50 border-pink-500/30 hover:bg-pink-500/10 text-gray-200"
                 >
@@ -624,7 +668,7 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
           </CardHeader>
 
           <CardContent className="relative p-0">
-            <Tabs defaultValue="logs" className="w-full">
+            <Tabs defaultValue="logs" className="w-full" onValueChange={setActiveTab}>
               <div className="flex items-center justify-between p-4 border-b border-pink-500/10">
                 <TabsList className="bg-gradient-to-r from-gray-900/50 to-black/50 border border-pink-500/20">
                   <TabsTrigger value="logs" className="data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-300">
@@ -693,7 +737,7 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
               </div>
 
               <TabsContent value="logs" className="mt-0">
-                <ScrollArea className="h-[70vh]">
+                <div className="h-[70vh] overflow-auto" ref={logsContainerRef}>
                   <div className="p-4 space-y-2 font-mono text-sm">
                     <AnimatePresence initial={false}>
                       {filteredLogs.length > 0 ? (
@@ -755,11 +799,11 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
                       )}
                     </AnimatePresence>
                   </div>
-                </ScrollArea>
+                </div>
               </TabsContent>
 
               <TabsContent value="formatted" className="mt-0">
-                <ScrollArea className="h-[70vh]">
+                <div className="h-[70vh] overflow-auto" ref={formattedLogsContainerRef}>
                   <div className="p-4 space-y-4">
                     {filteredLogs.length > 0 ? (
                       filteredLogs.map((log, index) => (
@@ -795,7 +839,7 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
                       </motion.div>
                     )}
                   </div>
-                </ScrollArea>
+                </div>
               </TabsContent>
             </Tabs>
           </CardContent>
