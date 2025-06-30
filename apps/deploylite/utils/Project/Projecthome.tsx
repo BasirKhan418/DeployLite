@@ -59,6 +59,7 @@ import Connect from "./Connect";
 import NoProject from "./NoProject";
 
 interface Project {
+  projecturl: any;
   id?: number;
   _id?: string;
   name: string;
@@ -576,7 +577,9 @@ const Projecthome = ({ name }: { name: string }) => {
                                   {project.name && (
                                     <CardDescription className="flex items-center text-sm mb-4 text-gray-400 hover:text-pink-400 transition-colors">
                                       <ExternalLink className="mr-2 h-3 w-3" />
-                                      <span className="truncate">{`${project.name}.cloud.deploylite.tech`}</span>
+                                      <span className="truncate" onClick={()=>{
+                                        window.open(`https://${project.projecturl}`, '_blank');
+                                      }}>{`${project.projecturl}`}</span>
                                     </CardDescription>
                                   )}
 
@@ -718,7 +721,7 @@ const Projecthome = ({ name }: { name: string }) => {
                                     className="text-gray-400 hover:text-pink-300 transition-colors"
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      window.open(`https://${project.name}.cloud.deploylite.tech`, '_blank');
+                                      window.open(`https://${project.projecturl}`, '_blank');
                                     }}
                                   >
                                     <ExternalLink className="h-4 w-4" />
