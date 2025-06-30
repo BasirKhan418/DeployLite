@@ -2,6 +2,7 @@ const { exec } = require('child_process');
 const path = require('path');
 const Redis = require('ioredis');
 const axios = require('axios');
+const fs = require('fs');
 
 // Redis configuration (Aiven)
 const redisConfig = {
@@ -15,7 +16,7 @@ const redisConfig = {
 const publisher = new Redis(redisConfig);
 
 // Environment variables
-const { projectid,techused } = process.env;
+const { projectid,techused,installcommand,buildcommand,env,runcommand } = process.env;
 
 if(techused !== "Next.js" && techused !== "Node.js") {
     console.error("Invalid tech stack specified. Supported stacks are: Next.js, Node.js");
@@ -69,11 +70,22 @@ const init = async () => {
     publishLog("🚀 Starting Next.js SSR deployment");
 
     const appPath = path.join(__dirname, 'output');
+    const envPath = path.join(appPath, '.env');
 
     try {
-        await updateDeploymentStatus("pending");
-        await runCommand(`cd ${appPath} && npm install`);
-        await runCommand(`cd ${appPath} && npm run build`);
+        publishLog("Writing .env file...", 'info');
+
+        fs.writeFileSync(envPath, env || "");
+
+        publishLog("✅ .env file created successfully", 'success');
+
+        await runCommand(`cd ${appPath} && ${installcommand || "npm install"}`);
+        if (techused === "Next.js") {
+            await runCommand(`cd ${appPath} && ${buildcommand || 'npm run build'}`);
+        }
+        if(techused === "Node.js" && buildcommand!=="") {
+            await runCommand(`cd ${appPath} && ${buildcommand || 'npm run build'}`);
+        }
         await updateDeploymentStatus("live");
         publishLog("✅ Deployment successful and server running fine", 'success');
         await runCommand(`cd ${appPath} && npm run start -- --port 80`);

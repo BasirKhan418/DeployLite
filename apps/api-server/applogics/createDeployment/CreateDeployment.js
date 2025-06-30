@@ -79,6 +79,7 @@ const CreateDeployment = async (req, res) => {
             env: env || "",
           }),
         })
+        console.log("tech used is ", techused);
         let data = await result.json();
         if (data.success) {
 
@@ -111,6 +112,11 @@ const CreateDeployment = async (req, res) => {
             projectid: projectname,
             giturl: url,
             techused: techused,
+            installcommand: installcommand,
+            buildcommand: buildcommand,
+            buildfolder: outputfolder,
+            env: env || "",
+            runcommand: startcommand || "npm run start",
           }),
         })
         let data = await result.json();
@@ -137,7 +143,7 @@ const CreateDeployment = async (req, res) => {
 
           const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-          await sleep(5000);
+          await sleep(8000);
           console.log("checking ip after 5 seconds");
 
           const data2 = await new_func();
