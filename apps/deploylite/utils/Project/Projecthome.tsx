@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 
-
 import {
   PlusCircle,
   MoreHorizontal,
@@ -73,7 +72,7 @@ interface Project {
   logo?: string;
   updatedAt?: string;
   techused?: string;
-  type?: string;
+  type?: 'frontend' | 'backend' | 'fullstack'; 
   startdate?: string;
   repourl?: string;
 }
@@ -177,10 +176,13 @@ const Projecthome = ({ name }: { name: string }) => {
     let filtered = [...projects];
 
     // Apply search filter
-    if (searchQuery) {
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
       filtered = filtered.filter(project =>
-        project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.techused?.toLowerCase().includes(searchQuery.toLowerCase())
+        project.name.toLowerCase().includes(query) ||
+        project.techused?.toLowerCase().includes(query) ||
+        project.type?.toLowerCase().includes(query) ||
+        project.repobranch?.toLowerCase().includes(query)
       );
     }
 
@@ -196,6 +198,8 @@ const Projecthome = ({ name }: { name: string }) => {
           return a.name.localeCompare(b.name);
         case "status":
           return (a.projectstatus || "").localeCompare(b.projectstatus || "");
+        case "type":
+          return (a.type || "").localeCompare(b.type || "");
         case "recent":
         default:
           return new Date(b.updatedAt || b.startdate || 0).getTime() - 
@@ -256,6 +260,15 @@ const Projecthome = ({ name }: { name: string }) => {
     }
   };
 
+  const handleOpenProject = (project: Project, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (project.name) {
+      const url = `https://${project.name}.cloud.deploylite.tech`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'live':
@@ -294,6 +307,11 @@ const Projecthome = ({ name }: { name: string }) => {
     if (techLower.includes('python') || techLower.includes('django')) return <Server className="w-4 h-4" />;
     if (techLower.includes('database') || techLower.includes('sql')) return <Database className="w-4 h-4" />;
     return <Globe className="w-4 h-4" />;
+  };
+
+  // Helper function to determine if project should show CPU/RAM
+  const shouldShowPerformanceMetrics = (project: Project) => {
+    return project.type === 'backend' || project.type === 'fullstack';
   };
 
   const getProjectStats = () => {
@@ -434,6 +452,7 @@ const Projecthome = ({ name }: { name: string }) => {
                         <option value="recent">Most Recent</option>
                         <option value="name">Name</option>
                         <option value="status">Status</option>
+                        <option value="type">Type</option>
                       </select>
                     </div>
 
@@ -497,7 +516,10 @@ const Projecthome = ({ name }: { name: string }) => {
                             whileHover="hover"
                             custom={index}
                           >
-                            <Card className="group relative overflow-hidden bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20 hover:border-pink-500/40 transition-all duration-300 cursor-pointer h-full">
+                            <Card 
+                              className="group relative overflow-hidden bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20 hover:border-pink-500/40 transition-all duration-300 cursor-pointer h-full"
+                              onClick={() => router.push(`/project/overview?id=${project._id || project.id}`)}
+                            >
                               <motion.div variants={cardHover}>
                                 <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                 
@@ -516,6 +538,11 @@ const Projecthome = ({ name }: { name: string }) => {
                                           <span className={`text-xs px-2 py-1 rounded-full border ${getStatusColor(project.projectstatus || '')}`}>
                                             {project.projectstatus}
                                           </span>
+                                          {project.type && (
+                                            <Badge variant="secondary" className="bg-gray-700/50 text-gray-300 text-xs">
+                                              {project.type}
+                                            </Badge>
+                                          )}
                                         </div>
                                       </div>
                                     </div>
@@ -574,7 +601,10 @@ const Projecthome = ({ name }: { name: string }) => {
 
                                 <CardContent className="relative">
                                   {project.name && (
-                                    <CardDescription className="flex items-center text-sm mb-4 text-gray-400 hover:text-pink-400 transition-colors">
+                                    <CardDescription 
+                                      className="flex items-center text-sm mb-4 text-gray-400 hover:text-pink-400 transition-colors cursor-pointer"
+                                      onClick={(e) => handleOpenProject(project, e)}
+                                    >
                                       <ExternalLink className="mr-2 h-3 w-3" />
                                       <span className="truncate">{`${project.name}.cloud.deploylite.tech`}</span>
                                     </CardDescription>
@@ -593,16 +623,19 @@ const Projecthome = ({ name }: { name: string }) => {
                                       )}
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-4 text-sm">
-                                      <div className="flex items-center space-x-2">
-                                        <Cpu className="h-4 w-4 text-pink-400" />
-                                        <span className="text-gray-300">CPU: {project.cpu || 15}%</span>
+                                    {/* Conditionally show CPU/RAM based on project type */}
+                                    {shouldShowPerformanceMetrics(project) && (
+                                      <div className="grid grid-cols-2 gap-4 text-sm">
+                                        <div className="flex items-center space-x-2">
+                                          <Cpu className="h-4 w-4 text-pink-400" />
+                                          <span className="text-gray-300">CPU: {project.cpu || 15}%</span>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                          <HardDrive className="h-4 w-4 text-green-400" />
+                                          <span className="text-gray-300">RAM: {project.memory || 25}%</span>
+                                        </div>
                                       </div>
-                                      <div className="flex items-center space-x-2">
-                                        <HardDrive className="h-4 w-4 text-green-400" />
-                                        <span className="text-gray-300">RAM: {project.memory || 25}%</span>
-                                      </div>
-                                    </div>
+                                    )}
 
                                     <div className="flex items-center justify-between text-xs text-gray-400 pt-2 border-t border-gray-700/50">
                                       <div className="flex items-center space-x-1">
@@ -666,10 +699,15 @@ const Projecthome = ({ name }: { name: string }) => {
                                       <span className={`text-xs px-2 py-1 rounded-full border ${getStatusColor(project.projectstatus || '')}`}>
                                         {project.projectstatus}
                                       </span>
+                                      {project.type && (
+                                        <Badge variant="secondary" className="bg-gray-700/50 text-gray-300 text-xs">
+                                          {project.type}
+                                        </Badge>
+                                      )}
                                     </div>
                                   </div>
                                   
-                                                                      <div className="flex items-center gap-6 text-sm text-gray-400">
+                                  <div className="flex items-center gap-6 text-sm text-gray-400">
                                     <div className="flex items-center gap-2">
                                       <GitBranch className="h-4 w-4" />
                                       <span>{project.repobranch || 'main'}</span>
@@ -698,17 +736,19 @@ const Projecthome = ({ name }: { name: string }) => {
                               </div>
 
                               <div className="flex items-center space-x-6">
-                                {/* Performance Metrics */}
-                                <div className="hidden md:flex items-center space-x-4 text-sm">
-                                  <div className="flex items-center space-x-2">
-                                    <Cpu className="h-4 w-4 text-pink-400" />
-                                    <span className="text-gray-300">{project.cpu || 15}%</span>
+                                {/* Performance Metrics - Only show for backend/fullstack projects */}
+                                {shouldShowPerformanceMetrics(project) && (
+                                  <div className="hidden md:flex items-center space-x-4 text-sm">
+                                    <div className="flex items-center space-x-2">
+                                      <Cpu className="h-4 w-4 text-pink-400" />
+                                      <span className="text-gray-300">{project.cpu || 15}%</span>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                      <HardDrive className="h-4 w-4 text-green-400" />
+                                      <span className="text-gray-300">{project.memory || 25}%</span>
+                                    </div>
                                   </div>
-                                  <div className="flex items-center space-x-2">
-                                    <HardDrive className="h-4 w-4 text-green-400" />
-                                    <span className="text-gray-300">{project.memory || 25}%</span>
-                                  </div>
-                                </div>
+                                )}
 
                                 {/* URL Link */}
                                 {project.name && (
@@ -716,10 +756,7 @@ const Projecthome = ({ name }: { name: string }) => {
                                     variant="ghost"
                                     size="sm"
                                     className="text-gray-400 hover:text-pink-300 transition-colors"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      window.open(`https://${project.name}.cloud.deploylite.tech`, '_blank');
-                                    }}
+                                    onClick={(e) => handleOpenProject(project, e)}
                                   >
                                     <ExternalLink className="h-4 w-4" />
                                   </Button>
