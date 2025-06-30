@@ -15,7 +15,12 @@ const redisConfig = {
 const publisher = new Redis(redisConfig);
 
 // Environment variables
-const { projectid } = process.env;
+const { projectid,techused } = process.env;
+
+if(techused !== "Next.js" && techused !== "Node.js") {
+    console.error("Invalid tech stack specified. Supported stacks are: Next.js, Node.js");
+    process.exit(1);
+}
 
 // Redis log publisher
 const publishLog = (message, type = 'info') => {

@@ -56,12 +56,11 @@ const CreateDeployment = async (req, res) => {
 
       //analyze all the deployments startegies here and call the respective deployment strategy
       if (techused == "React" || techused == "Vite") {
+        console.log("react deployment started");
         let depdata = await Deployment.findOneAndUpdate({
           projectid: projectid
         }, { status: "started", deploymentdate: new Date(), commit_message: "Deployment Created By Deploylite", author_name: "DeployLite" })
         let updateproject = await Project.findOneAndUpdate({ _id: projectid }, { projecturl: `${projectname}.cloud.deploylite.tech`, memoryusage: 0, cpuusage: 0, storageusage: 0 })
-        //start deployment for react
-        console.log("react deployment started")
         const result = await fetch(`${process.env.DEPLOYMENT_API}/deploy/react`, {
           method: "POST",
           headers: {
@@ -70,7 +69,8 @@ const CreateDeployment = async (req, res) => {
           },
           body: JSON.stringify({
             projectid: projectname,
-            giturl: url
+            giturl: url,
+            techused: techused,
           }),
         })
         let data = await result.json();
@@ -103,7 +103,8 @@ const CreateDeployment = async (req, res) => {
           },
           body: JSON.stringify({
             projectid: projectname,
-            giturl: url
+            giturl: url,
+            techused: techused,
           }),
         })
         let data = await result.json();

@@ -7,7 +7,7 @@ const FullStackHost = async (req, res) => {
     task: process.env.task2,
   };
   //getting the giturl and projectid
-  const { giturl, projectid } = req.body;
+  const { giturl, projectid,techused } = req.body;
   console.log(giturl, projectid);
 
   const cmd = new RunTaskCommand({
@@ -36,6 +36,10 @@ const FullStackHost = async (req, res) => {
             {
               name: "projectid",
               value: projectid,
+            },
+             {
+              name: "techused",
+              value: techused,
             },
           ],
         },
