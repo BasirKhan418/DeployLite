@@ -138,7 +138,7 @@ const CreateDeployment = async (req, res) => {
 
           if (data2.success) {
             //update the project with the url
-            let updateproject = await Project.findOneAndUpdate({ _id: projectid }, { url: data2.url })
+            let updateproject = await Project.findOneAndUpdate({ _id: projectid }, { url: data2.url ,arn: data.data.tasks[0].taskArn});
             return res.status(201).json({
               success: true,
               message: "Deployment Started",

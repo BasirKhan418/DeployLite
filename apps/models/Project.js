@@ -28,6 +28,7 @@ outputfolder:{type:String,default:"not applicable"},
 env:{type:String},
 hookid:{type:String},
 customdomain:{type:String}
+arn:{type:String,default:""},
 },{timestamps:true})
 mongoose.models = {}
 export default mongoose.model.Project||mongoose.model('Project',ProjectSchema);
