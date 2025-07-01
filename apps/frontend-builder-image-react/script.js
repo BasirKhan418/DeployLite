@@ -25,7 +25,7 @@ const redisConfig = {
 const publisher = new Redis(redisConfig);
 const { region, accesskeyid, accesskeysecret, projectid, bucket,techused,installcommand,buildcommand,buildfolder,env} = process.env;
 
-if(techused !== "React" && techused !== "Vite" ) {
+if(techused !== "React" && techused !== "Vite" && techused !=="Vue.js") {
     console.error("Invalid tech stack specified. Supported stacks are: React, Vite, HTML,CSS,JS");
     process.exit(1);
 }
