@@ -234,12 +234,11 @@ export default function CreateWebbuilder() {
       console.log('API Response:', res);
       
       setLoading(false);
-
-      if (res.success) {
-        toast.success(res.message);
-        console.log('Project created successfully:', res.project);
-        // router.push(`/project/overview?id=${res.project._id}&type=webbuilder`);
-      } else {
+ 
+   if (res.success) {
+    toast.success(res.message);
+   router.push(`/project/overview?id=${res.project._id}&type=webbuilder`);
+    } else {
         if (res.projectname === "exists") {
           setStage(1);
           setProjectError(true);
