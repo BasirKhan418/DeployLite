@@ -131,20 +131,16 @@ export default function WebBuilder() {
     
     try {
       // Using the same project API but filtering for webbuilder type
-      const result = await fetch(`/api/project/crud?email=${user.email}&type=webbuilder`);
+      const result = await fetch(`/api/project/wordpress`);
       const data = await result.json();
       
       console.log('Web Builder API Response:', data);
       
       if (data.success && data.projectdata) {
-        // Filter for webbuilder projects
-        const webBuilderProjects = data.projectdata.filter((project: any) => 
-          project.type === 'webbuilder'
-        );
-        setProjects(webBuilderProjects);
-        setFilteredProjects(webBuilderProjects);
+      
+        setProjects(data.projectdata);
+        setFilteredProjects(data.projectdata);
         setHasProjectsLoaded(true);
-        console.log('Web Builder projects loaded:', webBuilderProjects.length);
       } else {
         console.log('No web builder projects found:', data.message);
         setProjects([]);

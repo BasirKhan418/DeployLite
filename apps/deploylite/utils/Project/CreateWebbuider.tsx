@@ -214,45 +214,17 @@ export default function CreateWebbuilder() {
     setLoading(true);
 
     try {
-      console.log('=== WEB BUILDER PROJECT SUBMISSION ===');
-      console.log('Project Details:', {
-        name: projectDetails.name,
-        type: 'webbuilder',
-        webbuilder: selectedWebBuilder,
-        dbname: projectDetails.dbname,
-        dbuser: projectDetails.dbuser,
-        dbpass: '***HIDDEN***',
-        planid: selectedPlan.id,
-        userid: user.email,
-      });
 
       const submissionData = {
         name: projectDetails.name,
-        type: 'webbuilder',
         webbuilder: selectedWebBuilder,
         dbname: projectDetails.dbname,
         dbuser: projectDetails.dbuser,
         dbpass: projectDetails.dbpass,
         planid: selectedPlan.id,
-        
-        repourl: '', // Empty for webbuilder
-        repobranch: '', // Empty for webbuilder
-        techused: selectedWebBuilder,
-        buildcommand: '', // Not needed for webbuilder
-        rootfolder: '/',
-        outputfolder: 'public',
-        startcommand: '', // Will be handled by webbuilder
-        installcommand: '', // Will be handled by webbuilder
-        env: `DB_NAME=${projectDetails.dbname}\nDB_USER=${projectDetails.dbuser}\nDB_PASS=${projectDetails.dbpass}`,
-        userid: user.email,
       };
 
-      console.log('Final submission data:', {
-        ...submissionData,
-        dbpass: '***HIDDEN***'
-      });
-
-      const createProject = await fetch("/api/project/crud", {
+      const createProject = await fetch("/api/project/wordpress", {
         headers: { "Content-Type": "application/json" },
         method: "POST",
         body: JSON.stringify(submissionData),
@@ -266,7 +238,7 @@ export default function CreateWebbuilder() {
       if (res.success) {
         toast.success(res.message);
         console.log('Project created successfully:', res.project);
-        router.push(`/project/overview?id=${res.project._id}&type=webbuilder`);
+        // router.push(`/project/overview?id=${res.project._id}&type=webbuilder`);
       } else {
         if (res.projectname === "exists") {
           setStage(1);
