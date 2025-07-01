@@ -185,3 +185,66 @@ export const POST = async (req: NextRequest) => {
         }, { status: 500 });
     }
 }
+
+
+export const DELETE = async (req: NextRequest) => {
+    try {
+         const getcookie = await cookies();
+        const data = await req.json();
+        await ConnectDb();
+        
+        const auth = await CheckAuth();
+        
+        if (!auth.result) {
+            return NextResponse.json({
+                message: "User is not authenticated",
+                success: false,
+                autherror: true
+            }, { status: 401 });
+        }
+        
+        const projectdelete = await WebBuilder.findOneAndDelete({ _id: data.id });
+        console.log("Project to delete:", projectdelete);
+        if(projectdelete !== null && projectdelete.arn !== null || projectdelete.arn !== undefined|| projectdelete.arn !== ""){ {
+            console.log("inside ")
+        console.log("Project not found or ARN is missing",projectdelete.arn);
+         const createdep = await fetch(`${process.env.DEPLOYMENT_API}/deploy/delete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': getcookie.get("token")?.value || '',
+            },
+            body: JSON.stringify({
+              task:projectdelete.arn
+            })
+        });
+    
+        
+        const result = await createdep.json();
+        console.log(result);
+          return NextResponse.json({
+            success: true,
+            message: "Project Deleted Successfully"
+        });
+    }
+        if (projectdelete == null) {
+            return NextResponse.json({
+                success: false,
+                message: "Project not found"
+            }, { status: 404 });
+        }
+        
+        return NextResponse.json({
+            success: true,
+            message: "Project Deleted Successfully"
+        });
+    }
+        
+    } catch (err) {
+        console.error("Error deleting project:", err);
+        return NextResponse.json({
+            success: false,
+            message: "Something went wrong please try again later!"
+        }, { status: 500 });
+    }
+}
