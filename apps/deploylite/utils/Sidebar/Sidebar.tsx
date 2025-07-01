@@ -80,9 +80,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
-  };
+  
 
   const markAllAsRead = () => {
     setUnreadNotifications(0);
@@ -707,19 +705,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Theme Toggle */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl hover:bg-pink-500/10 hover:text-pink-300 transition-all duration-300"
-            >
-              {theme === "light" ? (
-                <MoonIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-              ) : (
-                <SunIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-              )}
-            </Button>
+            
 
             {/* Avatar Dropdown */}
             <DropdownMenu>
