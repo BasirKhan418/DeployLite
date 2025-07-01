@@ -232,7 +232,7 @@ export default function WebBuilder() {
       }
       
       setLoading(true);
-      const deleteproject = await fetch(`/api/project/crud`, {
+      const deleteproject = await fetch(`/api/project/wordpress`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
