@@ -6,10 +6,12 @@ declare global {
     Razorpay?: any;
   }
 }
+
 import { toast, Toaster } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ethers } from "ethers";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,6 +24,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 
 import {
   CreditCardIcon,
@@ -30,6 +33,27 @@ import {
   AlertTriangleIcon,
   FileTextIcon,
   RefreshCwIcon,
+  Wallet as WalletIcon,
+  TrendingUp,
+  TrendingDown,
+  Calendar,
+  Clock,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Activity,
+  Users,
+  Target,
+  Zap,
+  Loader2,
+  Download,
+  Eye,
+  EyeOff,
+  Plus,
+  Minus,
+  BarChart3,
+  PieChart,
+  LineChart,
+  ExternalLink,
 } from "lucide-react";
 
 import {
@@ -41,9 +65,12 @@ import {
   Title,
   Tooltip,
   Legend,
+  ArcElement,
+  BarElement,
 } from "chart.js";
-import { Line } from "react-chartjs-2";
-import { useAppSelector } from "@/lib/hook";
+import { Line, Doughnut, Bar } from "react-chartjs-2";
+import { useAppSelector, useAppDispatch } from "@/lib/hook";
+import { add as addWallet } from "@/lib/features/wallet/Wallet";
 
 ChartJS.register(
   CategoryScale,
@@ -52,150 +79,238 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  ArcElement,
+  BarElement
 );
 
-export default function ImprovedPlatformWallet() {
-  const user = useAppSelector((state) => state.user.user);
-  const wallet = useAppSelector((state) => state.wallet.wallet);
+// Animation variants
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.4, 0.25, 1] } }
+};
 
+const stagger = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+};
+
+const scaleIn = {
+  hidden: { scale: 0.95, opacity: 0 },
+  visible: { scale: 1, opacity: 1, transition: { duration: 0.3, ease: "easeOut" } }
+};
+
+interface Transaction {
+  _id?: string;
+  amount: number;
+  description: string;
+  type: "credit" | "debit";
+  date: string;
+  category?: string;
+  status?: string;
+}
+
+interface WalletData {
+  userid: string;
+  balance: number;
+  transactions: Transaction[];
+}
+
+interface ProjectData {
+  name: string;
+  planid: {
+    name: string;
+    pricepmonth: string;
+    pricephour: string;
+  };
+  projectstatus: string;
+  startdate: string;
+}
+
+export default function Wallet() {
+  const user = useAppSelector((state) => state.user.user);
+  const walletStore = useAppSelector((state) => state.wallet.wallet);
+  const dispatch = useAppDispatch();
+  
+  const [wallet, setWallet] = useState<WalletData | null>(null);
+  const [projects, setProjects] = useState<ProjectData[]>([]);
   const [addFundsAmount, setAddFundsAmount] = useState("");
   const [cryptoAmount, setCryptoAmount] = useState("");
   const [cryptoWalletAddress, setCryptoWalletAddress] = useState("");
   const [cryptoConnected, setCryptoConnected] = useState(false);
   const [cryptoBalance, setCryptoBalance] = useState("0");
   const [loading, setLoading] = useState(false);
-  const [transactions, setTransactions] = useState([
-    {
-      id: 1,
-      type: "Platform Usage",
-      amount: 50,
-      date: "2023-09-15",
-      time: "14:30",
-    },
-    {
-      id: 2,
-      type: "Add Funds",
-      amount: 100,
-      date: "2023-09-14",
-      time: "09:15",
-    },
-    {
-      id: 3,
-      type: "Service Upgrade",
-      amount: 80,
-      date: "2023-09-13",
-      time: "18:45",
-    },
-  ]);
+  const [balanceVisible, setBalanceVisible] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [stats, setStats] = useState({
+    totalSpent: 0,
+    thisMonth: 0,
+    avgPerDay: 0,
+    estimatedMonthly: 0,
+    activeProjects: 0,
+    lastTransaction: null as Transaction | null
+  });
 
   const router = useRouter();
 
-  const midnightIST = new Date();
-  midnightIST.setHours(24, 0, 0, 0);
-  const date = midnightIST.toLocaleString("en-IN", {
-    timeZone: "Asia/Kolkata",
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
-
-  async function handleConnectCryptoWallet() {
+  // Fetch wallet data and projects
+  const fetchWalletData = async () => {
     try {
-      if (!window.ethereum) {
-        alert("MetaMask not detected!");
-        return;
+      setRefreshing(true);
+      
+      // Fetch wallet data
+      const walletRes = await fetch('/api/get/home');
+      const walletData = await walletRes.json();
+      
+      if (walletData.success && walletData.wallet) {
+        setWallet(walletData.wallet);
+        dispatch(addWallet(walletData.wallet));
       }
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const accounts = await provider.send("eth_requestAccounts", []);
-      const account = accounts[0] || "";
-      setCryptoWalletAddress(account);
-      setCryptoConnected(true);
 
-      const signer = await provider.getSigner();
-      const balanceWei = await provider.getBalance(account);
-      const balanceEth = ethers.formatEther(balanceWei);
-      setCryptoBalance(balanceEth);
+      // Fetch projects data
+      const projectsRes = await fetch('/api/project/crud');
+      const projectsData = await projectsRes.json();
+      
+      if (projectsData.success && projectsData.projectdata) {
+        setProjects(projectsData.projectdata);
+      }
+
+      // Calculate stats
+      calculateStats(walletData.wallet, projectsData.projectdata || []);
+      
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching wallet data:', error);
+      toast.error('Failed to fetch wallet data');
+    } finally {
+      setRefreshing(false);
     }
-  }
-  async function handleSendCryptoPayment() {
-    if (!cryptoConnected) {
-      toast.error("Connect your MetaMask wallet first!");
-      return;
+  };
+
+  // Calculate statistics
+  const calculateStats = (walletData: WalletData, projectsData: ProjectData[]) => {
+    if (!walletData?.transactions) return;
+
+    const transactions = walletData.transactions;
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    // Calculate monthly spending
+    const thisMonthSpending = transactions
+      .filter(tx => {
+        const txDate = new Date(tx.date);
+        return tx.type === 'debit' && 
+               txDate.getMonth() === currentMonth && 
+               txDate.getFullYear() === currentYear;
+      })
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    // Calculate total spending
+    const totalSpent = transactions
+      .filter(tx => tx.type === 'debit')
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    // Calculate daily average
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const avgPerDay = thisMonthSpending / now.getDate();
+
+    // Estimate monthly cost based on active projects
+    const activeProjects = projectsData.filter(p => p.projectstatus === 'live').length;
+    const estimatedMonthly = projectsData
+      .filter(p => p.projectstatus === 'live')
+      .reduce((sum, p) => {
+        const monthlyPrice = parseFloat(p.planid?.pricepmonth || '0');
+        return sum + monthlyPrice;
+      }, 0);
+
+    // Get last transaction
+    const lastTransaction = transactions.sort((a, b) => 
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    )[0] || null;
+
+    setStats({
+      totalSpent,
+      thisMonth: thisMonthSpending,
+      avgPerDay,
+      estimatedMonthly,
+      activeProjects,
+      lastTransaction
+    });
+  };
+
+  useEffect(() => {
+    if (user?.email) {
+      fetchWalletData();
     }
+  }, [user]);
 
-    if (
-      !cryptoAmount ||
-      isNaN(Number(cryptoAmount)) ||
-      Number(cryptoAmount) <= 0
-    ) {
-      toast.error("Enter a valid ETH amount!");
-      return;
-    }
+  // Generate chart data
+  const generateChartData = () => {
+    if (!wallet?.transactions) return { labels: [], datasets: [] };
 
-    try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - (6 - i));
+      return date;
+    });
 
-      const tx = await signer.sendTransaction({
-        to: "0xeDe6eC29Fb53e32310e0960D35099aE9428700ff", 
-        value: ethers.parseEther(cryptoAmount),
-      });
+    const dailySpending = last7Days.map(date => {
+      const daySpending = wallet.transactions
+        .filter(tx => {
+          const txDate = new Date(tx.date);
+          return tx.type === 'debit' && 
+                 txDate.toDateString() === date.toDateString();
+        })
+        .reduce((sum, tx) => sum + tx.amount, 0);
+      return daySpending;
+    });
 
-      toast.success("Transaction sent! Waiting for confirmation...");
-
-      await tx.wait();
-      toast.success(`Transaction confirmed! Hash: ${tx.hash}`);
-
-      // Convert ETH to INR for transaction history
-      const convertedINR = getConvertedAmountInINR(Number(cryptoAmount));
-      const newTx = {
-        id: Date.now(),
-        type: "Crypto Payment",
-        amount: convertedINR,
-        date: new Date().toLocaleDateString(),
-        time: new Date().toLocaleTimeString(),
-      };
-      setTransactions((prev) => [newTx, ...prev]);
-
-      setCryptoAmount("");
-    } catch (error) {
-      console.error(error);
-      toast.error("Transaction failed! Check console for details.");
-    }
-  }
-
-  function getConvertedAmountInINR(cryptoValue: number) {
-    const conversionRate = 150000;
-    return cryptoValue * conversionRate;
-  }
-
-  function handleDepositCrypto() {
-    if (!cryptoAmount) return;
-
-    const ethValue = Number.parseFloat(cryptoAmount);
-    const convertedINR = getConvertedAmountInINR(ethValue);
-
-    const newTx = {
-      id: Date.now(),
-      type: "Crypto Deposit",
-      amount: convertedINR,
-      date: new Date().toLocaleDateString(),
-      time: new Date().toLocaleTimeString(),
+    return {
+      labels: last7Days.map(date => date.toLocaleDateString('en-US', { weekday: 'short' })),
+      datasets: [
+        {
+          label: 'Daily Spending (₹)',
+          data: dailySpending,
+          borderColor: 'rgb(147, 51, 234)',
+          backgroundColor: 'rgba(147, 51, 234, 0.1)',
+          tension: 0.4,
+          fill: true,
+        },
+      ],
     };
-    setTransactions((prev) => [newTx, ...prev]);
+  };
 
-    setCryptoAmount("");
-    alert(
-      `Deposited ${cryptoAmount} ETH (~₹${convertedINR.toFixed(2)}) to your DeployLite balance!`
-    );
-  }
+  // Generate spending categories chart
+  const generateCategoriesChart = () => {
+    if (!wallet?.transactions) return { labels: [], datasets: [] };
 
+    const categories = wallet.transactions
+      .filter(tx => tx.type === 'debit')
+      .reduce((acc, tx) => {
+        const category = tx.category || 'Other';
+        acc[category] = (acc[category] || 0) + tx.amount;
+        return acc;
+      }, {} as Record<string, number>);
+
+    return {
+      labels: Object.keys(categories),
+      datasets: [
+        {
+          data: Object.values(categories),
+          backgroundColor: [
+            'rgba(147, 51, 234, 0.8)',
+            'rgba(59, 130, 246, 0.8)',
+            'rgba(16, 185, 129, 0.8)',
+            'rgba(245, 158, 11, 0.8)',
+            'rgba(239, 68, 68, 0.8)',
+          ],
+          borderWidth: 0,
+        },
+      ],
+    };
+  };
+
+  // Razorpay payment handler
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
       if (window.Razorpay) {
@@ -210,434 +325,764 @@ export default function ImprovedPlatformWallet() {
     });
   };
 
-  const handleRazorpayPayment = async (e: React.MouseEvent<HTMLButtonElement> | React.FormEvent<HTMLFormElement>) => {
-    setLoading(true);
-
-    var amount =
-      addFundsAmount || Number(prompt("Enter the amount to add funds"));
-
-    const data = { amount, email: user.email, name: user.name };
-
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_HOST}/api/precheckout`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      }
-    );
-
-    const r = await response.json();
-    setLoading(false);
-
-    if (r.success) {
-      const scriptLoaded = await loadRazorpayScript();
-      if (!scriptLoaded) {
-        toast.error("Razorpay SDK failed to load.");
-        return;
-      }
-
-      var options = {
-        key: process.env.NEXT_PUBLIC_KEY_ID,
-        amount: r.order.amount,
-        currency: "INR",
-        name: `DeployLite`,
-        description: `Add funds to DeployLite Wallet`,
-        image: "/logo.png",
-        order_id: r.order.id,
-        callback_url: `${process.env.NEXT_PUBLIC_HOST}/api/postcheckout`,
-        prefill: { name: user.name, email: user.email },
-        notes: { address: "Razorpay Corporate Office" },
-        theme: { color: "#FD0872" },
-      };
-
-      var rzp1 = new window.Razorpay(options);
-      rzp1.open();
-      e.preventDefault();
-    } else {
-      toast.error("Error in Payment");
-    }
-  };
-
-  function handleStripePayment() {
-    toast.error(
-      "Stripe Payment Gateway not implemented yet.Will be available soon..."
-    );
-  }
-
-  function handleAddFundsInINR() {
-    if (!addFundsAmount) return;
-    const amt = Number.parseFloat(addFundsAmount);
-    if (amt <= 0) {
-      alert("Please enter a valid amount.");
+  const handleRazorpayPayment = async () => {
+    if (!addFundsAmount || parseFloat(addFundsAmount) <= 0) {
+      toast.error("Please enter a valid amount");
       return;
     }
 
-    const newTx = {
-      id: Date.now(),
-      type: "Add Funds (INR)",
-      amount: amt,
-      date: new Date().toLocaleDateString(),
-      time: new Date().toLocaleTimeString(),
-    };
-    setTransactions((prev) => [newTx, ...prev]);
-    setAddFundsAmount("");
-    alert(`Deposited ₹${amt.toFixed(2)} to your DeployLite balance!`);
-  }
+    setLoading(true);
+    const amount = parseFloat(addFundsAmount);
+    const data = { amount, email: user.email, name: user.name };
 
-  const chartLabels = [
-    "Day 1",
-    "Day 2",
-    "Day 3",
-    "Day 4",
-    "Day 5",
-    "Day 6",
-    "Day 7",
-  ];
-  const chartValues = [50, 100, 75, 140, 200, 90, 120];
+    try {
+      const response = await fetch(`/api/precheckout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-  const chartData = {
-    labels: chartLabels,
-    datasets: [
-      {
-        label: "Daily Spend (₹)",
-        data: chartValues,
-        borderColor: "#f472b6",
-        backgroundColor: "rgba(244, 114, 182, 0.5)",
-      },
-    ],
+      const r = await response.json();
+      setLoading(false);
+
+      if (r.success) {
+        const scriptLoaded = await loadRazorpayScript();
+        if (!scriptLoaded) {
+          toast.error("Razorpay SDK failed to load.");
+          return;
+        }
+
+        const options = {
+          key: process.env.NEXT_PUBLIC_KEY_ID,
+          amount: r.order.amount,
+          currency: "INR",
+          name: "DeployLite",
+          description: "Add funds to DeployLite Wallet",
+          image: "/logo.png",
+          order_id: r.order.id,
+          callback_url: `/api/postcheckout`,
+          prefill: { name: user.name, email: user.email },
+          notes: { address: "DeployLite Platform" },
+          theme: { color: "#9333ea" },
+          handler: function(response: any) {
+            toast.success("Payment successful! Funds added to wallet.");
+            setAddFundsAmount("");
+            fetchWalletData();
+          },
+        };
+
+        const rzp1 = new window.Razorpay(options);
+        rzp1.open();
+      } else {
+        toast.error("Error in Payment");
+      }
+    } catch (error) {
+      setLoading(false);
+      toast.error("Payment failed");
+    }
+  };
+
+  // Crypto wallet functions
+  const handleConnectCryptoWallet = async () => {
+    try {
+      if (!window.ethereum) {
+        toast.error("MetaMask not detected!");
+        return;
+      }
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const accounts = await provider.send("eth_requestAccounts", []);
+      const account = accounts[0] || "";
+      setCryptoWalletAddress(account);
+      setCryptoConnected(true);
+
+      const balanceWei = await provider.getBalance(account);
+      const balanceEth = ethers.formatEther(balanceWei);
+      setCryptoBalance(balanceEth);
+      toast.success("MetaMask connected successfully!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to connect MetaMask");
+    }
+  };
+
+  const handleSendCryptoPayment = async () => {
+    if (!cryptoConnected) {
+      toast.error("Connect your MetaMask wallet first!");
+      return;
+    }
+
+    if (!cryptoAmount || isNaN(Number(cryptoAmount)) || Number(cryptoAmount) <= 0) {
+      toast.error("Enter a valid ETH amount!");
+      return;
+    }
+
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+
+      const tx = await signer.sendTransaction({
+        to: "0xeDe6eC29Fb53e32310e0960D35099aE9428700ff",
+        value: ethers.parseEther(cryptoAmount),
+      });
+
+      toast.success("Transaction sent! Waiting for confirmation...");
+      await tx.wait();
+      toast.success(`Transaction confirmed! Hash: ${tx.hash}`);
+      setCryptoAmount("");
+      
+      // Refresh wallet data
+      fetchWalletData();
+    } catch (error) {
+      console.error(error);
+      toast.error("Transaction failed!");
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  };
+
+  const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   };
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
-      legend: { position: "top" as const },
-      title: { display: true, text: "Usage Over Time" },
+      legend: { 
+        display: false 
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleColor: '#ffffff',
+        bodyColor: '#ffffff',
+        borderColor: 'rgba(147, 51, 234, 0.5)',
+        borderWidth: 1,
+      },
     },
     scales: {
       x: {
-        type: 'category' as const,
-        grid: {
-          color: "rgba(244, 114, 182, 0.2)",
-        },
+        grid: { color: 'rgba(147, 51, 234, 0.1)' },
+        ticks: { color: '#9ca3af' },
       },
       y: {
+        grid: { color: 'rgba(147, 51, 234, 0.1)' },
+        ticks: { color: '#9ca3af' },
         beginAtZero: true,
-        type: 'linear' as const,
-        grid: {
-          color: "rgba(244, 114, 182, 0.2)",
-        },
       },
     },
   };
 
+  if (!user?.email) {
+    router.push('/login');
+    return null;
+  }
+
   return (
-    <div
-      className={`min-h-screen bg-gradient-to-br from-black via-black to-pink-900 text-gray-100 transition-colors duration-300 backdrop-filter backdrop-blur-lg`}
-    >
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900/50 to-black">
       <Toaster position="top-right" />
-      <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-      <div className="max-w-7xl mx-auto p-4 md:p-8">
-        {/* Row: Main Wallet + Quick Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Wallet Card */}
-          <Card className="col-span-2 overflow-hidden bg-black bg-opacity-50 backdrop-filter backdrop-blur-lg border border-pink-700 shadow-lg">
-            <div className="bg-gradient-to-br from-pink-900 to-black p-6">
-              <CardTitle className="text-2xl mb-2 text-pink-100">
-                DeployLite Balance
-              </CardTitle>
-              <CardDescription className="text-pink-300">
-                Available funds for your account
-              </CardDescription>
-              <p className="text-5xl font-bold mt-4 text-pink-400">
-                ₹{wallet.balance}
-              </p>
+      
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={stagger}
+        className="max-w-7xl mx-auto p-6"
+      >
+        {/* Header */}
+        <motion.div variants={fadeIn} className="mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-xl">
+                <WalletIcon className="h-8 w-8 text-purple-400" />
+              </div>
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                  Wallet
+                </h1>
+                <p className="text-gray-400 mt-1">
+                  Manage your DeployLite balance and transactions
+                </p>
+              </div>
             </div>
-            <CardFooter className="flex justify-between mt-4">
-              {/* Razorpay / Stripe Payment */}
+            
+            <div className="flex items-center space-x-3">
               <Button
-                className="bg-pink-700 hover:bg-pink-600 text-white backdrop-filter backdrop-blur-sm"
-                onClick={handleRazorpayPayment}
+                onClick={fetchWalletData}
+                disabled={refreshing}
+                variant="outline"
+                className="bg-black/50 border-purple-500/30 hover:bg-purple-500/10 hover:border-purple-500/50 text-gray-200 hover:text-purple-300"
               >
-                <DollarSignIcon className="mr-2 h-4 w-4" /> Pay (Razorpay)
+                <RefreshCwIcon className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                Refresh
               </Button>
-              <Button
-                className="bg-pink-800 hover:bg-pink-700 text-white"
-                onClick={handleStripePayment}
-              >
-                <DollarSignIcon className="mr-2 h-4 w-4" /> Pay (Stripe)
-              </Button>
-              <Button
-                className="bg-gray-800 hover:bg-gray-700 text-pink-100"
-                onClick={() => {
-                  router.push("/settings");
-                }}
-              >
-                <SettingsIcon className="mr-2 h-4 w-4" /> Manage Account
-              </Button>
-            </CardFooter>
-          </Card>
+            </div>
+          </div>
+        </motion.div>
 
-          {/* Quick Actions */}
-          <Card className="bg-black bg-opacity-50 backdrop-filter backdrop-blur-lg border border-pink-700 shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-pink-100">Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <Button className="w-full bg-pink-700 hover:bg-pink-600 text-white">
-                  <RefreshCwIcon className="mr-2 h-4 w-4" /> Auto-Recharge
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full border-pink-700 text-pink-300 hover:bg-pink-900"
-                >
-                  <FileTextIcon className="mr-2 h-4 w-4" /> Download Invoices
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full border-pink-700 text-pink-300 hover:bg-pink-900"
-                >
-                  <AlertTriangleIcon className="mr-2 h-4 w-4" /> View Alerts
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Row: Add Funds + Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-          {/* Add Funds (INR) */}
-          <Card className="bg-black bg-opacity-50 backdrop-filter backdrop-blur-lg border border-pink-700 shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-pink-100">Add Funds (INR)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col space-y-4">
-                <Label htmlFor="amount" className="text-pink-300">
-                  Amount
-                </Label>
-                <Input
-                  id="amount"
-                  placeholder="Enter amount in INR"
-                  value={addFundsAmount}
-                  onChange={(e) => setAddFundsAmount(e.target.value)}
-                  className="bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-sm text-pink-100 border-pink-700 placeholder-pink-400"
-                />
-                <Button
-                  className="bg-pink-700 hover:bg-pink-600 text-white"
-                  onClick={handleRazorpayPayment}
-                >
-                  <CreditCardIcon className="mr-2 h-4 w-4" /> Add Funds
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Wallet Summary */}
-          <Card className="bg-black bg-opacity-50 backdrop-filter backdrop-blur-lg border border-pink-700 shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-pink-100">Wallet Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-pink-300">Total Spent This Month:</span>
-                  <span className="font-bold text-pink-100">₹0</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-pink-300">Remaining Budget:</span>
-                  <span className="font-bold text-pink-100">
-                    ₹{wallet.balance}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-pink-300">Next Billing Date:</span>
-                  <span className="font-bold text-pink-100">{date}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Tabs Section */}
-        <Tabs defaultValue="transactions" className="mt-8">
-          <TabsList className="bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-sm border border-pink-700">
-            <TabsTrigger value="transactions" className="text-pink-100">
-              Transactions
-            </TabsTrigger>
-            <TabsTrigger value="billing" className="text-pink-100">
-              Billing
-            </TabsTrigger>
-            <TabsTrigger value="crypto" className="text-pink-100">
-              Crypto
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="text-pink-100">
-              Analytics
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Transactions Tab */}
-          <TabsContent value="transactions">
-            <Card className="bg-black bg-opacity-50 backdrop-filter backdrop-blur-lg border border-pink-700 shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-pink-100">
-                  Recent Transactions
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-4">
-                  {transactions.map((tx) => (
-                    <li
-                      key={tx.id}
-                      className="flex justify-between items-center bg-gray-800 bg-opacity-50 p-4 rounded-lg"
-                    >
-                      <div>
-                        <p className="font-semibold text-pink-100">{tx.type}</p>
-                        <p className="text-sm text-pink-300">
-                          {tx.date} at {tx.time}
-                        </p>
-                      </div>
-                      <p
-                        className={`font-bold ${
-                          tx.type.toLowerCase().includes("add") ||
-                          tx.type.toLowerCase().includes("crypto")
-                            ? "text-green-400"
-                            : "text-red-400"
-                        }`}
-                      >
-                        {tx.type.toLowerCase().includes("add") ||
-                        tx.type.toLowerCase().includes("crypto")
-                          ? "+"
-                          : "-"}
-                        ₹{tx.amount.toFixed(2)}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-              <CardFooter>
-                <Button
-                  variant="link"
-                  className="text-pink-400 hover:text-pink-300"
-                >
-                  View All Transactions
-                </Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-
-          {/* Billing Tab */}
-          <TabsContent value="billing">
-            <Card className="bg-black bg-opacity-50 backdrop-filter backdrop-blur-lg border border-pink-700 shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-pink-100">
-                  Billing Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-pink-300">Current Plan:</span>
-                    <span className="font-bold text-pink-100">Pro Plan</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-pink-300">Billing Cycle:</span>
-                    <span className="font-bold text-pink-100">Monthly</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-pink-300">Next Invoice Amount:</span>
-                    <span className="font-bold text-pink-100">₹99.99</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-pink-300">Payment Method:</span>
-                    <span className="font-bold text-pink-100">
-                      Visa ****1234
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button
-                  variant="link"
-                  className="text-pink-400 hover:text-pink-300"
-                >
-                  Update Billing Info
-                </Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-
-          {/* Crypto Tab */}
-          <TabsContent value="crypto">
-            <Card className="bg-black bg-opacity-50 backdrop-filter backdrop-blur-lg border border-pink-700 shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-pink-100">
-                  Blockchain Wallet
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {cryptoConnected ? (
-                    <>
-                      <p className="text-sm text-pink-300">
-                        Connected Wallet:{" "}
-                        <span className="font-mono break-all text-xs text-pink-100">
-                          {cryptoWalletAddress}
-                        </span>
-                      </p>
-                      <p className="text-sm text-pink-300">
-                        On-chain Balance:{" "}
-                        <span className="text-pink-100">
-                          {Number(cryptoBalance).toFixed(6)} ETH
-                        </span>
-                      </p>
-                      <Label htmlFor="cryptoAmount" className="text-pink-300">
-                        Enter Amount (ETH)
-                      </Label>
-                      <Input
-                        id="cryptoAmount"
-                        placeholder="e.g., 0.01"
-                        value={cryptoAmount}
-                        onChange={(e) => setCryptoAmount(e.target.value)}
-                        className="bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-sm text-pink-100 border-pink-700 placeholder-pink-400"
-                      />
-                      <Button
-                        className="bg-green-700 hover:bg-green-600 text-white"
-                        onClick={handleSendCryptoPayment}
-                      >
-                        <DollarSignIcon className="mr-2 h-4 w-4" /> Pay with
-                        MetaMask
-                      </Button>
-                    </>
-                  ) : (
+        {/* Main Balance Card */}
+        <motion.div variants={fadeIn} className="mb-8">
+          <Card className="relative overflow-hidden bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300">
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10" />
+            <CardContent className="relative p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <p className="text-gray-400 text-sm font-medium">Available Balance</p>
+                  <div className="flex items-center gap-3 mt-2">
+                    {balanceVisible ? (
+                      <h2 className="text-5xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                        ₹{wallet?.balance?.toLocaleString() || '0'}
+                      </h2>
+                    ) : (
+                      <h2 className="text-5xl font-bold text-gray-400">••••••</h2>
+                    )}
                     <Button
-                      className="bg-pink-700 hover:bg-pink-600 text-white"
-                      onClick={handleConnectCryptoWallet}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setBalanceVisible(!balanceVisible)}
+                      className="text-gray-400 hover:text-purple-400"
                     >
-                      Connect to MetaMask
+                      {balanceVisible ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </Button>
+                  </div>
+                </div>
+                
+                <div className="text-right">
+                  <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                    <Activity className="w-4 h-4" />
+                    Last updated: {wallet ? formatTime(new Date().toISOString()) : '--:--'}
+                  </div>
+                  {stats.lastTransaction && (
+                    <div className={`flex items-center gap-2 text-sm ${
+                      stats.lastTransaction.type === 'credit' ? 'text-emerald-400' : 'text-red-400'
+                    }`}>
+                      {stats.lastTransaction.type === 'credit' ? (
+                        <ArrowUpRight className="w-4 h-4" />
+                      ) : (
+                        <ArrowDownLeft className="w-4 h-4" />
+                      )}
+                      Last: ₹{stats.lastTransaction.amount}
+                    </div>
                   )}
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
 
-          {/* Analytics Tab (Chart) */}
-          <TabsContent value="analytics">
-            <Card className="bg-black bg-opacity-50 backdrop-filter backdrop-blur-lg border border-pink-700 shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-pink-100">Usage Analytics</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="w-full">
-                  <Line data={chartData} options={chartOptions} />
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                {[
+                  { 
+                    label: "This Month", 
+                    value: `₹${stats.thisMonth.toLocaleString()}`, 
+                    icon: Calendar, 
+                    color: "text-purple-400",
+                    change: stats.thisMonth > 0 ? "spending" : "no activity"
+                  },
+                  { 
+                    label: "Daily Average", 
+                    value: `₹${Math.round(stats.avgPerDay).toLocaleString()}`, 
+                    icon: TrendingUp, 
+                    color: "text-blue-400",
+                    change: "per day"
+                  },
+                  { 
+                    label: "Active Projects", 
+                    value: stats.activeProjects.toString(), 
+                    icon: Zap, 
+                    color: "text-emerald-400",
+                    change: "running"
+                  },
+                  { 
+                    label: "Est. Monthly", 
+                    value: `₹${Math.round(stats.estimatedMonthly).toLocaleString()}`, 
+                    icon: Target, 
+                    color: "text-orange-400",
+                    change: "projects cost"
+                  },
+                ].map((stat, index) => (
+                  <div key={index} className="p-4 rounded-xl bg-gradient-to-r from-gray-800/30 to-black/30 border border-gray-700/30">
+                    <div className="flex items-center gap-3 mb-2">
+                      <stat.icon className={`w-5 h-5 ${stat.color}`} />
+                      <span className="text-gray-300 text-sm font-medium">{stat.label}</span>
+                    </div>
+                    <div className="text-xl font-bold text-gray-100">{stat.value}</div>
+                    <div className="text-xs text-gray-500">{stat.change}</div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Add Funds Section */}
+        <motion.div variants={fadeIn} className="mb-8">
+          <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-purple-500/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3">
+                <Plus className="w-5 h-5 text-purple-400" />
+                Add Funds
+              </CardTitle>
+              <CardDescription className="text-gray-400">
+                Add money to your DeployLite wallet using Razorpay
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <Label htmlFor="amount" className="text-gray-300 mb-2 block">
+                    Amount (INR)
+                  </Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    placeholder="Enter amount"
+                    value={addFundsAmount}
+                    onChange={(e) => setAddFundsAmount(e.target.value)}
+                    className="bg-black/50 border-gray-700 text-white placeholder-gray-500 focus:border-purple-500/50"
+                  />
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
+                <div className="flex items-end">
+                  <Button
+                    onClick={handleRazorpayPayment}
+                    disabled={loading || !addFundsAmount}
+                    className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-8"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCardIcon className="w-4 h-4 mr-2" />
+                        Add Funds
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Tabs Section */}
+        <motion.div variants={fadeIn}>
+          <Tabs defaultValue="transactions" className="w-full">
+            <TabsList className="grid grid-cols-3 lg:grid-cols-4 mb-8 bg-gradient-to-r from-gray-900/50 to-black/50 backdrop-blur-xl border border-purple-500/20 rounded-xl p-1">
+              <TabsTrigger value="transactions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-blue-500/20 data-[state=active]:text-purple-300 data-[state=active]:border data-[state=active]:border-purple-500/30 rounded-lg transition-all duration-300">
+                Transactions
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-blue-500/20 data-[state=active]:text-purple-300 data-[state=active]:border data-[state=active]:border-purple-500/30 rounded-lg transition-all duration-300">
+                Analytics
+              </TabsTrigger>
+              <TabsTrigger value="crypto" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-blue-500/20 data-[state=active]:text-purple-300 data-[state=active]:border data-[state=active]:border-purple-500/30 rounded-lg transition-all duration-300">
+                Crypto
+              </TabsTrigger>
+              <TabsTrigger value="projects" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-blue-500/20 data-[state=active]:text-purple-300 data-[state=active]:border data-[state=active]:border-purple-500/30 rounded-lg transition-all duration-300">
+                Projects
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="transactions" className="space-y-6">
+              <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-purple-500/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3">
+                    <Activity className="w-5 h-5 text-purple-400" />
+                    Recent Transactions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {wallet?.transactions && wallet.transactions.length > 0 ? (
+                    <div className="space-y-3">
+                      {wallet.transactions
+                        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                        .slice(0, 10)
+                        .map((tx, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-800/30 to-black/30 border border-gray-700/30 hover:border-purple-500/30 transition-colors"
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className={`p-2 rounded-lg ${
+                                tx.type === 'credit' 
+                                  ? 'bg-emerald-500/20 text-emerald-400' 
+                                  : 'bg-red-500/20 text-red-400'
+                              }`}>
+                                {tx.type === 'credit' ? (
+                                  <ArrowUpRight className="w-4 h-4" />
+                                ) : (
+                                  <ArrowDownLeft className="w-4 h-4" />
+                                )}
+                              </div>
+                              <div>
+                                <p className="font-medium text-gray-200">{tx.description}</p>
+                                <div className="flex items-center gap-2 text-sm text-gray-400">
+                                  <Calendar className="w-3 h-3" />
+                                  {formatDate(tx.date)}
+                                  <Clock className="w-3 h-3 ml-2" />
+                                  {formatTime(tx.date)}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className={`font-bold text-lg ${
+                                tx.type === 'credit' ? 'text-emerald-400' : 'text-red-400'
+                              }`}>
+                                {tx.type === 'credit' ? '+' : '-'}₹{tx.amount.toLocaleString()}
+                              </p>
+                              <Badge variant="secondary" className="bg-gray-700/50 text-gray-300 text-xs">
+                                {tx.type === 'credit' ? 'Credit' : 'Debit'}
+                              </Badge>
+                            </div>
+                          </motion.div>
+                        ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <Activity className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                      <p className="text-gray-400">No transactions found</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="analytics" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Spending Chart */}
+                <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-purple-500/20">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3">
+                      <LineChart className="w-5 h-5 text-purple-400" />
+                      Daily Spending Trend
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-64">
+                      <Line data={generateChartData()} options={chartOptions} />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Categories Chart */}
+                <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-purple-500/20">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3">
+                      <PieChart className="w-5 h-5 text-purple-400" />
+                      Spending Categories
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-64 flex items-center justify-center">
+                      {generateCategoriesChart().labels.length > 0 ? (
+                        <Doughnut 
+                          data={generateCategoriesChart()} 
+                          options={{
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                              legend: {
+                                position: 'bottom',
+                                labels: { color: '#9ca3af' }
+                              }
+                            }
+                          }} 
+                        />
+                      ) : (
+                        <div className="text-center">
+                          <PieChart className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                          <p className="text-gray-400">No spending data available</p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Monthly Statistics */}
+              <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-purple-500/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3">
+                    <BarChart3 className="w-5 h-5 text-purple-400" />
+                    Monthly Overview
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div className="text-center p-6 rounded-xl bg-gradient-to-r from-purple-500/10 to-blue-500/10">
+                      <div className="text-3xl font-bold text-purple-400 mb-2">
+                        ₹{stats.thisMonth.toLocaleString()}
+                      </div>
+                      <p className="text-gray-300 text-sm">This Month</p>
+                      <p className="text-gray-500 text-xs mt-1">Total spent</p>
+                    </div>
+                    <div className="text-center p-6 rounded-xl bg-gradient-to-r from-blue-500/10 to-cyan-500/10">
+                      <div className="text-3xl font-bold text-blue-400 mb-2">
+                        ₹{Math.round(stats.avgPerDay).toLocaleString()}
+                      </div>
+                      <p className="text-gray-300 text-sm">Daily Average</p>
+                      <p className="text-gray-500 text-xs mt-1">Per day spending</p>
+                    </div>
+                    <div className="text-center p-6 rounded-xl bg-gradient-to-r from-emerald-500/10 to-green-500/10">
+                      <div className="text-3xl font-bold text-emerald-400 mb-2">
+                        {stats.activeProjects}
+                      </div>
+                      <p className="text-gray-300 text-sm">Active Projects</p>
+                      <p className="text-gray-500 text-xs mt-1">Running services</p>
+                    </div>
+                    <div className="text-center p-6 rounded-xl bg-gradient-to-r from-orange-500/10 to-red-500/10">
+                      <div className="text-3xl font-bold text-orange-400 mb-2">
+                        ₹{Math.round(stats.estimatedMonthly).toLocaleString()}
+                      </div>
+                      <p className="text-gray-300 text-sm">Estimated Cost</p>
+                      <p className="text-gray-500 text-xs mt-1">Monthly projection</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="crypto" className="space-y-6">
+              <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-purple-500/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3">
+                    <WalletIcon className="w-5 h-5 text-purple-400" />
+                    Crypto Payments
+                  </CardTitle>
+                  <CardDescription className="text-gray-400">
+                    Pay with Ethereum using MetaMask
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {cryptoConnected ? (
+                    <>
+                      <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
+                          <span className="text-emerald-400 font-medium">Wallet Connected</span>
+                        </div>
+                        <p className="text-sm text-gray-300 mb-2">
+                          Address: <code className="text-xs bg-black/30 px-2 py-1 rounded">{cryptoWalletAddress.slice(0, 6)}...{cryptoWalletAddress.slice(-4)}</code>
+                        </p>
+                        <p className="text-sm text-gray-300">
+                          Balance: <span className="text-emerald-400 font-medium">{Number(cryptoBalance).toFixed(6)} ETH</span>
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="cryptoAmount" className="text-gray-300 mb-2 block">
+                            Amount (ETH)
+                          </Label>
+                          <Input
+                            id="cryptoAmount"
+                            type="number"
+                            step="0.0001"
+                            placeholder="0.01"
+                            value={cryptoAmount}
+                            onChange={(e) => setCryptoAmount(e.target.value)}
+                            className="bg-black/50 border-gray-700 text-white placeholder-gray-500 focus:border-purple-500/50"
+                          />
+                          {cryptoAmount && (
+                            <p className="text-xs text-gray-400 mt-1">
+                              ≈ ₹{(parseFloat(cryptoAmount) * 150000).toLocaleString()} INR
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex items-end">
+                          <Button
+                            onClick={handleSendCryptoPayment}
+                            disabled={!cryptoAmount || parseFloat(cryptoAmount) <= 0}
+                            className="w-full bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white"
+                          >
+                            <ExternalLink className="w-4 h-4 mr-2" />
+                            Send Payment
+                          </Button>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-12">
+                      <WalletIcon className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-gray-200 mb-2">Connect MetaMask</h3>
+                      <p className="text-gray-400 mb-6">Connect your MetaMask wallet to pay with Ethereum</p>
+                      <Button
+                        onClick={handleConnectCryptoWallet}
+                        className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white px-8"
+                      >
+                        <WalletIcon className="w-4 h-4 mr-2" />
+                        Connect MetaMask
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="projects" className="space-y-6">
+              <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-purple-500/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3">
+                    <Zap className="w-5 h-5 text-purple-400" />
+                    Project Costs
+                  </CardTitle>
+                  <CardDescription className="text-gray-400">
+                    Billing information for your active projects
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {projects && projects.length > 0 ? (
+                    <div className="space-y-4">
+                      {projects.map((project, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-800/30 to-black/30 border border-gray-700/30 hover:border-purple-500/30 transition-colors"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className={`p-2 rounded-lg ${
+                              project.projectstatus === 'live' 
+                                ? 'bg-emerald-500/20 text-emerald-400' 
+                                : project.projectstatus === 'failed'
+                                ? 'bg-red-500/20 text-red-400'
+                                : 'bg-orange-500/20 text-orange-400'
+                            }`}>
+                              <Zap className="w-4 h-4" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-200">{project.name}</p>
+                              <div className="flex items-center gap-2 text-sm text-gray-400">
+                                <Badge variant="secondary" className="bg-gray-700/50 text-gray-300 text-xs">
+                                  {project.planid?.name || 'Unknown Plan'}
+                                </Badge>
+                                <span className={`px-2 py-1 rounded-full text-xs ${
+                                  project.projectstatus === 'live' 
+                                    ? 'bg-emerald-500/20 text-emerald-400' 
+                                    : project.projectstatus === 'failed'
+                                    ? 'bg-red-500/20 text-red-400'
+                                    : 'bg-orange-500/20 text-orange-400'
+                                }`}>
+                                  {project.projectstatus}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-gray-200">
+                              ₹{project.planid?.pricepmonth || '0'}/month
+                            </p>
+                            <p className="text-sm text-gray-400">
+                              ₹{project.planid?.pricephour || '0'}/hour
+                            </p>
+                          </div>
+                        </motion.div>
+                      ))}
+                      
+                      {/* Total Cost Summary */}
+                      <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-purple-400 font-medium">Total Estimated Monthly Cost</p>
+                            <p className="text-gray-400 text-sm">Based on active projects</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                              ₹{Math.round(stats.estimatedMonthly).toLocaleString()}
+                            </p>
+                            <p className="text-sm text-gray-400">per month</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <Zap className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                      <p className="text-gray-400">No projects found</p>
+                      <Button
+                        onClick={() => router.push('/project')}
+                        className="mt-4 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
+                      >
+                        Create Project
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </motion.div>
+
+        {/* Quick Actions Footer */}
+        <motion.div variants={fadeIn} className="mt-8">
+          <Card className="bg-gradient-to-r from-gray-900/50 to-black/50 backdrop-blur-xl border border-purple-500/20">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-gray-200 mb-4 flex items-center gap-2">
+                <Activity className="w-5 h-5 text-purple-400" />
+                Quick Actions
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Button
+                  onClick={() => router.push('/project')}
+                  className="justify-start h-auto p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20 hover:border-purple-500/40 hover:from-purple-500/20 hover:to-blue-500/20 text-left transition-all duration-300"
+                  variant="ghost"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-lg">
+                      <Zap className="w-4 h-4 text-purple-400" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-200">Create Project</div>
+                      <div className="text-sm text-gray-400">Deploy new services</div>
+                    </div>
+                  </div>
+                </Button>
+
+                <Button
+                  onClick={() => router.push('/settings')}
+                  className="justify-start h-auto p-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 hover:border-blue-500/40 hover:from-blue-500/20 hover:to-cyan-500/20 text-left transition-all duration-300"
+                  variant="ghost"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-lg">
+                      <SettingsIcon className="w-4 h-4 text-blue-400" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-200">Account Settings</div>
+                      <div className="text-sm text-gray-400">Manage your account</div>
+                    </div>
+                  </div>
+                </Button>
+
+                <Button
+                  onClick={fetchWalletData}
+                  className="justify-start h-auto p-4 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20 hover:border-emerald-500/40 hover:from-emerald-500/20 hover:to-green-500/20 text-left transition-all duration-300"
+                  variant="ghost"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-r from-emerald-500/20 to-green-500/20 rounded-lg">
+                      <RefreshCwIcon className="w-4 h-4 text-emerald-400" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-200">Refresh Data</div>
+                      <div className="text-sm text-gray-400">Update wallet balance</div>
+                    </div>
+                  </div>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
