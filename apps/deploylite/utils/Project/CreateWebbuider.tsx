@@ -134,6 +134,32 @@ const webBuilders = [
   },
 ];
 
+interface PricingPlan {
+  _id: string;
+  name: string;
+  pcategory: string;
+  features: string[];
+  cpu: string;
+  ram: string;
+  storage: string;
+  bandwidth: string;
+  pricephour: string;
+  pricepmonth: string;
+  isfree: boolean;
+}
+
+interface SelectedPlan {
+  name: string;
+  id: string;
+  pricephour: string;
+  pricepmonth: string;
+  features: string[];
+  cpu: string;
+  ram: string;
+  storage: string;
+  bandwidth: string;
+}
+
 export default function CreateWebbuilder() {
   const user = useAppSelector((state) => state.user.user);
   const router = useRouter();
@@ -146,9 +172,9 @@ export default function CreateWebbuilder() {
     dbpass: "",
   });
 
-  const [selectedWebBuilder, setSelectedWebBuilder] = useState("");
+  const [selectedWebBuilder, setSelectedWebBuilder] = useState("WordPress");
   const [loading, setLoading] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState({
+  const [selectedPlan, setSelectedPlan] = useState<SelectedPlan>({
     name: "", 
     id: "", 
     pricephour: "", 
@@ -159,14 +185,13 @@ export default function CreateWebbuilder() {
     storage: "",
     bandwidth: ""
   });
-  const [pricingPlans, setPricingPlans] = useState([]);
-  const [displayPricing, setDisplayPricing] = useState([]);
+  const [pricingPlans, setPricingPlans] = useState<PricingPlan[]>([]);
+  const [displayPricing, setDisplayPricing] = useState<PricingPlan[]>([]);
 
   const [isProjectError, setProjectError] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
 
-  const handleProjectDetailsChange = (e: any) => {
+  const handleProjectDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProjectError(false);
     setProjectDetails({ ...projectDetails, [e.target.name]: e.target.value });
   };
@@ -179,8 +204,24 @@ export default function CreateWebbuilder() {
       if (data.success) {
         setPricingPlans(data.data);
         // Filter for webbuilder plans
-        const webbuilderPlans = data.data.filter((item: any) => item.pcategory === "webbuilder");
+        const webbuilderPlans = data.data.filter((item: PricingPlan) => item.pcategory === "webbuilder");
         setDisplayPricing(webbuilderPlans);
+        
+        // Auto-select first plan if available
+        if (webbuilderPlans.length > 0) {
+          const firstPlan = webbuilderPlans[0];
+          setSelectedPlan({
+            name: firstPlan.name,
+            id: firstPlan._id,
+            pricephour: firstPlan.pricephour,
+            pricepmonth: firstPlan.pricepmonth,
+            features: firstPlan.features,
+            cpu: firstPlan.cpu,
+            ram: firstPlan.ram,
+            storage: firstPlan.storage,
+            bandwidth: firstPlan.bandwidth
+          });
+        }
       } else {
         toast.error(data.message);
       }
@@ -196,9 +237,10 @@ export default function CreateWebbuilder() {
 
   // Generate secure database credentials
   const generateDbCredentials = () => {
-    const dbName = `${projectDetails.name.toLowerCase().replace(/[^a-z0-9]/g, '')}_db`;
-    const dbUser = `${projectDetails.name.toLowerCase().replace(/[^a-z0-9]/g, '')}_user`;
-    const dbPass = Math.random().toString(36).slice(-12) + Math.random().toString(36).slice(-8).toUpperCase();
+    const cleanName = projectDetails.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const dbName = `${cleanName}_db`;
+    const dbUser = `${cleanName}_user`;
+    const dbPass = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase() + Math.floor(Math.random() * 100);
     
     setProjectDetails({
       ...projectDetails,
@@ -208,15 +250,52 @@ export default function CreateWebbuilder() {
     });
   };
 
+  // Validate project name
+  const validateProjectName = (name: string) => {
+    if (!name) return "Project name is required";
+    if (name.length < 3) return "Project name must be at least 3 characters";
+    if (name.length > 50) return "Project name must be less than 50 characters";
+    if (!/^[a-zA-Z0-9\s-_]+$/.test(name)) return "Project name can only contain letters, numbers, spaces, hyphens, and underscores";
+    return null;
+  };
+
   // Handle submit
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required fields
+    const nameError = validateProjectName(projectDetails.name);
+    if (nameError) {
+      setProjectError(true);
+      setErrorMsg(nameError);
+      toast.error(nameError);
+      setStage(1);
+      return;
+    }
+
+    if (!projectDetails.dbname || !projectDetails.dbuser || !projectDetails.dbpass) {
+      toast.error("Database credentials are required");
+      setStage(1);
+      return;
+    }
+
+    if (!selectedWebBuilder) {
+      toast.error("Please select a web builder");
+      setStage(2);
+      return;
+    }
+
+    if (!selectedPlan.id) {
+      toast.error("Please select a pricing plan");
+      setStage(3);
+      return;
+    }
+
     setLoading(true);
 
     try {
-
       const submissionData = {
-        name: projectDetails.name,
+        name: projectDetails.name.trim(),
         webbuilder: selectedWebBuilder,
         dbname: projectDetails.dbname,
         dbuser: projectDetails.dbuser,
@@ -224,8 +303,12 @@ export default function CreateWebbuilder() {
         planid: selectedPlan.id,
       };
 
+      console.log('Submitting project data:', submissionData);
+
       const createProject = await fetch("/api/project/wordpress", {
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+        },
         method: "POST",
         body: JSON.stringify(submissionData),
       });
@@ -235,16 +318,17 @@ export default function CreateWebbuilder() {
       
       setLoading(false);
  
-   if (res.success) {
-    toast.success(res.message);
-   router.push(`/project/overview?id=${res.project._id}&type=webbuilder`);
-    } else {
-        if (res.projectname === "exists") {
+      if (res.success) {
+        toast.success(res.message);
+        // Redirect to project overview with webbuilder type
+        router.push(`/project/overview?id=${res.project._id}&type=webbuilder`);
+      } else {
+        if (res.projectname === "exists" || res.webbuildername === "exists") {
           setStage(1);
           setProjectError(true);
           setErrorMsg(res.message);
         }
-        toast.error(res.message);
+        toast.error(res.message || 'Failed to create project');
         console.error('Project creation failed:', res);
       }
     } catch (err: any) {
@@ -253,6 +337,12 @@ export default function CreateWebbuilder() {
       setLoading(false);
     }
   };
+
+  // Check if user is authenticated and has GitHub connected
+  if (!user?.email) {
+    router.push('/login');
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900/50 to-black">
@@ -334,249 +424,268 @@ export default function CreateWebbuilder() {
                 </CardHeader>
 
                 <CardContent>
-                  <AnimatePresence mode="wait">
-                    {/* Stage 1: Project Details */}
-                    {stage === 1 && (
-                      <motion.div
-                        key="stage1"
-                        initial="hidden"
-                        animate="visible"
-                        exit="hidden"
-                        variants={slideIn}
-                        className="space-y-6"
-                      >
-                        <div className="grid grid-cols-1 gap-6">
-                          {/* Project Name */}
-                          <div>
-                            <Label htmlFor="project-name" className="text-gray-200 font-medium">
-                              Project Name
-                            </Label>
-                            <Input
-                              id="project-name"
-                              name="name"
-                              value={projectDetails.name}
-                              onChange={handleProjectDetailsChange}
-                              placeholder="my-awesome-website"
-                              className="mt-2 bg-black/50 border-gray-700 text-white placeholder-gray-500 focus:border-purple-500/50"
-                            />
-                            {isProjectError && (
-                              <p className="text-red-400 text-sm mt-1 flex items-center gap-2">
-                                <AlertCircle className="w-4 h-4" />
-                                {errorMsg}
-                              </p>
-                            )}
-                          </div>
-
-                          {/* Database Configuration */}
-                          <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                              <Label className="text-gray-200 font-medium flex items-center gap-2">
-                                <Database className="w-4 h-4" />
-                                Database Configuration
+                  <form onSubmit={handleSubmit}>
+                    <AnimatePresence mode="wait">
+                      {/* Stage 1: Project Details */}
+                      {stage === 1 && (
+                        <motion.div
+                          key="stage1"
+                          initial="hidden"
+                          animate="visible"
+                          exit="hidden"
+                          variants={slideIn}
+                          className="space-y-6"
+                        >
+                          <div className="grid grid-cols-1 gap-6">
+                            {/* Project Name */}
+                            <div>
+                              <Label htmlFor="project-name" className="text-gray-200 font-medium">
+                                Project Name *
                               </Label>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={generateDbCredentials}
-                                className="text-purple-400 border-purple-500/30 hover:bg-purple-500/10"
-                              >
-                                <Sparkles className="w-4 h-4 mr-2" />
-                                Auto Generate
-                              </Button>
+                              <Input
+                                id="project-name"
+                                name="name"
+                                value={projectDetails.name}
+                                onChange={handleProjectDetailsChange}
+                                placeholder="my-awesome-website"
+                                className="mt-2 bg-black/50 border-gray-700 text-white placeholder-gray-500 focus:border-purple-500/50"
+                                required
+                              />
+                              {isProjectError && (
+                                <p className="text-red-400 text-sm mt-1 flex items-center gap-2">
+                                  <AlertCircle className="w-4 h-4" />
+                                  {errorMsg}
+                                </p>
+                              )}
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              {/* Database Name */}
-                              <div>
+                            {/* Database Configuration */}
+                            <div className="space-y-4">
+                              <div className="flex items-center justify-between">
                                 <Label className="text-gray-200 font-medium flex items-center gap-2">
                                   <Database className="w-4 h-4" />
-                                  Database Name
+                                  Database Configuration
                                 </Label>
-                                <Input
-                                  name="dbname"
-                                  value={projectDetails.dbname}
-                                  onChange={handleProjectDetailsChange}
-                                  placeholder="my_website_db"
-                                  className="mt-2 bg-black/50 border-gray-700 text-white placeholder-gray-500 focus:border-purple-500/50"
-                                />
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={generateDbCredentials}
+                                  className="text-purple-400 border-purple-500/30 hover:bg-purple-500/10"
+                                >
+                                  <Sparkles className="w-4 h-4 mr-2" />
+                                  Auto Generate
+                                </Button>
                               </div>
 
-                              {/* Database User */}
-                              <div>
-                                <Label className="text-gray-200 font-medium flex items-center gap-2">
-                                  <User className="w-4 h-4" />
-                                  Database User
-                                </Label>
-                                <Input
-                                  name="dbuser"
-                                  value={projectDetails.dbuser}
-                                  onChange={handleProjectDetailsChange}
-                                  placeholder="db_user"
-                                  className="mt-2 bg-black/50 border-gray-700 text-white placeholder-gray-500 focus:border-purple-500/50"
-                                />
-                              </div>
-
-                              {/* Database Password */}
-                              <div>
-                                <Label className="text-gray-200 font-medium flex items-center gap-2">
-                                  <Lock className="w-4 h-4" />
-                                  Database Password
-                                </Label>
-                                <Input
-                                  name="dbpass"
-                                  type="password"
-                                  value={projectDetails.dbpass}
-                                  onChange={handleProjectDetailsChange}
-                                  placeholder="secure_password"
-                                  className="mt-2 bg-black/50 border-gray-700 text-white placeholder-gray-500 focus:border-purple-500/50"
-                                />
-                              </div>
-                            </div>
-
-                            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-                              <div className="flex items-start gap-3">
-                                <Info className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {/* Database Name */}
                                 <div>
-                                  <h4 className="text-blue-400 font-medium">Database Information</h4>
-                                  <p className="text-blue-300/80 text-sm mt-1">
-                                    A MySQL database will be automatically created with these credentials. Make sure to save these details as they will be needed for your web builder installation.
-                                  </p>
+                                  <Label className="text-gray-200 font-medium flex items-center gap-2">
+                                    <Database className="w-4 h-4" />
+                                    Database Name *
+                                  </Label>
+                                  <Input
+                                    name="dbname"
+                                    value={projectDetails.dbname}
+                                    onChange={handleProjectDetailsChange}
+                                    placeholder="my_website_db"
+                                    className="mt-2 bg-black/50 border-gray-700 text-white placeholder-gray-500 focus:border-purple-500/50"
+                                    required
+                                  />
+                                </div>
+
+                                {/* Database User */}
+                                <div>
+                                  <Label className="text-gray-200 font-medium flex items-center gap-2">
+                                    <User className="w-4 h-4" />
+                                    Database User *
+                                  </Label>
+                                  <Input
+                                    name="dbuser"
+                                    value={projectDetails.dbuser}
+                                    onChange={handleProjectDetailsChange}
+                                    placeholder="db_user"
+                                    className="mt-2 bg-black/50 border-gray-700 text-white placeholder-gray-500 focus:border-purple-500/50"
+                                    required
+                                  />
+                                </div>
+
+                                {/* Database Password */}
+                                <div>
+                                  <Label className="text-gray-200 font-medium flex items-center gap-2">
+                                    <Lock className="w-4 h-4" />
+                                    Database Password *
+                                  </Label>
+                                  <Input
+                                    name="dbpass"
+                                    type="password"
+                                    value={projectDetails.dbpass}
+                                    onChange={handleProjectDetailsChange}
+                                    placeholder="secure_password"
+                                    className="mt-2 bg-black/50 border-gray-700 text-white placeholder-gray-500 focus:border-purple-500/50"
+                                    required
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
+                                <div className="flex items-start gap-3">
+                                  <Info className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                                  <div>
+                                    <h4 className="text-blue-400 font-medium">Database Information</h4>
+                                    <p className="text-blue-300/80 text-sm mt-1">
+                                      A MySQL database will be automatically created with these credentials. Make sure to save these details as they will be needed for your web builder installation.
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
-                        </div>
 
-                        <Button
-                          onClick={() => {
-                            if (!projectDetails.name || !projectDetails.dbname || !projectDetails.dbuser || !projectDetails.dbpass) {
-                              toast.error("Please fill all required fields");
-                            } else {
-                              setStage(2);
-                            }
-                          }}
-                          className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white border-0 h-12 text-lg font-semibold rounded-xl shadow-lg shadow-purple-500/25"
-                        >
-                          Next: Choose Web Builder
-                          <ArrowRight className="ml-2 h-5 w-5" />
-                        </Button>
-                      </motion.div>
-                    )}
-
-                    {/* Stage 2: Web Builder Selection */}
-                    {stage === 2 && (
-                      <motion.div
-                        key="stage2"
-                        initial="hidden"
-                        animate="visible"
-                        exit="hidden"
-                        variants={slideIn}
-                        className="space-y-6"
-                      >
-                        <div className="text-center mb-8">
-                          <h3 className="text-2xl font-bold text-gray-100 mb-2">Choose Your Web Builder</h3>
-                          <p className="text-gray-400">Select the platform that best fits your project needs</p>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                          {webBuilders.map((builder, index) => (
-                            <motion.div
-                              key={builder.name}
-                              whileHover={{ scale: 1.02, y: -5 }}
-                              whileTap={{ scale: 0.98 }}
-                              className="relative cursor-pointer"
-                              onClick={() => setSelectedWebBuilder(builder.name)}
-                            >
-                              <div className={`relative p-6 rounded-2xl border-2 transition-all duration-300 bg-gradient-to-br from-gray-900/50 to-black/50 backdrop-blur-sm ${selectedWebBuilder === builder.name
-                                  ? "border-purple-500 shadow-lg shadow-purple-500/20"
-                                  : "border-gray-700 hover:border-purple-500/50"
-                                }`}>
-                                {selectedWebBuilder === builder.name && (
-                                  <div className="absolute top-4 right-4">
-                                    <CheckCircle className="w-6 h-6 text-purple-400" />
-                                  </div>
-                                )}
-
-                                <div className="text-center">
-                                  <div className="text-4xl mb-4">{builder.icon}</div>
-                                  <h4 className="text-xl font-bold text-gray-100 mb-2">{builder.name}</h4>
-                                  <p className="text-gray-400 text-sm mb-4">{builder.description}</p>
-                                  
-                                  <div className="space-y-2 mb-4">
-                                    {builder.features.slice(0, 3).map((feature, featureIndex) => (
-                                      <div key={featureIndex} className="flex items-center gap-2 text-sm text-gray-300">
-                                        <Check className="w-3 h-3 text-emerald-400 flex-shrink-0" />
-                                        <span>{feature}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-
-                                  <Badge 
-                                    variant="secondary" 
-                                    className={`text-xs ${
-                                      builder.complexity === 'Beginner to Advanced' ? 'bg-green-500/20 text-green-400' :
-                                      builder.complexity === 'Intermediate to Advanced' ? 'bg-yellow-500/20 text-yellow-400' :
-                                      builder.complexity === 'Advanced' ? 'bg-red-500/20 text-red-400' :
-                                      'bg-blue-500/20 text-blue-400'
-                                    }`}
-                                  >
-                                    {builder.complexity}
-                                  </Badge>
-                                </div>
-                              </div>
-                            </motion.div>
-                          ))}
-                        </div>
-
-                        <div className="flex justify-between pt-6">
                           <Button
-                            variant="outline"
-                            onClick={() => setStage(1)}
-                            className="border-gray-600 text-gray-300 hover:bg-gray-800"
-                          >
-                            <ChevronRight className="w-4 h-4 mr-2 rotate-180" />
-                            Back
-                          </Button>
-                          <Button
+                            type="button"
                             onClick={() => {
-                              if (selectedWebBuilder === "") {
-                                toast.error("Please select a web builder");
-                              } else {
-                                setStage(3);
+                              const nameError = validateProjectName(projectDetails.name);
+                              if (nameError) {
+                                setProjectError(true);
+                                setErrorMsg(nameError);
+                                toast.error(nameError);
+                                return;
                               }
+                              if (!projectDetails.dbname || !projectDetails.dbuser || !projectDetails.dbpass) {
+                                toast.error("Please fill all database fields or use Auto Generate");
+                                return;
+                              }
+                              setStage(2);
                             }}
-                            className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white border-0"
+                            className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white border-0 h-12 text-lg font-semibold rounded-xl shadow-lg shadow-purple-500/25"
                           >
-                            Next: Select Plan
-                            <ArrowRight className="ml-2 h-4 w-4" />
+                            Next: Choose Web Builder
+                            <ArrowRight className="ml-2 h-5 w-5" />
                           </Button>
-                        </div>
-                      </motion.div>
-                    )}
+                        </motion.div>
+                      )}
 
-                    {/* Stage 3: Select Plan */}
-                    {stage === 3 && (
-                      <motion.div
-                        key="stage3"
-                        initial="hidden"
-                        animate="visible"
-                        exit="hidden"
-                        variants={slideIn}
-                        className="space-y-6"
-                      >
-                        <div className="text-center mb-8">
-                          <h3 className="text-2xl font-bold text-gray-100 mb-2">Choose Your Plan</h3>
-                          <p className="text-gray-400">Select the perfect plan for your web builder project</p>
-                        </div>
+                      {/* Stage 2: Web Builder Selection */}
+                      {stage === 2 && (
+                        <motion.div
+                          key="stage2"
+                          initial="hidden"
+                          animate="visible"
+                          exit="hidden"
+                          variants={slideIn}
+                          className="space-y-6"
+                        >
+                          <div className="text-center mb-8">
+                            <h3 className="text-2xl font-bold text-gray-100 mb-2">Choose Your Web Builder</h3>
+                            <p className="text-gray-400">Select the platform that best fits your project needs</p>
+                          </div>
 
-                        <RadioGroup value={selectedPlan.name} className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                          {displayPricing.map((plan: any, index) => (
-                            <motion.div
-                              key={index}
-                              whileHover={{ scale: 1.02, y: -5 }}
-                              whileTap={{ scale: 0.98 }}
-                              className="relative cursor-pointer"
-                              onClick={() =>
+                          <RadioGroup value={selectedWebBuilder} onValueChange={setSelectedWebBuilder} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {webBuilders.map((builder, index) => (
+                              <motion.div
+                                key={builder.name}
+                                whileHover={{ scale: 1.02, y: -5 }}
+                                whileTap={{ scale: 0.98 }}
+                                className="relative cursor-pointer"
+                              >
+                                <div className={`relative p-6 rounded-2xl border-2 transition-all duration-300 bg-gradient-to-br from-gray-900/50 to-black/50 backdrop-blur-sm ${selectedWebBuilder === builder.name
+                                    ? "border-purple-500 shadow-lg shadow-purple-500/20"
+                                    : "border-gray-700 hover:border-purple-500/50"
+                                  }`}>
+                                  <RadioGroupItem value={builder.name} id={builder.name} className="sr-only" />
+
+                                  {selectedWebBuilder === builder.name && (
+                                    <div className="absolute top-4 right-4">
+                                      <CheckCircle className="w-6 h-6 text-purple-400" />
+                                    </div>
+                                  )}
+
+                                  <Label htmlFor={builder.name} className="cursor-pointer">
+                                    <div className="text-center">
+                                      <div className="text-4xl mb-4">{builder.icon}</div>
+                                      <h4 className="text-xl font-bold text-gray-100 mb-2">{builder.name}</h4>
+                                      <p className="text-gray-400 text-sm mb-4">{builder.description}</p>
+                                      
+                                      <div className="space-y-2 mb-4">
+                                        {builder.features.slice(0, 3).map((feature, featureIndex) => (
+                                          <div key={featureIndex} className="flex items-center gap-2 text-sm text-gray-300">
+                                            <Check className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                                            <span>{feature}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+
+                                      <Badge 
+                                        variant="secondary" 
+                                        className={`text-xs ${
+                                          builder.complexity === 'Beginner to Advanced' ? 'bg-green-500/20 text-green-400' :
+                                          builder.complexity === 'Intermediate to Advanced' ? 'bg-yellow-500/20 text-yellow-400' :
+                                          builder.complexity === 'Advanced' ? 'bg-red-500/20 text-red-400' :
+                                          'bg-blue-500/20 text-blue-400'
+                                        }`}
+                                      >
+                                        {builder.complexity}
+                                      </Badge>
+                                    </div>
+                                  </Label>
+                                </div>
+                              </motion.div>
+                            ))}
+                          </RadioGroup>
+
+                          <div className="flex justify-between pt-6">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => setStage(1)}
+                              className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                            >
+                              <ChevronRight className="w-4 h-4 mr-2 rotate-180" />
+                              Back
+                            </Button>
+                            <Button
+                              type="button"
+                              onClick={() => {
+                                if (!selectedWebBuilder) {
+                                  toast.error("Please select a web builder");
+                                } else {
+                                  setStage(3);
+                                }
+                              }}
+                              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white border-0"
+                            >
+                              Next: Select Plan
+                              <ArrowRight className="ml-2 h-4 w-4" />
+                            </Button>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {/* Stage 3: Select Plan */}
+                      {stage === 3 && (
+                        <motion.div
+                          key="stage3"
+                          initial="hidden"
+                          animate="visible"
+                          exit="hidden"
+                          variants={slideIn}
+                          className="space-y-6"
+                        >
+                          <div className="text-center mb-8">
+                            <h3 className="text-2xl font-bold text-gray-100 mb-2">Choose Your Plan</h3>
+                            <p className="text-gray-400">Select the perfect plan for your web builder project</p>
+                          </div>
+
+                          {displayPricing.length === 0 ? (
+                            <div className="text-center py-8">
+                              <p className="text-gray-400">Loading pricing plans...</p>
+                            </div>
+                          ) : (
+                            <RadioGroup value={selectedPlan.name} onValueChange={(value) => {
+                              const plan = displayPricing.find(p => p.name === value);
+                              if (plan) {
                                 setSelectedPlan({
                                   name: plan.name,
                                   id: plan._id,
@@ -587,282 +696,296 @@ export default function CreateWebbuilder() {
                                   ram: plan.ram,
                                   storage: plan.storage,
                                   bandwidth: plan.bandwidth
-                                })
+                                });
                               }
-                            >
-                              <div className={`relative p-6 rounded-2xl border-2 transition-all duration-300 bg-gradient-to-br from-gray-900/50 to-black/50 backdrop-blur-sm ${selectedPlan.name === plan.name
-                                  ? "border-purple-500 shadow-lg shadow-purple-500/20"
-                                  : "border-gray-700 hover:border-purple-500/50"
-                                }`}>
-                                <RadioGroupItem value={plan.name} id={plan.name} className="sr-only" />
+                            }} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                              {displayPricing.map((plan, index) => (
+                                <motion.div
+                                  key={index}
+                                  whileHover={{ scale: 1.02, y: -5 }}
+                                  whileTap={{ scale: 0.98 }}
+                                  className="relative cursor-pointer"
+                                >
+                                  <div className={`relative p-6 rounded-2xl border-2 transition-all duration-300 bg-gradient-to-br from-gray-900/50 to-black/50 backdrop-blur-sm ${selectedPlan.name === plan.name
+                                      ? "border-purple-500 shadow-lg shadow-purple-500/20"
+                                      : "border-gray-700 hover:border-purple-500/50"
+                                    }`}>
+                                    <RadioGroupItem value={plan.name} id={plan.name} className="sr-only" />
 
-                                {selectedPlan.name === plan.name && (
-                                  <div className="absolute top-4 right-4">
-                                    <CheckCircle className="w-6 h-6 text-purple-400" />
+                                    {selectedPlan.name === plan.name && (
+                                      <div className="absolute top-4 right-4">
+                                        <CheckCircle className="w-6 h-6 text-purple-400" />
+                                      </div>
+                                    )}
+
+                                    <Label htmlFor={plan.name} className="cursor-pointer">
+                                      <div className="text-center">
+                                        <div className="text-xl font-bold text-gray-100 mb-2">
+                                          {plan.name}
+                                        </div>
+                                        <p className="text-gray-400 mt-2 text-sm">
+                                          {plan.name.includes("Starter") && "Perfect for personal websites"}
+                                          {plan.name.includes("Pro") && "Ideal for business websites"}
+                                          {plan.name.includes("Enterprise") && "For high-traffic websites"}
+                                        </p>
+                                      </div>
+
+                                      <div className="mt-6 grid grid-cols-2 gap-4">
+                                        <div className="flex items-center gap-2">
+                                          <Cpu className="w-4 h-4 text-purple-400" />
+                                          <span className="text-sm text-gray-300">{plan.cpu}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <MemoryStick className="w-4 h-4 text-blue-400" />
+                                          <span className="text-sm text-gray-300">{plan.ram}</span>
+                                        </div>
+                                      </div>
+
+                                      <div className="mt-4 grid grid-cols-2 gap-4">
+                                        <div className="flex items-center gap-2">
+                                          <HardDrive className="w-4 h-4 text-green-400" />
+                                          <span className="text-sm text-gray-300">{plan.storage}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <Gauge className="w-4 h-4 text-orange-400" />
+                                          <span className="text-sm text-gray-300">{plan.bandwidth}</span>
+                                        </div>
+                                      </div>
+
+                                      <Separator className="my-4 bg-gray-700" />
+
+                                      <div className="text-center">
+                                        <div className="text-2xl font-bold text-gray-100">
+                                          ₹{plan.pricephour}
+                                          <span className="text-base font-normal text-gray-400">/hour</span>
+                                        </div>
+                                        <div className="text-sm text-gray-400 mt-1">
+                                          ~₹{plan.pricepmonth}/month
+                                        </div>
+                                      </div>
+
+                                      <div className="mt-4 space-y-2">
+                                        {plan.features.slice(0, 3).map((feature: string, featureIndex: number) => (
+                                          <div key={featureIndex} className="flex items-center gap-2">
+                                            <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                                            <span className="text-sm text-gray-300">{feature}</span>
+                                          </div>
+                                        ))}
+                                        {plan.features.length > 3 && (
+                                          <div className="text-xs text-gray-400">
+                                            +{plan.features.length - 3} more features
+                                          </div>
+                                        )}
+                                      </div>
+                                    </Label>
                                   </div>
-                                )}
+                                </motion.div>
+                              ))}
+                            </RadioGroup>
+                          )}
 
-                                <div className="text-center">
-                                  <Label htmlFor={plan.name} className="text-xl font-bold text-gray-100 cursor-pointer">
-                                    {plan.name}
-                                  </Label>
-                                  <p className="text-gray-400 mt-2 text-sm">
-                                    {plan.name.includes("Starter") && "Perfect for personal websites"}
-                                    {plan.name.includes("Pro") && "Ideal for business websites"}
-                                    {plan.name.includes("Enterprise") && "For high-traffic websites"}
-                                  </p>
+                          <div className="flex justify-between pt-6">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => setStage(2)}
+                              className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                            >
+                              <ChevronRight className="w-4 h-4 mr-2 rotate-180" />
+                              Back
+                            </Button>
+                            <Button
+                              type="button"
+                              onClick={() => {
+                                if (!selectedPlan.id) {
+                                  toast.error("Please select a plan");
+                                } else {
+                                  setStage(4);
+                                }
+                              }}
+                              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white border-0"
+                            >
+                              Next: Review
+                              <ArrowRight className="ml-2 h-4 w-4" />
+                            </Button>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {/* Stage 4: Review & Deploy */}
+                      {stage === 4 && (
+                        <motion.div
+                          key="stage4"
+                          initial="hidden"
+                          animate="visible"
+                          exit="hidden"
+                          variants={slideIn}
+                          className="space-y-6"
+                        >
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-2xl font-bold text-gray-100">Review & Deploy</h3>
+                            <div className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl">
+                              <CheckCircle className="w-5 h-5 text-green-400" />
+                              <div className="text-center">
+                                <div className="text-xs text-green-400 font-medium">Ready to Deploy</div>
+                                <div className="text-lg font-bold text-white">
+                                  {selectedWebBuilder}
                                 </div>
+                              </div>
+                            </div>
+                          </div>
 
-                                <div className="mt-6 grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Project Overview */}
+                            <Card className="bg-gradient-to-br from-gray-900/50 to-black/50 border-gray-700">
+                              <CardHeader className="pb-4">
+                                <CardTitle className="text-gray-100 flex items-center gap-2">
+                                  <Globe className="w-5 h-5 text-purple-400" />
+                                  Project Details
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent className="space-y-3">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-gray-400">Name:</span>
+                                  <span className="text-gray-100 font-medium">{projectDetails.name || "Untitled"}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-gray-400">Web Builder:</span>
+                                  <div className="flex items-center gap-2">
+                                    <Globe className="w-4 h-4 text-purple-400" />
+                                    <span className="text-gray-100">{selectedWebBuilder || "Not selected"}</span>
+                                  </div>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-gray-400">Database:</span>
+                                  <span className="text-gray-100 text-sm font-mono truncate max-w-32">
+                                    {projectDetails.dbname || "Not configured"}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-gray-400">DB User:</span>
+                                  <span className="text-gray-100 text-sm font-mono">
+                                    {projectDetails.dbuser || "Not set"}
+                                  </span>
+                                </div>
+                              </CardContent>
+                            </Card>
+
+                            {/* Plan Details */}
+                            <Card className="bg-gradient-to-br from-gray-900/50 to-black/50 border-gray-700">
+                              <CardHeader className="pb-4">
+                                <CardTitle className="text-gray-100 flex items-center gap-2">
+                                  <Zap className="w-5 h-5 text-blue-400" />
+                                  Selected Plan
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent className="space-y-3">
+                                <div className="text-center">
+                                  <div className="text-xl font-bold text-blue-400 mb-2">
+                                    {selectedPlan.name || "No plan selected"}
+                                  </div>
+                                  <div className="text-2xl font-bold text-gray-100">
+                                    ₹{selectedPlan.pricephour}
+                                    <span className="text-base font-normal text-gray-400">/hour</span>
+                                  </div>
+                                  <div className="text-sm text-gray-400">
+                                    ~₹{selectedPlan.pricepmonth}/month
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2 text-sm">
                                   <div className="flex items-center gap-2">
                                     <Cpu className="w-4 h-4 text-purple-400" />
-                                    <span className="text-sm text-gray-300">{plan.cpu}</span>
+                                    <span className="text-gray-300">{selectedPlan.cpu}</span>
                                   </div>
                                   <div className="flex items-center gap-2">
                                     <MemoryStick className="w-4 h-4 text-blue-400" />
-                                    <span className="text-sm text-gray-300">{plan.ram}</span>
+                                    <span className="text-gray-300">{selectedPlan.ram}</span>
                                   </div>
                                 </div>
-
-                                <div className="mt-4 grid grid-cols-2 gap-4">
-                                  <div className="flex items-center gap-2">
-                                    <HardDrive className="w-4 h-4 text-green-400" />
-                                    <span className="text-sm text-gray-300">{plan.storage}</span>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <Gauge className="w-4 h-4 text-orange-400" />
-                                    <span className="text-sm text-gray-300">{plan.bandwidth}</span>
-                                  </div>
+                                <div className="flex items-center gap-2 text-sm text-gray-400 justify-center">
+                                  <Coffee className="w-4 h-4" />
+                                  <span>Est. setup time: 5-10 minutes</span>
                                 </div>
-
-                                <Separator className="my-4 bg-gray-700" />
-
-                                <div className="text-center">
-                                  <div className="text-2xl font-bold text-gray-100">
-                                    ₹{plan.pricephour}
-                                    <span className="text-base font-normal text-gray-400">/hour</span>
-                                  </div>
-                                  <div className="text-sm text-gray-400 mt-1">
-                                    ~₹{plan.pricepmonth}/month
-                                  </div>
-                                </div>
-
-                                <div className="mt-4 space-y-2">
-                                  {plan.features.slice(0, 3).map((feature: any, featureIndex: number) => (
-                                    <div key={featureIndex} className="flex items-center gap-2">
-                                      <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                                      <span className="text-sm text-gray-300">{String(feature)}</span>
-                                    </div>
-                                  ))}
-                                  {plan.features.length > 3 && (
-                                    <div className="text-xs text-gray-400">
-                                      +{plan.features.length - 3} more features
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </motion.div>
-                          ))}
-                        </RadioGroup>
-
-                        <div className="flex justify-between pt-6">
-                          <Button
-                            variant="outline"
-                            onClick={() => setStage(2)}
-                            className="border-gray-600 text-gray-300 hover:bg-gray-800"
-                          >
-                            <ChevronRight className="w-4 h-4 mr-2 rotate-180" />
-                            Back
-                          </Button>
-                          <Button
-                            onClick={() => {
-                              if (selectedPlan.name === "") {
-                                toast.error("Please select a plan");
-                              } else {
-                                setStage(4);
-                              }
-                            }}
-                            className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white border-0"
-                          >
-                            Next: Review
-                            <ArrowRight className="ml-2 h-4 w-4" />
-                          </Button>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {/* Stage 4: Review & Deploy */}
-                    {stage === 4 && (
-                      <motion.div
-                        key="stage4"
-                        initial="hidden"
-                        animate="visible"
-                        exit="hidden"
-                        variants={slideIn}
-                        className="space-y-6"
-                      >
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-2xl font-bold text-gray-100">Review & Deploy</h3>
-                          <div className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl">
-                            <CheckCircle className="w-5 h-5 text-green-400" />
-                            <div className="text-center">
-                              <div className="text-xs text-green-400 font-medium">Ready to Deploy</div>
-                              <div className="text-lg font-bold text-white">
-                                {selectedWebBuilder}
-                              </div>
-                            </div>
+                              </CardContent>
+                            </Card>
                           </div>
-                        </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {/* Project Overview */}
+                          {/* Database Configuration Review */}
                           <Card className="bg-gradient-to-br from-gray-900/50 to-black/50 border-gray-700">
                             <CardHeader className="pb-4">
                               <CardTitle className="text-gray-100 flex items-center gap-2">
-                                <Globe className="w-5 h-5 text-purple-400" />
-                                Project Details
+                                <Database className="w-5 h-5 text-green-400" />
+                                Database Configuration
                               </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-3">
-                              <div className="flex justify-between items-center">
-                                <span className="text-gray-400">Name:</span>
-                                <span className="text-gray-100 font-medium">{projectDetails.name || "Untitled"}</span>
+                            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div className="space-y-2">
+                                <div className="text-xs text-gray-400">Database Name:</div>
+                                <code className="block text-sm bg-black/50 p-2 rounded border border-gray-700 text-green-400">
+                                  {projectDetails.dbname}
+                                </code>
                               </div>
-                              <div className="flex justify-between items-center">
-                                <span className="text-gray-400">Web Builder:</span>
-                                <div className="flex items-center gap-2">
-                                  <Globe className="w-4 h-4 text-purple-400" />
-                                  <span className="text-gray-100">{selectedWebBuilder || "Not selected"}</span>
-                                </div>
+                              <div className="space-y-2">
+                                <div className="text-xs text-gray-400">Database User:</div>
+                                <code className="block text-sm bg-black/50 p-2 rounded border border-gray-700 text-blue-400">
+                                  {projectDetails.dbuser}
+                                </code>
                               </div>
-                              <div className="flex justify-between items-center">
-                                <span className="text-gray-400">Database:</span>
-                                <span className="text-gray-100 text-sm font-mono truncate max-w-32">
-                                  {projectDetails.dbname || "Not configured"}
-                                </span>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <span className="text-gray-400">DB User:</span>
-                                <span className="text-gray-100 text-sm font-mono">
-                                  {projectDetails.dbuser || "Not set"}
-                                </span>
+                              <div className="space-y-2">
+                                <div className="text-xs text-gray-400">Database Password:</div>
+                                <code className="block text-sm bg-black/50 p-2 rounded border border-gray-700 text-purple-400">
+                                  {"•".repeat(Math.min(projectDetails.dbpass.length, 12))}
+                                </code>
                               </div>
                             </CardContent>
                           </Card>
 
-                          {/* Plan Details */}
-                          <Card className="bg-gradient-to-br from-gray-900/50 to-black/50 border-gray-700">
-                            <CardHeader className="pb-4">
-                              <CardTitle className="text-gray-100 flex items-center gap-2">
-                                <Zap className="w-5 h-5 text-blue-400" />
-                                Selected Plan
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-3">
-                              <div className="text-center">
-                                <div className="text-xl font-bold text-blue-400 mb-2">
-                                  {selectedPlan.name || "No plan selected"}
-                                </div>
-                                <div className="text-2xl font-bold text-gray-100">
-                                  ₹{selectedPlan.pricephour}
-                                  <span className="text-base font-normal text-gray-400">/hour</span>
-                                </div>
-                                <div className="text-sm text-gray-400">
-                                  ~₹{selectedPlan.pricepmonth}/month
-                                </div>
+                          {/* Important Notice */}
+                          <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-xl p-4">
+                            <div className="flex items-start gap-3">
+                              <AlertTriangle className="w-5 h-5 text-amber-400 mt-0.5" />
+                              <div>
+                                <h4 className="text-amber-400 font-medium">Important: Save Your Database Credentials</h4>
+                                <p className="text-amber-300/80 text-sm mt-1">
+                                  Please save your database credentials securely. You'll need them to complete the {selectedWebBuilder} installation after deployment.
+                                </p>
                               </div>
-                              <div className="grid grid-cols-2 gap-2 text-sm">
-                                <div className="flex items-center gap-2">
-                                  <Cpu className="w-4 h-4 text-purple-400" />
-                                  <span className="text-gray-300">{selectedPlan.cpu}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <MemoryStick className="w-4 h-4 text-blue-400" />
-                                  <span className="text-gray-300">{selectedPlan.ram}</span>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-2 text-sm text-gray-400 justify-center">
-                                <Coffee className="w-4 h-4" />
-                                <span>Est. setup time: 5-10 minutes</span>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        </div>
-
-                        {/* Database Configuration Review */}
-                        <Card className="bg-gradient-to-br from-gray-900/50 to-black/50 border-gray-700">
-                          <CardHeader className="pb-4">
-                            <CardTitle className="text-gray-100 flex items-center gap-2">
-                              <Database className="w-5 h-5 text-green-400" />
-                              Database Configuration
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="space-y-2">
-                              <div className="text-xs text-gray-400">Database Name:</div>
-                              <code className="block text-sm bg-black/50 p-2 rounded border border-gray-700 text-green-400">
-                                {projectDetails.dbname}
-                              </code>
-                            </div>
-                            <div className="space-y-2">
-                              <div className="text-xs text-gray-400">Database User:</div>
-                              <code className="block text-sm bg-black/50 p-2 rounded border border-gray-700 text-blue-400">
-                                {projectDetails.dbuser}
-                              </code>
-                            </div>
-                            <div className="space-y-2">
-                              <div className="text-xs text-gray-400">Database Password:</div>
-                              <code className="block text-sm bg-black/50 p-2 rounded border border-gray-700 text-purple-400">
-                                {"*".repeat(projectDetails.dbpass.length)}
-                              </code>
-                            </div>
-                          </CardContent>
-                        </Card>
-
-                        {/* Important Notice */}
-                        <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-xl p-4">
-                          <div className="flex items-start gap-3">
-                            <AlertTriangle className="w-5 h-5 text-amber-400 mt-0.5" />
-                            <div>
-                              <h4 className="text-amber-400 font-medium">Important: Save Your Database Credentials</h4>
-                              <p className="text-amber-300/80 text-sm mt-1">
-                                Please save your database credentials securely. You&apos;ll need them to complete the {selectedWebBuilder} installation after deployment.
-                              </p>
                             </div>
                           </div>
-                        </div>
 
-                        {/* Actions */}
-                        <div className="flex justify-between pt-6">
-                          <Button
-                            variant="outline"
-                            onClick={() => setStage(3)}
-                            className="border-gray-600 text-gray-300 hover:bg-gray-800"
-                          >
-                            <ChevronRight className="w-4 h-4 mr-2 rotate-180" />
-                            Back to Plans
-                          </Button>
-                          <Button
-                            onClick={handleSubmit}
-                            disabled={loading}
-                            className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white border-0 px-8 h-12 text-lg font-semibold shadow-lg shadow-purple-500/25"
-                          >
-                            {loading ? (
-                              <>
-                                <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                                Deploying...
-                              </>
-                            ) : (
-                              <>
-                                Deploy Now
-                                <Rocket className="ml-2 h-5 w-5" />
-                              </>
-                            )}
-                          </Button>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                          {/* Actions */}
+                          <div className="flex justify-between pt-6">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => setStage(3)}
+                              className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                            >
+                              <ChevronRight className="w-4 h-4 mr-2 rotate-180" />
+                              Back to Plans
+                            </Button>
+                            <Button
+                              type="submit"
+                              disabled={loading}
+                              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white border-0 px-8 h-12 text-lg font-semibold shadow-lg shadow-purple-500/25"
+                            >
+                              {loading ? (
+                                <>
+                                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                                  Deploying...
+                                </>
+                              ) : (
+                                <>
+                                  Deploy Now
+                                  <Rocket className="ml-2 h-5 w-5" />
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </form>
                 </CardContent>
               </Card>
             </motion.div>

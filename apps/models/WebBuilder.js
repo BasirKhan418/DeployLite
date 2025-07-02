@@ -16,8 +16,11 @@ endbilingdate:{type:Date},
 billstatus:{type:String},
 customdomain:{type:String},
 arn:{type:String,default:""},
-webbulder:{type:String,default:""},
+webbuilder:{type:String,default:"WordPress"},
 projecturl:{type:String,default:""},
+dbname:{type:String,required:true},
+dbuser:{type:String,required:true},
+dbpass:{type:String,required:true},
 },{timestamps:true})
 mongoose.models = {}
 export default mongoose.model.WebBuilder||mongoose.model('WebBuilder',WebBuilderSchema);
