@@ -146,7 +146,7 @@ const VirtualSpaceOverview: React.FC<VirtualSpaceOverviewProps> = ({ projectdata
 
   const handleAccessIDE = () => {
     if (projectdata.url) {
-      window.open(`http://${projectdata.url}:8080`, '_blank', 'noopener,noreferrer');
+      window.open(`http://${projectdata.projecturl}`, '_blank', 'noopener,noreferrer');
     } else if (projectdata.projecturl) {
       window.open(`https://${projectdata.projecturl}`, '_blank', 'noopener,noreferrer');
     } else {
@@ -155,7 +155,7 @@ const VirtualSpaceOverview: React.FC<VirtualSpaceOverviewProps> = ({ projectdata
   };
 
   const handleCopyUrl = () => {
-    const url = projectdata.url ? `http://${projectdata.url}:8080` : 
+    const url = projectdata.url ? `http://${projectdata.projecturl}` : 
                  projectdata.projecturl ? `https://${projectdata.projecturl}` : '';
     if (url) {
       navigator.clipboard.writeText(url);
