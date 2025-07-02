@@ -264,7 +264,7 @@ export default function VirtualSpace() {
     e.preventDefault();
     e.stopPropagation();
     if (project.url) {
-      window.open(`http://${project.url}:8080`, '_blank', 'noopener,noreferrer');
+      window.open(`http://${project.url}`, '_blank', 'noopener,noreferrer');
     } else if (project.projecturl) {
       window.open(`https://${project.projecturl}`, '_blank', 'noopener,noreferrer');
     } else {

@@ -387,7 +387,7 @@ export default function VirtualSpace() {
     switch (action) {
       case "access":
         if (workspace.url) {
-          window.open(`http://${workspace.url}:8080`, "_blank");
+          window.open(`http://${workspace.url}`, "_blank");
         } else if (workspace.projecturl) {
           window.open(`https://${workspace.projecturl}`, "_blank");
         } else {
