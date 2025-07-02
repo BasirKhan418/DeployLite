@@ -19,12 +19,8 @@ import {
   HardDrive,
   Zap,
   Clock,
-  Users,
   Settings,
-  Shield,
   CloudLightning,
-  Database,
-  GitBranch,
   Activity,
   TrendingUp,
   Eye,
@@ -36,120 +32,43 @@ import {
   XCircle,
   Loader2,
   Sparkles,
-  Brain,
-  Rocket,
-  Globe,
-  Lock,
   Calendar,
   BarChart3,
-  Layers,
   Server,
-  Wifi,
+  Globe,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { useAppSelector } from "@/lib/hook";
+import Connect from "@/utils/Project/Connect";
+import NoProject from "@/utils/Project/NoProject";
 
-// Workspace Interface
-interface Workspace {
-  id: string;
+// Virtual Space Interface based on the actual model
+interface VirtualSpace {
+  _id: string;
   name: string;
-  template: string;
-  status: "running" | "stopped" | "building" | "error";
-  lastAccessed: string;
-  cpu: number;
-  memory: number;
-  storage: number;
-  ide: string;
-  owner: string;
-  team?: string;
-  uptime: string;
-  cost: number;
-  aiAgents: number;
-  environment: "development" | "staging" | "production";
-  repository?: string;
-  branch?: string;
-  buildTime?: string;
+  projectstatus: "creating" | "live" | "failed" | "deploying";
+  startdate: string;
+  updatedAt: string;
+  url?: string;
+  projecturl?: string;
+  cpuusage: string;
+  memoryusage: string;
+  storageusage: string;
+  billstatus: string;
+  arn?: string;
+  userid: string;
+  planid: {
+    name: string;
+    cpu: string;
+    ram: string;
+    storage: string;
+    bandwidth: string;
+    pricephour: string;
+    pricepmonth: string;
+  };
 }
-
-// Mock data
-const mockWorkspaces: Workspace[] = [
-  {
-    id: "ws-001",
-    name: "e-commerce-api",
-    template: "Node.js + PostgreSQL",
-    status: "running",
-    lastAccessed: "2 minutes ago",
-    cpu: 45,
-    memory: 60,
-    storage: 25,
-    ide: "VS Code",
-    owner: "John Doe",
-    team: "Backend Team",
-    uptime: "2h 34m",
-    cost: 0.45,
-    aiAgents: 2,
-    environment: "development",
-    repository: "deploylite/e-commerce",
-    branch: "feature/payment",
-    buildTime: "3m 21s"
-  },
-  {
-    id: "ws-002",
-    name: "ai-dashboard",
-    template: "Python + ML Stack",
-    status: "running",
-    lastAccessed: "15 minutes ago",
-    cpu: 80,
-    memory: 85,
-    storage: 60,
-    ide: "JetBrains",
-    owner: "Sarah Wilson",
-    team: "AI Team",
-    uptime: "1h 12m",
-    cost: 1.25,
-    aiAgents: 5,
-    environment: "development",
-    repository: "deploylite/ai-models",
-    branch: "main",
-    buildTime: "8m 15s"
-  },
-  {
-    id: "ws-003",
-    name: "mobile-client",
-    template: "React Native",
-    status: "stopped",
-    lastAccessed: "3 hours ago",
-    cpu: 0,
-    memory: 0,
-    storage: 15,
-    ide: "VS Code",
-    owner: "Mike Chen",
-    team: "Mobile Team",
-    uptime: "0m",
-    cost: 0.00,
-    aiAgents: 1,
-    environment: "development",
-    repository: "deploylite/mobile-app",
-    branch: "develop"
-  },
-  {
-    id: "ws-004",
-    name: "data-pipeline",
-    template: "Apache Spark",
-    status: "building",
-    lastAccessed: "5 minutes ago",
-    cpu: 25,
-    memory: 40,
-    storage: 80,
-    ide: "Jupyter",
-    owner: "Alex Rodriguez",
-    team: "Data Team",
-    uptime: "0m",
-    cost: 0.15,
-    aiAgents: 0,
-    environment: "staging",
-    repository: "deploylite/data-pipeline",
-    branch: "feature/optimization"
-  }
-];
 
 // Animation variants
 const containerVariants = {
@@ -175,12 +94,12 @@ const itemVariants = {
 };
 
 // Utility Components
-const StatusBadge: React.FC<{ status: Workspace["status"] }> = ({ status }) => {
+const StatusBadge: React.FC<{ status: VirtualSpace["projectstatus"] }> = ({ status }) => {
   const statusConfig = {
-    running: { color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30", icon: CheckCircle },
-    stopped: { color: "bg-gray-500/10 text-gray-400 border-gray-500/30", icon: Square },
-    building: { color: "bg-amber-500/10 text-amber-400 border-amber-500/30", icon: Loader2 },
-    error: { color: "bg-red-500/10 text-red-400 border-red-500/30", icon: XCircle },
+    live: { color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30", icon: CheckCircle },
+    creating: { color: "bg-purple-500/10 text-purple-400 border-purple-500/30", icon: Clock },
+    deploying: { color: "bg-amber-500/10 text-amber-400 border-amber-500/30", icon: Loader2 },
+    failed: { color: "bg-red-500/10 text-red-400 border-red-500/30", icon: XCircle },
   };
 
   const config = statusConfig[status];
@@ -188,7 +107,7 @@ const StatusBadge: React.FC<{ status: Workspace["status"] }> = ({ status }) => {
 
   return (
     <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-medium ${config.color}`}>
-      <Icon className={`w-3 h-3 ${status === "building" ? "animate-spin" : ""}`} />
+      <Icon className={`w-3 h-3 ${status === "deploying" ? "animate-spin" : ""}`} />
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </div>
   );
@@ -209,12 +128,15 @@ const ResourceBar: React.FC<{ value: number; label: string; color: string }> = (
   </div>
 );
 
-const QuickStats: React.FC = () => {
+const QuickStats: React.FC<{ spaces: VirtualSpace[] }> = ({ spaces }) => {
+  const activeSpaces = spaces.filter(s => s.projectstatus === 'live').length;
+  const totalCost = spaces.reduce((sum, space) => sum + parseFloat(space.planid?.pricephour || '0'), 0);
+  
   const stats = [
-    { label: "Active Workspaces", value: "12", change: "+3", icon: Activity, color: "text-emerald-400" },
-    { label: "Total Users", value: "48", change: "+5", icon: Users, color: "text-blue-400" },
-    { label: "Monthly Cost", value: "$1,247", change: "-12%", icon: TrendingUp, color: "text-purple-400" },
-    { label: "AI Agents", value: "23", change: "+8", icon: Brain, color: "text-pink-400" },
+    { label: "Active Spaces", value: activeSpaces.toString(), change: "", icon: Activity, color: "text-emerald-400" },
+    { label: "Total Spaces", value: spaces.length.toString(), change: "", icon: CloudLightning, color: "text-blue-400" },
+    { label: "Hourly Cost", value: `₹${totalCost.toFixed(2)}`, change: "", icon: TrendingUp, color: "text-purple-400" },
+    { label: "This Month", value: `₹${(totalCost * 24 * 30).toFixed(0)}`, change: "", icon: BarChart3, color: "text-pink-400" },
   ];
 
   return (
@@ -233,11 +155,6 @@ const QuickStats: React.FC = () => {
                 <div className={`p-2 bg-gradient-to-r from-gray-800/50 to-gray-900/50 rounded-lg ${stat.color}`}>
                   <stat.icon className="w-5 h-5" />
                 </div>
-                <div className={`text-xs px-2 py-1 rounded-full ${
-                  stat.change.startsWith('+') ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
-                }`}>
-                  {stat.change}
-                </div>
               </div>
               <div className="text-2xl font-bold text-gray-100 mb-1">{stat.value}</div>
               <div className="text-sm text-gray-400">{stat.label}</div>
@@ -249,20 +166,19 @@ const QuickStats: React.FC = () => {
   );
 };
 
-const WorkspaceCard: React.FC<{ workspace: Workspace; onAction: (action: string, workspace: Workspace) => void }> = ({ 
-  workspace, 
-  onAction 
-}) => {
-  const getIdeIcon = (ide: string) => {
-    switch (ide.toLowerCase()) {
-      case "vs code": return Code;
-      case "jetbrains": return Terminal;
-      case "jupyter": return Database;
-      default: return Monitor;
-    }
+const VirtualSpaceCard: React.FC<{ 
+  workspace: VirtualSpace; 
+  onAction: (action: string, workspace: VirtualSpace) => void 
+}> = ({ workspace, onAction }) => {
+  
+  const getUptime = (startdate: string) => {
+    const start = new Date(startdate);
+    const now = new Date();
+    const diff = now.getTime() - start.getTime();
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours}h ${minutes}m`;
   };
-
-  const IdeIcon = getIdeIcon(workspace.ide);
 
   return (
     <motion.div
@@ -277,18 +193,18 @@ const WorkspaceCard: React.FC<{ workspace: Workspace; onAction: (action: string,
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-lg">
-              <IdeIcon className="w-5 h-5 text-pink-400" />
+              <Terminal className="w-5 h-5 text-pink-400" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-100 group-hover:text-pink-300 transition-colors">
                 {workspace.name}
               </h3>
-              <p className="text-sm text-gray-400">{workspace.template}</p>
+              <p className="text-sm text-gray-400">Virtual Development Space</p>
             </div>
           </div>
           
           <div className="flex items-center gap-2">
-            <StatusBadge status={workspace.status} />
+            <StatusBadge status={workspace.projectstatus} />
             <button
               onClick={() => onAction("menu", workspace)}
               className="p-1 hover:bg-gray-700/50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
@@ -298,54 +214,50 @@ const WorkspaceCard: React.FC<{ workspace: Workspace; onAction: (action: string,
           </div>
         </div>
 
-        {/* Environment & Repository */}
-        <div className="flex items-center gap-4 mb-4 text-sm">
-          <div className="flex items-center gap-2 text-gray-400">
-            <Layers className="w-4 h-4" />
-            <span className="capitalize">{workspace.environment}</span>
-          </div>
-          {workspace.repository && (
-            <div className="flex items-center gap-2 text-gray-400">
-              <GitBranch className="w-4 h-4" />
-              <span className="truncate max-w-32">{workspace.branch}</span>
-            </div>
-          )}
-        </div>
-
         {/* Resource Usage */}
         <div className="space-y-3 mb-4">
-          <ResourceBar value={workspace.cpu} label="CPU" color="bg-pink-500" />
-          <ResourceBar value={workspace.memory} label="Memory" color="bg-purple-500" />
-          <ResourceBar value={workspace.storage} label="Storage" color="bg-blue-500" />
+          <ResourceBar 
+            value={parseInt(workspace.cpuusage) || 0} 
+            label="CPU" 
+            color="bg-pink-500" 
+          />
+          <ResourceBar 
+            value={parseInt(workspace.memoryusage) || 0} 
+            label="Memory" 
+            color="bg-purple-500" 
+          />
+          <ResourceBar 
+            value={parseInt(workspace.storageusage) || 0} 
+            label="Storage" 
+            color="bg-blue-500" 
+          />
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-gray-400" />
-            <span className="text-gray-300">{workspace.uptime}</span>
+            <span className="text-gray-300">{getUptime(workspace.startdate)}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Brain className="w-4 h-4 text-purple-400" />
-            <span className="text-gray-300">{workspace.aiAgents} agents</span>
+            <Cpu className="w-4 h-4 text-purple-400" />
+            <span className="text-gray-300">{workspace.planid?.cpu || "N/A"}</span>
           </div>
         </div>
 
         {/* Footer */}
         <div className="flex items-center justify-between pt-4 border-t border-gray-700/50">
-          <div className="flex items-center gap-2 text-xs text-gray-400">
-            <Users className="w-3 h-3" />
-            <span>{workspace.owner}</span>
-            {workspace.team && <span>• {workspace.team}</span>}
+          <div className="text-xs text-gray-400">
+            {workspace.planid?.name || "No plan"}
           </div>
           <div className="text-xs text-gray-400">
-            ${workspace.cost.toFixed(2)}/hr
+            ₹{workspace.planid?.pricephour || "0"}/hr
           </div>
         </div>
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2 mt-4">
-          {workspace.status === "running" ? (
+          {workspace.projectstatus === "live" ? (
             <>
               <button
                 onClick={() => onAction("access", workspace)}
@@ -361,21 +273,29 @@ const WorkspaceCard: React.FC<{ workspace: Workspace; onAction: (action: string,
                 <Pause className="w-4 h-4" />
               </button>
             </>
-          ) : workspace.status === "stopped" ? (
-            <button
-              onClick={() => onAction("start", workspace)}
-              className="flex-1 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white text-sm py-2 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
-            >
-              <Play className="w-4 h-4" />
-              Start Workspace
-            </button>
-          ) : (
+          ) : workspace.projectstatus === "creating" || workspace.projectstatus === "deploying" ? (
             <button
               disabled
               className="flex-1 bg-gray-700/30 text-gray-500 text-sm py-2 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2"
             >
               <Loader2 className="w-4 h-4 animate-spin" />
-              {workspace.status === "building" ? "Building..." : "Processing..."}
+              {workspace.projectstatus === "creating" ? "Creating..." : "Deploying..."}
+            </button>
+          ) : workspace.projectstatus === "failed" ? (
+            <button
+              onClick={() => onAction("retry", workspace)}
+              className="flex-1 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white text-sm py-2 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
+            >
+              <Play className="w-4 h-4" />
+              Retry Deploy
+            </button>
+          ) : (
+            <button
+              onClick={() => onAction("start", workspace)}
+              className="flex-1 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white text-sm py-2 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
+            >
+              <Play className="w-4 h-4" />
+              Start Space
             </button>
           )}
         </div>
@@ -384,7 +304,7 @@ const WorkspaceCard: React.FC<{ workspace: Workspace; onAction: (action: string,
   );
 };
 
-const CreateWorkspaceButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
+const CreateVirtualSpaceButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
   <motion.div
     variants={itemVariants}
     whileHover={{ scale: 1.02, y: -4 }}
@@ -398,62 +318,147 @@ const CreateWorkspaceButton: React.FC<{ onClick: () => void }> = ({ onClick }) =
         <Plus className="w-8 h-8" />
       </div>
       <div className="text-center">
-        <h3 className="text-lg font-semibold mb-2">Create New Workspace</h3>
-        <p className="text-sm text-gray-500">Choose from our templates or bring your own</p>
+        <h3 className="text-lg font-semibold mb-2">Create Virtual Space</h3>
+        <p className="text-sm text-gray-500">Set up your cloud development environment</p>
       </div>
     </button>
   </motion.div>
 );
 
 export default function VirtualSpace() {
-  const [workspaces, setWorkspaces] = useState<Workspace[]>(mockWorkspaces);
+  const user = useAppSelector((state) => state.user.user);
+  const router = useRouter();
+  
+  const [virtualSpaces, setVirtualSpaces] = useState<VirtualSpace[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [hasProjectsLoaded, setHasProjectsLoaded] = useState(false);
 
-  const filteredWorkspaces = workspaces.filter(workspace => {
-    const matchesSearch = workspace.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         workspace.template.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         workspace.owner.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "all" || workspace.status === statusFilter;
+  // Fetch virtual spaces
+  const fetchVirtualSpaces = async () => {
+    if (!user?.email) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch('/api/project/virtualspace');
+      const data = await response.json();
+      
+      if (data.success && data.projectdata) {
+        setVirtualSpaces(data.projectdata);
+        setHasProjectsLoaded(true);
+      } else {
+        console.log('No virtual spaces found:', data.message);
+        setVirtualSpaces([]);
+        setHasProjectsLoaded(true);
+        if (data.message && !data.message.includes('No Projects found')) {
+          toast.error(data.message);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching virtual spaces:', error);
+      toast.error('Failed to fetch virtual spaces');
+      setVirtualSpaces([]);
+      setHasProjectsLoaded(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user?.email) {
+      fetchVirtualSpaces();
+    }
+  }, [user]);
+
+  const filteredSpaces = virtualSpaces.filter(space => {
+    const matchesSearch = space.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === "all" || space.projectstatus === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const handleWorkspaceAction = (action: string, workspace: Workspace) => {
-    console.log(`Action: ${action} on workspace:`, workspace.name);
-    // Implement actual actions here
+  const handleVirtualSpaceAction = (action: string, workspace: VirtualSpace) => {
+    console.log(`Action: ${action} on virtual space:`, workspace.name);
+    
     switch (action) {
-      case "start":
-        setWorkspaces(prev => prev.map(w => 
-          w.id === workspace.id ? { ...w, status: "building" } : w
-        ));
-        // Simulate build process
-        setTimeout(() => {
-          setWorkspaces(prev => prev.map(w => 
-            w.id === workspace.id ? { ...w, status: "running", uptime: "0m" } : w
-          ));
-        }, 3000);
+      case "access":
+        if (workspace.url) {
+          window.open(`http://${workspace.url}:8080`, "_blank");
+        } else if (workspace.projecturl) {
+          window.open(`https://${workspace.projecturl}`, "_blank");
+        } else {
+          toast.error("Virtual space URL not available");
+        }
         break;
       case "pause":
-        setWorkspaces(prev => prev.map(w => 
-          w.id === workspace.id ? { ...w, status: "stopped", uptime: "0m", cpu: 0, memory: 0 } : w
-        ));
+        // Implement pause functionality
+        toast.info("Pause functionality coming soon");
         break;
-      case "access":
-        // Open IDE in new tab/window
-        window.open(`/ai/workspace/${workspace.id}/ide`, "_blank");
+      case "start":
+        // Implement start functionality
+        toast.info("Start functionality coming soon");
+        break;
+      case "retry":
+        // Implement retry functionality
+        toast.info("Retry functionality coming soon");
         break;
       default:
         break;
     }
   };
 
-  const handleCreateWorkspace = () => {
-    console.log("Create new workspace");
-    // Navigate to workspace creation flow
-    window.location.href = "/ai/configure";
+  const handleCreateVirtualSpace = () => {
+    router.push("/project/createproject/virtualspace");
   };
+
+  const handleDeleteVirtualSpace = async (id: string) => {
+    if (!id) {
+      toast.error('Virtual space ID is missing');
+      return;
+    }
+    
+    try {
+      const confirm = window.confirm('Are you sure you want to delete this virtual space?');
+      if (!confirm) return;
+      
+      setLoading(true);
+      const response = await fetch(`/api/project/virtualspace`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id })
+      });
+      
+      const result = await response.json();
+      setLoading(false);
+      
+      if (result.success) {
+        toast.success(result.message);
+        fetchVirtualSpaces();
+      } else {
+        toast.error(result.message);
+      }
+    } catch (err) {
+      console.error('Error while deleting virtual space:', err);
+      setLoading(false);
+      toast.error('Error while deleting virtual space');
+    }
+  };
+
+  // Check if user is authenticated and has GitHub connected
+  if (!user?.connectgithub) {
+    return <Connect />;
+  }
+
+  // Show NoProject component if no virtual spaces and not loading
+  if (hasProjectsLoaded && virtualSpaces.length === 0 && !loading) {
+    return <NoProject name="virtualspace" />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900/50 to-black">
@@ -476,170 +481,221 @@ export default function VirtualSpace() {
                     Virtual Space
                   </h1>
                   <p className="text-gray-400 mt-1">
-                    Cloud development environments powered by infrastructure-as-code
+                    Cloud development environments powered by containerized infrastructure
                   </p>
                 </div>
               </div>
               
               <div className="flex items-center space-x-3">
-                <button
-                  onClick={handleCreateWorkspace}
+                <Button
+                  onClick={handleCreateVirtualSpace}
+                  disabled={loading}
                   className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white border-0 rounded-xl px-6 py-3 font-medium shadow-lg shadow-pink-500/25 transition-all duration-300 flex items-center gap-2"
                 >
-                  <Plus className="w-5 h-5" />
-                  New Workspace
-                </button>
+                  {loading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Plus className="w-5 h-5" />
+                  )}
+                  New Virtual Space
+                </Button>
               </div>
             </div>
           </motion.div>
 
           {/* Quick Stats */}
-          <QuickStats />
+          {virtualSpaces.length > 0 && (
+            <QuickStats spaces={virtualSpaces} />
+          )}
 
           {/* Filters and Controls */}
-          <motion.div variants={itemVariants}>
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-gradient-to-r from-gray-900/50 to-black/50 backdrop-blur-xl border border-pink-500/20 rounded-xl p-4">
-              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                {/* Search */}
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <input
-                    type="text"
-                    placeholder="Search workspaces..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 pr-4 py-2 bg-black/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-pink-500/50 transition-colors w-full sm:w-64"
-                  />
+          {virtualSpaces.length > 0 && (
+            <motion.div variants={itemVariants}>
+              <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-gradient-to-r from-gray-900/50 to-black/50 backdrop-blur-xl border border-pink-500/20 rounded-xl p-4">
+                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                  {/* Search */}
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <input
+                      type="text"
+                      placeholder="Search virtual spaces..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10 pr-4 py-2 bg-black/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-pink-500/50 transition-colors w-full sm:w-64"
+                    />
+                  </div>
+
+                  {/* Status Filter */}
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="px-4 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-pink-500/50 transition-colors"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="live">Live</option>
+                    <option value="creating">Creating</option>
+                    <option value="deploying">Deploying</option>
+                    <option value="failed">Failed</option>
+                  </select>
                 </div>
 
-                {/* Status Filter */}
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-4 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-pink-500/50 transition-colors"
-                >
-                  <option value="all">All Status</option>
-                  <option value="running">Running</option>
-                  <option value="stopped">Stopped</option>
-                  <option value="building">Building</option>
-                  <option value="error">Error</option>
-                </select>
+                {/* View Mode Toggle */}
+                <div className="flex items-center gap-2 bg-black/30 rounded-lg p-1">
+                  <button
+                    onClick={() => setViewMode("grid")}
+                    className={`p-2 rounded-lg transition-colors ${
+                      viewMode === "grid" ? "bg-pink-500 text-white" : "text-gray-400 hover:text-gray-300"
+                    }`}
+                  >
+                    <Grid3X3 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode("list")}
+                    className={`p-2 rounded-lg transition-colors ${
+                      viewMode === "list" ? "bg-pink-500 text-white" : "text-gray-400 hover:text-gray-300"
+                    }`}
+                  >
+                    <List className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
+            </motion.div>
+          )}
 
-              {/* View Mode Toggle */}
-              <div className="flex items-center gap-2 bg-black/30 rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded-lg transition-colors ${
-                    viewMode === "grid" ? "bg-pink-500 text-white" : "text-gray-400 hover:text-gray-300"
-                  }`}
-                >
-                  <Grid3X3 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode("list")}
-                  className={`p-2 rounded-lg transition-colors ${
-                    viewMode === "list" ? "bg-pink-500 text-white" : "text-gray-400 hover:text-gray-300"
-                  }`}
-                >
-                  <List className="w-4 h-4" />
-                </button>
+          {/* Loading State */}
+          {loading && (
+            <motion.div
+              variants={itemVariants}
+              className="flex items-center justify-center py-20"
+            >
+              <div className="text-center">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  className="w-12 h-12 border-2 border-pink-500 border-t-transparent rounded-full mx-auto mb-6"
+                />
+                <p className="text-gray-200 text-xl font-medium mb-2">Loading virtual spaces</p>
+                <p className="text-gray-400">Please wait while we fetch your data...</p>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          )}
 
-          {/* Workspaces Grid */}
-          <motion.div variants={itemVariants}>
-            <AnimatePresence mode="wait">
-              {viewMode === "grid" ? (
-                <motion.div
-                  key="grid"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-                >
-                  <CreateWorkspaceButton onClick={handleCreateWorkspace} />
-                  {filteredWorkspaces.map((workspace) => (
-                    <WorkspaceCard
-                      key={workspace.id}
-                      workspace={workspace}
-                      onAction={handleWorkspaceAction}
-                    />
-                  ))}
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="list"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="space-y-4"
-                >
-                  {/* List view would go here - implement as needed */}
-                  <div className="bg-gradient-to-r from-gray-900/50 to-black/50 backdrop-blur-xl border border-pink-500/20 rounded-xl p-6 text-center">
-                    <p className="text-gray-400">List view coming soon...</p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
+          {/* Virtual Spaces Grid */}
+          {!loading && (
+            <motion.div variants={itemVariants}>
+              <AnimatePresence mode="wait">
+                {viewMode === "grid" ? (
+                  <motion.div
+                    key="grid"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+                  >
+                    <CreateVirtualSpaceButton onClick={handleCreateVirtualSpace} />
+                    {filteredSpaces.map((workspace) => (
+                      <VirtualSpaceCard
+                        key={workspace._id}
+                        workspace={workspace}
+                        onAction={handleVirtualSpaceAction}
+                      />
+                    ))}
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="list"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="space-y-4"
+                  >
+                    {filteredSpaces.map((workspace) => (
+                      <div key={workspace._id} className="bg-gradient-to-r from-gray-900/50 to-black/50 backdrop-blur-xl border border-pink-500/20 rounded-xl p-6">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <Terminal className="w-6 h-6 text-pink-400" />
+                            <div>
+                              <h3 className="text-lg font-semibold text-gray-100">{workspace.name}</h3>
+                              <p className="text-sm text-gray-400">Virtual Development Space</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <StatusBadge status={workspace.projectstatus} />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteVirtualSpace(workspace._id)}
+                              className="text-red-400 hover:text-red-300"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )}
 
           {/* Quick Actions */}
-          <motion.div variants={itemVariants}>
-            <div className="bg-gradient-to-r from-gray-900/50 to-black/50 backdrop-blur-xl border border-pink-500/20 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-gray-200 mb-4 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-pink-400" />
-                Quick Actions
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button 
-                  onClick={() => window.location.href = "/ai/templates"}
-                  className="justify-start h-auto p-4 bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20 hover:border-pink-500/40 hover:from-pink-500/20 hover:to-purple-500/20 text-left transition-all duration-300 rounded-lg"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-lg">
-                      <Rocket className="w-4 h-4 text-pink-400" />
+          {virtualSpaces.length > 0 && (
+            <motion.div variants={itemVariants}>
+              <div className="bg-gradient-to-r from-gray-900/50 to-black/50 backdrop-blur-xl border border-pink-500/20 rounded-xl p-6">
+                <h3 className="text-lg font-semibold text-gray-200 mb-4 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-pink-400" />
+                  Quick Actions
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <button 
+                    onClick={handleCreateVirtualSpace}
+                    className="justify-start h-auto p-4 bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20 hover:border-pink-500/40 hover:from-pink-500/20 hover:to-purple-500/20 text-left transition-all duration-300 rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-lg">
+                        <Plus className="w-4 h-4 text-pink-400" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-gray-200">New Virtual Space</div>
+                        <div className="text-sm text-gray-400">Create development environment</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-medium text-gray-200">Browse Templates</div>
-                      <div className="text-sm text-gray-400">Start with pre-configured environments</div>
-                    </div>
-                  </div>
-                </button>
+                  </button>
 
-                <button 
-                  onClick={() => window.location.href = "/ai/monitor"}
-                  className="justify-start h-auto p-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 hover:border-blue-500/40 hover:from-blue-500/20 hover:to-cyan-500/20 text-left transition-all duration-300 rounded-lg"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-lg">
-                      <Brain className="w-4 h-4 text-blue-400" />
+                  <button 
+                    onClick={() => router.push('/docs/virtualspace')}
+                    className="justify-start h-auto p-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 hover:border-blue-500/40 hover:from-blue-500/20 hover:to-cyan-500/20 text-left transition-all duration-300 rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-lg">
+                        <Monitor className="w-4 h-4 text-blue-400" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-gray-200">Documentation</div>
+                        <div className="text-sm text-gray-400">Learn about virtual spaces</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-medium text-gray-200">AI Agents</div>
-                      <div className="text-sm text-gray-400">Deploy coding assistants</div>
-                    </div>
-                  </div>
-                </button>
+                  </button>
 
-                <button 
-                  onClick={() => window.location.href = "/ai/monitor"}
-                  className="justify-start h-auto p-4 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20 hover:border-emerald-500/40 hover:from-emerald-500/20 hover:to-green-500/20 text-left transition-all duration-300 rounded-lg"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-r from-emerald-500/20 to-green-500/20 rounded-lg">
-                      <BarChart3 className="w-4 h-4 text-emerald-400" />
+                  <button 
+                    onClick={() => router.push('/project/virtualspace')}
+                    className="justify-start h-auto p-4 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20 hover:border-emerald-500/40 hover:from-emerald-500/20 hover:to-green-500/20 text-left transition-all duration-300 rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-r from-emerald-500/20 to-green-500/20 rounded-lg">
+                        <BarChart3 className="w-4 h-4 text-emerald-400" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-gray-200">Management</div>
+                        <div className="text-sm text-gray-400">Manage virtual spaces</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-medium text-gray-200">Analytics</div>
-                      <div className="text-sm text-gray-400">Monitor usage and costs</div>
-                    </div>
-                  </div>
-                </button>
+                  </button>
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          )}
         </div>
       </motion.div>
     </div>

@@ -1,7 +1,7 @@
 import VirtualSpace from "../../../models/VirtualSpace.js";
 import ioredis from "ioredis";
 
-const CreateVirtualSpace  = async (req, res) => {
+const CreateVirtualSpace = async (req, res) => {
     const redisConfig = {
         host: 'valkey-1dec9a5f-basirkhanaws-5861.c.aivencloud.com',
         port: 24291,
@@ -14,7 +14,7 @@ const CreateVirtualSpace  = async (req, res) => {
     // analyze all the deployments strategies here and call the respective deployment strategy
     // creating a webhook
     console.log(req.body);
-    console.log("hitting the server for webbuilder deployment creation");
+    console.log("hitting the server for virtual space deployment creation");
     let token = req.headers.authorization;
     
     const {
@@ -25,10 +25,9 @@ const CreateVirtualSpace  = async (req, res) => {
     } = req.body;
     
     try {
-        console.log("Creating webbuilder deployment for:", projectname);
-        console.log("Database config:", { dbname, dbuser, dbpass: "***" });
+        console.log("Creating virtual space deployment for:", projectname);
+        console.log("Virtual space config:", { projectname, passwd: "***" });
         
-        // Update webbuilder project status
         let updateproject = await VirtualSpace.findOneAndUpdate(
             { _id: projectid }, 
             { 
@@ -50,7 +49,7 @@ const CreateVirtualSpace  = async (req, res) => {
         
         console.log("Updated project:", updateproject.name);
         
-        // Call deployment API for webbuilder (WordPress container)
+        // Call deployment API for virtual space (containerized development environment)
         const result = await fetch(`${process.env.DEPLOYMENT_API}/deploy/virtualspace`, {
             method: "POST",
             headers: {
@@ -59,7 +58,7 @@ const CreateVirtualSpace  = async (req, res) => {
             },
             body: JSON.stringify({
                 projectid: projectname,
-                passwd:passwd,
+                passwd: passwd,
             }),
         });
         
@@ -95,7 +94,7 @@ const CreateVirtualSpace  = async (req, res) => {
             console.log("IP check response:", data2);
 
             if (data2.success) {
-                // Update the webbuilder project with the URL and ARN
+                // Update the virtual space project with the URL and ARN
                 let updateproject = await VirtualSpace.findOneAndUpdate(
                     { _id: projectid }, 
                     { 
@@ -119,7 +118,7 @@ const CreateVirtualSpace  = async (req, res) => {
                     }
                 });
             } else {
-                console.log("Error in getting IP for webbuilder");
+                console.log("Error in getting IP for virtual space");
                 console.log(data2);
                 
                 // Update project status to failed
@@ -170,4 +169,4 @@ const CreateVirtualSpace  = async (req, res) => {
     }
 };
 
-export default CreateVirtualSpace 
+export default CreateVirtualSpace;

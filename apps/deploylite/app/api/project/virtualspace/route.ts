@@ -30,7 +30,7 @@ export const GET = async () => {
             }, { status: 404 });
         }
         
-        const projectdata = await VirtualSpace.find({ userid: user._id }).populate("userid");
+        const projectdata = await VirtualSpace.find({ userid: user._id }).populate("userid").populate("planid");
         
         if (!projectdata || projectdata.length === 0) {
             return NextResponse.json({
@@ -76,12 +76,17 @@ export const POST = async (req: NextRequest) => {
         // Validate required fields
         if (!data.name) {
             return NextResponse.json({
-                message: "Project name is required",
+                message: "Virtual space name is required",
                 success: false,
             }, { status: 400 });
         }
 
-     
+        if (!data.password) {
+            return NextResponse.json({
+                message: "Password is required",
+                success: false,
+            }, { status: 400 });
+        }
 
         if (!data.planid) {
             return NextResponse.json({
@@ -90,7 +95,7 @@ export const POST = async (req: NextRequest) => {
             }, { status: 400 });
         }
         
-     
+        // Process name (remove spaces and convert to lowercase)
         const name = data.name.replace(/\s+/g, '').toLowerCase();
         console.log("Processed name:", name);
         
@@ -98,7 +103,7 @@ export const POST = async (req: NextRequest) => {
         const webbuildername = await WebBuilder.findOne({ name: name });
         const virtualspacename = await VirtualSpace.findOne({ name: name });
         
-       
+        // Check for existing names across all project types
         if (projectname != null) {
             return NextResponse.json({
                 message: "Project name already exists. Select a different name",
@@ -114,7 +119,7 @@ export const POST = async (req: NextRequest) => {
                 webbuildername: "exists"
             }, { status: 409 });
         }
-        //check for virtual space name
+
         if (virtualspacename != null) {
             return NextResponse.json({
                 message: "Virtual Space name already exists. Select a different name",
@@ -146,7 +151,7 @@ export const POST = async (req: NextRequest) => {
             }, { status: 404 });
         }
 
-        console.log("creating webbuilder project");
+        console.log("creating virtual space project");
         
         const startbilingdate = new Date(); 
         const endbilingdate = new Date(startbilingdate); 
@@ -157,7 +162,6 @@ export const POST = async (req: NextRequest) => {
         console.log('Start Billing Date (Today, local time):', startbilingdate.toLocaleString());
         console.log('End Billing Date (Next day, 12:00 AM local time):', endbilingdate.toLocaleString());
         
-       
         const project = new VirtualSpace({
             name: name,
             planid: data.planid,
@@ -175,7 +179,7 @@ export const POST = async (req: NextRequest) => {
         
         console.log("Project saved successfully:", project._id);
         
-        // Call deployment API
+        // Call deployment API for virtual space
         const createdep = await fetch(`${process.env.DEPLOYMENT_API}/createdeployment/virtualspace`, {
             method: 'POST',
             headers: {
@@ -186,7 +190,7 @@ export const POST = async (req: NextRequest) => {
                 projectid: project._id,
                 userid: user._id,
                 name: name,
-                passwd: data.password || "",
+                passwd: data.password,
             })
         });
         
@@ -195,22 +199,22 @@ export const POST = async (req: NextRequest) => {
         
         if (result.success) {
             return NextResponse.json({
-                message: "Project Created & Deployment Started",
+                message: "Virtual Space Created & Deployment Started",
                 success: true,
                 project: project
             });
         } else {
             return NextResponse.json({
-                message: `Project creation failed: Reason - ${result.message}`,
+                message: `Virtual space creation failed: Reason - ${result.message}`,
                 success: false,
                 project: project
             }, { status: 500 });
         }
 
     } catch (err) {
-        console.error("Error occurred while creating project:", err);
+        console.error("Error occurred while creating virtual space:", err);
         return NextResponse.json({
-            message: "Error occurred while creating project",
+            message: "Error occurred while creating virtual space",
             error: err instanceof Error ? err.message : "Unknown error",
             success: false,
         }, { status: 500 });
@@ -235,7 +239,7 @@ export const DELETE = async (req: NextRequest) => {
         }
         
         const projectdelete = await VirtualSpace.findOneAndDelete({ _id: data.id });
-        console.log("Project to delete:", projectdelete);
+        console.log("Virtual space to delete:", projectdelete);
         
         if(projectdelete !== null && (projectdelete.arn !== null && projectdelete.arn !== undefined && projectdelete.arn !== "")) {
             console.log("Stopping ECS task with ARN:", projectdelete.arn);
@@ -258,7 +262,7 @@ export const DELETE = async (req: NextRequest) => {
         if (projectdelete == null) {
             return NextResponse.json({
                 success: false,
-                message: "Project not found"
+                message: "Virtual space not found"
             }, { status: 404 });
         }
         
@@ -268,7 +272,7 @@ export const DELETE = async (req: NextRequest) => {
         });
         
     } catch (err) {
-        console.error("Error deleting project:", err);
+        console.error("Error deleting virtual space:", err);
         return NextResponse.json({
             success: false,
             message: "Something went wrong please try again later!"
