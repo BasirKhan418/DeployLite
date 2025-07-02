@@ -88,7 +88,7 @@ export const POST = async (req: NextRequest) => {
         console.log(name);
         
         const projectname = await Project.findOne({ name: name });
-        const webbuilder = await Webbuilder.findOne({ name: name });
+        const webbuilder = await WebBuilder.findOne({ name: name });
         const virtualspace = await VirtualSpace.findOne({ name: name });
         
         // If project name already exists
