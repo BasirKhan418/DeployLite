@@ -21,6 +21,9 @@
     "packages/*"
   ],
   "dependencies": {
-    "lottie-react": "^2.4.1"
+    "dotenv": "^17.0.1",
+    "lottie-react": "^2.4.1",
+    "pidusage": "^4.0.1",
+    "redis": "^5.5.6"
   }
 }

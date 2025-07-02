@@ -11,6 +11,8 @@ import webhook from './routes/webhook.js';
 import status from './routes/status.js';
 import rebuild from './routes/rebuild.js';
 import llm from './routes/llm.js';
+import fixDecisionRoutes from './routes/fixDecision.js';
+import monitorRoutes from './routes/monitor.js';
 const app = express();
 app.use(express.json());
 app.use(cors({
@@ -22,6 +24,8 @@ app.use('/rebuild',rebuild.router);
 app.use('/deploy',deploy.router);
 app.use('/webhook',webhook.router);
 app.use('/createdeployment',createDeploymentMiddleware,createDeployment.router);
+app.use('/',fixDecisionRoutes);
+app.use('/monitor',monitorRoutes);
 app.get('/',async(req,res)=>{
     
 
