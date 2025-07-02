@@ -46,7 +46,7 @@ export const GET = async () => {
         });
         
     } catch (err) {
-        console.error("Error in GET /api/project/crud:", err);
+        console.error("Error in GET /api/project/wordpress:", err);
         return NextResponse.json({
             success: false,
             message: "Something went wrong please try again later!"
@@ -62,6 +62,8 @@ export const POST = async (req: NextRequest) => {
         const data = await req.json();
         const auth = await CheckAuth();
         
+        console.log("Received data:", data); 
+        
         if (!auth.result) {
             return NextResponse.json({
                 message: "User is not authenticated",
@@ -70,15 +72,36 @@ export const POST = async (req: NextRequest) => {
             }, { status: 401 });
         }
 
+        // Validate required fields
+        if (!data.name) {
+            return NextResponse.json({
+                message: "Project name is required",
+                success: false,
+            }, { status: 400 });
+        }
+
+        if (!data.dbname || !data.dbuser || !data.dbpass) {
+            return NextResponse.json({
+                message: "Database credentials (dbname, dbuser, dbpass) are required",
+                success: false,
+            }, { status: 400 });
+        }
+
+        if (!data.planid) {
+            return NextResponse.json({
+                message: "Plan ID is required",
+                success: false,
+            }, { status: 400 });
+        }
         
-        // Check project is unique or not
+     
         const name = data.name.replace(/\s+/g, '').toLowerCase();
-        console.log(name);
+        console.log("Processed name:", name);
         
         const projectname = await Project.findOne({ name: name });
         const webbuildername = await WebBuilder.findOne({ name: name });
         
-        // If project name already exists
+       
         if (projectname != null) {
             return NextResponse.json({
                 message: "Project name already exists. Select a different name",
@@ -95,7 +118,7 @@ export const POST = async (req: NextRequest) => {
             }, { status: 409 });
         }
         
-        console.log(data.planid);
+        console.log("Checking plan:", data.planid);
         const checkplan = await PricingPlan.findOne({ _id: data.planid });
         
         if (checkplan == null) {
@@ -108,7 +131,7 @@ export const POST = async (req: NextRequest) => {
         
         console.log("checking user");
         const user = await User.findOne({ email: auth.email });
-        console.log(user);
+        console.log("User found:", user ? "Yes" : "No");
         
         if (user == null) {
             return NextResponse.json({
@@ -118,7 +141,7 @@ export const POST = async (req: NextRequest) => {
             }, { status: 404 });
         }
 
-        console.log("creating project");
+        console.log("creating webbuilder project");
         
         const startbilingdate = new Date(); 
         const endbilingdate = new Date(startbilingdate); 
@@ -129,20 +152,29 @@ export const POST = async (req: NextRequest) => {
         console.log('Start Billing Date (Today, local time):', startbilingdate.toLocaleString());
         console.log('End Billing Date (Next day, 12:00 AM local time):', endbilingdate.toLocaleString());
         
+       
         const project = new WebBuilder({
             name: name,
             planid: data.planid,
             userid: user._id,
             startdate: new Date(),
-            projectstatus: "live",
+            projectstatus: "creating",
             billstatus: "pending",
             startbilingdate: startbilingdate,
             endbilingdate: endbilingdate,
-            webbuilder: data.webbuilder,
+            webbuilder: data.webbuilder || "WordPress",
+            dbname: data.dbname,        
+            dbuser: data.dbuser,
+            dbpass: data.dbpass,
         });
+        
+        console.log("Project object before save:", project);
         
         await project.save();
         
+        console.log("Project saved successfully:", project._id);
+        
+        // Call deployment API
         const createdep = await fetch(`${process.env.DEPLOYMENT_API}/createdeployment/webbuilder`, {
             method: 'POST',
             headers: {
@@ -155,12 +187,12 @@ export const POST = async (req: NextRequest) => {
                 name: name,
                 dbname: data.dbname,
                 dbuser: data.dbuser,
-                dbpass:data.dbpass
+                dbpass: data.dbpass
             })
         });
         
         const result = await createdep.json();
-        console.log(result);
+        console.log("Deployment API response:", result);
         
         if (result.success) {
             return NextResponse.json({
@@ -205,28 +237,25 @@ export const DELETE = async (req: NextRequest) => {
         
         const projectdelete = await WebBuilder.findOneAndDelete({ _id: data.id });
         console.log("Project to delete:", projectdelete);
-        if(projectdelete !== null && projectdelete.arn !== null || projectdelete.arn !== undefined|| projectdelete.arn !== ""){ {
-            console.log("inside ")
-        console.log("Project not found or ARN is missing",projectdelete.arn);
-         const createdep = await fetch(`${process.env.DEPLOYMENT_API}/deploy/delete`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': getcookie.get("token")?.value || '',
-            },
-            body: JSON.stringify({
-              task:projectdelete.arn
-            })
-        });
-    
         
-        const result = await createdep.json();
-        console.log(result);
-          return NextResponse.json({
-            success: true,
-            message: "Project Deleted Successfully"
-        });
-    }
+        if(projectdelete !== null && (projectdelete.arn !== null && projectdelete.arn !== undefined && projectdelete.arn !== "")) {
+            console.log("Stopping ECS task with ARN:", projectdelete.arn);
+            
+            const createdep = await fetch(`${process.env.DEPLOYMENT_API}/deploy/delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': getcookie.get("token")?.value || '',
+                },
+                body: JSON.stringify({
+                  task: projectdelete.arn
+                })
+            });
+        
+            const result = await createdep.json();
+            console.log("Delete task result:", result);
+        }
+        
         if (projectdelete == null) {
             return NextResponse.json({
                 success: false,
@@ -238,7 +267,6 @@ export const DELETE = async (req: NextRequest) => {
             success: true,
             message: "Project Deleted Successfully"
         });
-    }
         
     } catch (err) {
         console.error("Error deleting project:", err);
