@@ -9,7 +9,7 @@ import Deployment from "../../../../../models/Deployment"
 import { cookies } from "next/headers"
 import CryptoJS from "crypto-js"
 import VirtualSpace from "../../../../../models/VirtualSpace"
-import Webbuilder from "../../../../../models/Webbuilder"
+import Webbuilder from "../../../../../models/WebBuilder"
 export const GET = async () => {
     try {
         await ConnectDb();
