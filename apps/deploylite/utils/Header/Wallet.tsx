@@ -9,9 +9,8 @@ declare global {
 
 import { toast, Toaster } from "sonner";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ethers } from "ethers";
-import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,7 +23,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 
 import {
   CreditCardIcon,
@@ -33,27 +31,19 @@ import {
   AlertTriangleIcon,
   FileTextIcon,
   RefreshCwIcon,
-  Wallet as WalletIcon,
-  TrendingUp,
-  TrendingDown,
-  Calendar,
-  Clock,
-  ArrowUpRight,
-  ArrowDownLeft,
-  Activity,
-  Users,
-  Target,
-  Zap,
+  WalletIcon,
+  TrendingUpIcon,
+  CalendarIcon,
+  ArrowUpIcon,
+  ArrowDownIcon,
   Loader2,
-  Download,
-  Eye,
-  EyeOff,
   Plus,
   Minus,
-  BarChart3,
-  PieChart,
-  LineChart,
-  ExternalLink,
+  Activity,
+  Eye,
+  EyeOff,
+  Download,
+  CopyIcon,
 } from "lucide-react";
 
 import {
@@ -65,252 +55,181 @@ import {
   Title,
   Tooltip,
   Legend,
-  ArcElement,
   BarElement,
 } from "chart.js";
-import { Line, Doughnut, Bar } from "react-chartjs-2";
+import { Line, Bar } from "react-chartjs-2";
 import { useAppSelector, useAppDispatch } from "@/lib/hook";
 import { add as addWallet } from "@/lib/features/wallet/Wallet";
+import { add as addUser } from "@/lib/features/user/User";
+import { motion, AnimatePresence } from "framer-motion";
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
-  Legend,
-  ArcElement,
-  BarElement
+  Legend
 );
 
-// Animation variants
-const fadeIn = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.4, 0.25, 1] } }
-};
-
-const stagger = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
-};
-
-const scaleIn = {
-  hidden: { scale: 0.95, opacity: 0 },
-  visible: { scale: 1, opacity: 1, transition: { duration: 0.3, ease: "easeOut" } }
-};
-
 interface Transaction {
-  _id?: string;
   amount: number;
   description: string;
-  type: "credit" | "debit";
+  type: 'credit' | 'debit';
   date: string;
-  category?: string;
-  status?: string;
+  _id?: string;
 }
 
 interface WalletData {
+  _id: string;
   userid: string;
   balance: number;
   transactions: Transaction[];
 }
 
 interface ProjectData {
+  _id: string;
   name: string;
   planid: {
     name: string;
-    pricepmonth: string;
     pricephour: string;
+    pricepmonth: string;
   };
   projectstatus: string;
   startdate: string;
+  cpuusage?: string;
+  memoryusage?: string;
 }
 
-export default function Wallet() {
+export default function WalletComponent() {
   const user = useAppSelector((state) => state.user.user);
-  const walletStore = useAppSelector((state) => state.wallet.wallet);
+  const walletState = useAppSelector((state) => state.wallet.wallet);
   const dispatch = useAppDispatch();
-  
-  const [wallet, setWallet] = useState<WalletData | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // State
+  const [walletData, setWalletData] = useState<WalletData | null>(null);
   const [projects, setProjects] = useState<ProjectData[]>([]);
   const [addFundsAmount, setAddFundsAmount] = useState("");
-  const [cryptoAmount, setCryptoAmount] = useState("");
-  const [cryptoWalletAddress, setCryptoWalletAddress] = useState("");
-  const [cryptoConnected, setCryptoConnected] = useState(false);
-  const [cryptoBalance, setCryptoBalance] = useState("0");
   const [loading, setLoading] = useState(false);
-  const [balanceVisible, setBalanceVisible] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [stats, setStats] = useState({
-    totalSpent: 0,
-    thisMonth: 0,
-    avgPerDay: 0,
-    estimatedMonthly: 0,
-    activeProjects: 0,
-    lastTransaction: null as Transaction | null
-  });
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [balanceVisible, setBalanceVisible] = useState(true);
+  const [cryptoConnected, setCryptoConnected] = useState(false);
+  const [cryptoWalletAddress, setCryptoWalletAddress] = useState("");
+  const [cryptoBalance, setCryptoBalance] = useState("0");
+  const [cryptoAmount, setCryptoAmount] = useState("");
 
-  const router = useRouter();
+  // Check for payment status in URL and show notifications
+  useEffect(() => {
+    const paymentStatus = searchParams?.get('payment');
+    const amount = searchParams?.get('amount');
 
-  // Fetch wallet data and projects
-  const fetchWalletData = async () => {
+    if (paymentStatus === 'success' && amount) {
+      toast.success(`Payment successful! ₹${amount} added to your wallet.`);
+      
+      // Clean up URL parameters after showing toast
+      setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          const url = new URL(window.location.href);
+          url.searchParams.delete('payment');
+          url.searchParams.delete('amount');
+          url.searchParams.delete('order_id');
+          window.history.replaceState({}, '', url.toString());
+        }
+      }, 1000);
+    } else if (paymentStatus === 'failed') {
+      toast.error('Payment verification failed. Please try again.');
+    } else if (paymentStatus === 'error') {
+      toast.error('Payment processing error. Please contact support.');
+    }
+  }, [searchParams]);
+
+  // Initial data fetch
+  useEffect(() => {
+    const initializeData = async () => {
+      setInitialLoading(true);
+      try {
+        // Always fetch fresh data when component mounts
+        await Promise.all([
+          fetchUserAndWalletData(),
+          fetchProjects()
+        ]);
+      } catch (error) {
+        console.error('Error initializing data:', error);
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+
+    initializeData();
+  }, []);
+
+  // Fetch user and wallet data
+  const fetchUserAndWalletData = async () => {
     try {
       setRefreshing(true);
+      const response = await fetch('/api/get/home', {
+        method: 'GET',
+        credentials: 'include', // Include cookies for authentication
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       
-      // Fetch wallet data
-      const walletRes = await fetch('/api/get/home');
-      const walletData = await walletRes.json();
+      const data = await response.json();
+      console.log('Home API Response:', data);
       
-      if (walletData.success && walletData.wallet) {
-        setWallet(walletData.wallet);
-        dispatch(addWallet(walletData.wallet));
+      if (data.success && data.user && data.wallet) {
+        // Update Redux store with fresh data
+        dispatch(addUser(data.user));
+        dispatch(addWallet(data.wallet));
+        setWalletData(data.wallet);
+        
+        console.log('Wallet data updated:', data.wallet);
+      } else {
+        console.error('Failed to fetch user/wallet data:', data);
+        if (!data.success) {
+          // Only redirect to login if we're sure auth failed
+          toast.error('Session expired. Please login again.');
+          router.push('/login');
+        }
       }
-
-      // Fetch projects data
-      const projectsRes = await fetch('/api/project/crud');
-      const projectsData = await projectsRes.json();
-      
-      if (projectsData.success && projectsData.projectdata) {
-        setProjects(projectsData.projectdata);
-      }
-
-      // Calculate stats
-      calculateStats(walletData.wallet, projectsData.projectdata || []);
-      
     } catch (error) {
-      console.error('Error fetching wallet data:', error);
-      toast.error('Failed to fetch wallet data');
+      console.error('Error fetching user/wallet data:', error);
+      toast.error('Error loading data. Please refresh the page.');
     } finally {
       setRefreshing(false);
     }
   };
 
-  // Calculate statistics
-  const calculateStats = (walletData: WalletData, projectsData: ProjectData[]) => {
-    if (!walletData?.transactions) return;
+  // Fetch projects for analytics
+  const fetchProjects = async () => {
+    try {
+      const [regularProjects, webbuilderProjects] = await Promise.all([
+        fetch('/api/project/crud', { credentials: 'include' }),
+        fetch('/api/project/wordpress', { credentials: 'include' })
+      ]);
 
-    const transactions = walletData.transactions;
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
+      const regularData = await regularProjects.json();
+      const webbuilderData = await webbuilderProjects.json();
 
-    // Calculate monthly spending
-    const thisMonthSpending = transactions
-      .filter(tx => {
-        const txDate = new Date(tx.date);
-        return tx.type === 'debit' && 
-               txDate.getMonth() === currentMonth && 
-               txDate.getFullYear() === currentYear;
-      })
-      .reduce((sum, tx) => sum + tx.amount, 0);
+      const allProjects = [
+        ...(regularData.success ? regularData.projectdata : []),
+        ...(webbuilderData.success ? webbuilderData.projectdata : [])
+      ];
 
-    // Calculate total spending
-    const totalSpent = transactions
-      .filter(tx => tx.type === 'debit')
-      .reduce((sum, tx) => sum + tx.amount, 0);
-
-    // Calculate daily average
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const avgPerDay = thisMonthSpending / now.getDate();
-
-    // Estimate monthly cost based on active projects
-    const activeProjects = projectsData.filter(p => p.projectstatus === 'live').length;
-    const estimatedMonthly = projectsData
-      .filter(p => p.projectstatus === 'live')
-      .reduce((sum, p) => {
-        const monthlyPrice = parseFloat(p.planid?.pricepmonth || '0');
-        return sum + monthlyPrice;
-      }, 0);
-
-    // Get last transaction
-    const lastTransaction = transactions.sort((a, b) => 
-      new Date(b.date).getTime() - new Date(a.date).getTime()
-    )[0] || null;
-
-    setStats({
-      totalSpent,
-      thisMonth: thisMonthSpending,
-      avgPerDay,
-      estimatedMonthly,
-      activeProjects,
-      lastTransaction
-    });
-  };
-
-  useEffect(() => {
-    if (user?.email) {
-      fetchWalletData();
+      setProjects(allProjects);
+      console.log('Projects fetched:', allProjects.length);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
     }
-  }, [user]);
-
-  // Generate chart data
-  const generateChartData = () => {
-    if (!wallet?.transactions) return { labels: [], datasets: [] };
-
-    const last7Days = Array.from({ length: 7 }, (_, i) => {
-      const date = new Date();
-      date.setDate(date.getDate() - (6 - i));
-      return date;
-    });
-
-    const dailySpending = last7Days.map(date => {
-      const daySpending = wallet.transactions
-        .filter(tx => {
-          const txDate = new Date(tx.date);
-          return tx.type === 'debit' && 
-                 txDate.toDateString() === date.toDateString();
-        })
-        .reduce((sum, tx) => sum + tx.amount, 0);
-      return daySpending;
-    });
-
-    return {
-      labels: last7Days.map(date => date.toLocaleDateString('en-US', { weekday: 'short' })),
-      datasets: [
-        {
-          label: 'Daily Spending (₹)',
-          data: dailySpending,
-          borderColor: 'rgb(147, 51, 234)',
-          backgroundColor: 'rgba(147, 51, 234, 0.1)',
-          tension: 0.4,
-          fill: true,
-        },
-      ],
-    };
   };
 
-  // Generate spending categories chart
-  const generateCategoriesChart = () => {
-    if (!wallet?.transactions) return { labels: [], datasets: [] };
-
-    const categories = wallet.transactions
-      .filter(tx => tx.type === 'debit')
-      .reduce((acc, tx) => {
-        const category = tx.category || 'Other';
-        acc[category] = (acc[category] || 0) + tx.amount;
-        return acc;
-      }, {} as Record<string, number>);
-
-    return {
-      labels: Object.keys(categories),
-      datasets: [
-        {
-          data: Object.values(categories),
-          backgroundColor: [
-            'rgba(147, 51, 234, 0.8)',
-            'rgba(59, 130, 246, 0.8)',
-            'rgba(16, 185, 129, 0.8)',
-            'rgba(245, 158, 11, 0.8)',
-            'rgba(239, 68, 68, 0.8)',
-          ],
-          borderWidth: 0,
-        },
-      ],
-    };
-  };
-
-  // Razorpay payment handler
+  // Load Razorpay script
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
       if (window.Razorpay) {
@@ -325,27 +244,37 @@ export default function Wallet() {
     });
   };
 
+  // Handle Razorpay payment
   const handleRazorpayPayment = async () => {
-    if (!addFundsAmount || parseFloat(addFundsAmount) <= 0) {
+    if (!addFundsAmount || Number(addFundsAmount) <= 0) {
       toast.error("Please enter a valid amount");
       return;
     }
 
+    if (!user?.email) {
+      toast.error("User not authenticated");
+      return;
+    }
+
     setLoading(true);
-    const amount = parseFloat(addFundsAmount);
-    const data = { amount, email: user.email, name: user.name };
 
     try {
-      const response = await fetch(`/api/precheckout`, {
+      const amount = Number(addFundsAmount);
+      console.log('Initiating payment for amount:', amount);
+      
+      const data = { amount, email: user.email, name: user.name };
+
+      const response = await fetch('/api/precheckout', {
         method: "POST",
+        credentials: 'include',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
-      const r = await response.json();
-      setLoading(false);
+      const result = await response.json();
+      console.log('Precheckout response:', result);
 
-      if (r.success) {
+      if (result.success) {
         const scriptLoaded = await loadRazorpayScript();
         if (!scriptLoaded) {
           toast.error("Razorpay SDK failed to load.");
@@ -354,31 +283,44 @@ export default function Wallet() {
 
         const options = {
           key: process.env.NEXT_PUBLIC_KEY_ID,
-          amount: r.order.amount,
+          amount: result.order.amount,
           currency: "INR",
           name: "DeployLite",
           description: "Add funds to DeployLite Wallet",
           image: "/logo.png",
-          order_id: r.order.id,
-          callback_url: `/api/postcheckout`,
+          order_id: result.order.id,
+          callback_url: `${window.location.origin}/api/postcheckout`,
           prefill: { name: user.name, email: user.email },
-          notes: { address: "DeployLite Platform" },
-          theme: { color: "#9333ea" },
-          handler: function(response: any) {
-            toast.success("Payment successful! Funds added to wallet.");
+          notes: { address: "DeployLite Corporate Office" },
+          theme: { color: "#8B5CF6" },
+          handler: function (response: any) {
+            console.log('Payment successful:', response);
+            toast.success("Payment successful! Your wallet will be updated shortly.");
             setAddFundsAmount("");
-            fetchWalletData();
+            
+            // Fetch updated wallet data after successful payment
+            setTimeout(() => {
+              fetchUserAndWalletData();
+            }, 2000);
           },
+          modal: {
+            ondismiss: function() {
+              console.log('Payment modal dismissed');
+              toast.info("Payment cancelled");
+            }
+          }
         };
 
-        const rzp1 = new window.Razorpay(options);
-        rzp1.open();
+        const rzp = new window.Razorpay(options);
+        rzp.open();
       } else {
-        toast.error("Error in Payment");
+        toast.error(result.message || "Payment initialization failed");
       }
     } catch (error) {
+      console.error('Payment error:', error);
+      toast.error("Payment failed. Please try again.");
+    } finally {
       setLoading(false);
-      toast.error("Payment failed");
     }
   };
 
@@ -389,19 +331,22 @@ export default function Wallet() {
         toast.error("MetaMask not detected!");
         return;
       }
+      
       const provider = new ethers.BrowserProvider(window.ethereum);
       const accounts = await provider.send("eth_requestAccounts", []);
       const account = accounts[0] || "";
+      
       setCryptoWalletAddress(account);
       setCryptoConnected(true);
 
       const balanceWei = await provider.getBalance(account);
       const balanceEth = ethers.formatEther(balanceWei);
       setCryptoBalance(balanceEth);
-      toast.success("MetaMask connected successfully!");
+      
+      toast.success("MetaMask wallet connected successfully!");
     } catch (error) {
       console.error(error);
-      toast.error("Failed to connect MetaMask");
+      toast.error("Failed to connect MetaMask wallet");
     }
   };
 
@@ -411,7 +356,7 @@ export default function Wallet() {
       return;
     }
 
-    if (!cryptoAmount || isNaN(Number(cryptoAmount)) || Number(cryptoAmount) <= 0) {
+    if (!cryptoAmount || Number(cryptoAmount) <= 0) {
       toast.error("Enter a valid ETH amount!");
       return;
     }
@@ -429,61 +374,133 @@ export default function Wallet() {
       await tx.wait();
       toast.success(`Transaction confirmed! Hash: ${tx.hash}`);
       setCryptoAmount("");
-      
-      // Refresh wallet data
-      fetchWalletData();
     } catch (error) {
       console.error(error);
       toast.error("Transaction failed!");
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+  // Manual refresh function
+  const handleRefresh = async () => {
+    await Promise.all([
+      fetchUserAndWalletData(),
+      fetchProjects()
+    ]);
+    toast.success("Data refreshed successfully!");
   };
 
-  const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
+  // Calculate statistics
+  const calculateStats = () => {
+    if (!walletData || !projects) return null;
+
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+
+    const monthlyTransactions = walletData.transactions.filter(tx => {
+      const txDate = new Date(tx.date);
+      return txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear;
     });
+
+    const monthlySpent = monthlyTransactions
+      .filter(tx => tx.type === 'debit')
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    const monthlyAdded = monthlyTransactions
+      .filter(tx => tx.type === 'credit')
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    const activeProjects = projects.filter(p => p.projectstatus === 'live').length;
+    
+    const estimatedMonthlyCost = projects.reduce((sum, project) => {
+      if (project.planid?.pricepmonth) {
+        return sum + Number(project.planid.pricepmonth);
+      }
+      return sum;
+    }, 0);
+
+    return {
+      monthlySpent,
+      monthlyAdded,
+      activeProjects,
+      estimatedMonthlyCost,
+      totalProjects: projects.length
+    };
   };
+
+  // Generate chart data
+  const generateChartData = () => {
+    if (!walletData) return null;
+
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      return date;
+    }).reverse();
+
+    const dailySpend = last7Days.map(date => {
+      const dayTransactions = walletData.transactions.filter(tx => {
+        const txDate = new Date(tx.date);
+        return (
+          txDate.toDateString() === date.toDateString() &&
+          tx.type === 'debit'
+        );
+      });
+      return dayTransactions.reduce((sum, tx) => sum + tx.amount, 0);
+    });
+
+    return {
+      labels: last7Days.map(date => date.toLocaleDateString('en-US', { weekday: 'short' })),
+      datasets: [
+        {
+          label: 'Daily Spend (₹)',
+          data: dailySpend,
+          borderColor: '#8B5CF6',
+          backgroundColor: 'rgba(139, 92, 246, 0.1)',
+          tension: 0.4,
+        },
+      ],
+    };
+  };
+
+  const stats = calculateStats();
+  const chartData = generateChartData();
 
   const chartOptions = {
     responsive: true,
-    maintainAspectRatio: false,
     plugins: {
       legend: { 
-        display: false 
+        position: "top" as const,
+        labels: { color: '#E5E7EB' }
       },
-      tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: '#ffffff',
-        bodyColor: '#ffffff',
-        borderColor: 'rgba(147, 51, 234, 0.5)',
-        borderWidth: 1,
+      title: { 
+        display: true, 
+        text: "Daily Spending Pattern",
+        color: '#E5E7EB'
       },
     },
     scales: {
       x: {
-        grid: { color: 'rgba(147, 51, 234, 0.1)' },
-        ticks: { color: '#9ca3af' },
+        grid: { color: "rgba(139, 92, 246, 0.2)" },
+        ticks: { color: '#E5E7EB' }
       },
       y: {
-        grid: { color: 'rgba(147, 51, 234, 0.1)' },
-        ticks: { color: '#9ca3af' },
         beginAtZero: true,
+        grid: { color: "rgba(139, 92, 246, 0.2)" },
+        ticks: { color: '#E5E7EB' }
       },
     },
   };
 
-  if (!user?.email) {
-    router.push('/login');
-    return null;
+  // Show loading screen while initial data is being fetched
+  if (initialLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900/50 to-black flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-purple-400 mx-auto mb-4" />
+          <p className="text-gray-400 text-lg">Loading your wallet...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -491,172 +508,191 @@ export default function Wallet() {
       <Toaster position="top-right" />
       
       <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={stagger}
-        className="max-w-7xl mx-auto p-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="max-w-7xl mx-auto p-4 md:p-8"
       >
         {/* Header */}
-        <motion.div variants={fadeIn} className="mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-xl">
-                <WalletIcon className="h-8 w-8 text-purple-400" />
-              </div>
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                  Wallet
-                </h1>
-                <p className="text-gray-400 mt-1">
-                  Manage your DeployLite balance and transactions
-                </p>
-              </div>
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                Wallet
+              </h1>
+              <p className="text-gray-400 mt-2">Manage your DeployLite balance and transactions</p>
             </div>
-            
-            <div className="flex items-center space-x-3">
-              <Button
-                onClick={fetchWalletData}
-                disabled={refreshing}
-                variant="outline"
-                className="bg-black/50 border-purple-500/30 hover:bg-purple-500/10 hover:border-purple-500/50 text-gray-200 hover:text-purple-300"
-              >
-                <RefreshCwIcon className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-                Refresh
-              </Button>
-            </div>
+            <Button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              variant="outline"
+              className="border-purple-500/30 hover:bg-purple-500/10"
+            >
+              {refreshing ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              ) : (
+                <RefreshCwIcon className="w-4 h-4 mr-2" />
+              )}
+              Refresh
+            </Button>
           </div>
         </motion.div>
 
         {/* Main Balance Card */}
-        <motion.div variants={fadeIn} className="mb-8">
-          <Card className="relative overflow-hidden bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10" />
-            <CardContent className="relative p-8">
-              <div className="flex items-center justify-between mb-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <Card className="mb-8 bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-purple-500/20 shadow-2xl">
+            <div className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 p-8">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-2xl">
+                    <WalletIcon className="w-8 h-8 text-purple-400" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-2xl mb-2 text-gray-100">
+                      DeployLite Balance
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Available funds for deployments and services
+                    </CardDescription>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setBalanceVisible(!balanceVisible)}
+                  className="text-gray-400 hover:text-gray-200"
+                >
+                  {balanceVisible ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </Button>
+              </div>
+              
+              <div className="mt-6 flex items-center gap-4">
                 <div>
-                  <p className="text-gray-400 text-sm font-medium">Available Balance</p>
-                  <div className="flex items-center gap-3 mt-2">
-                    {balanceVisible ? (
-                      <h2 className="text-5xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                        ₹{wallet?.balance?.toLocaleString() || '0'}
-                      </h2>
-                    ) : (
-                      <h2 className="text-5xl font-bold text-gray-400">••••••</h2>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setBalanceVisible(!balanceVisible)}
-                      className="text-gray-400 hover:text-purple-400"
-                    >
-                      {balanceVisible ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="text-right">
-                  <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-                    <Activity className="w-4 h-4" />
-                    Last updated: {wallet ? formatTime(new Date().toISOString()) : '--:--'}
-                  </div>
-                  {stats.lastTransaction && (
-                    <div className={`flex items-center gap-2 text-sm ${
-                      stats.lastTransaction.type === 'credit' ? 'text-emerald-400' : 'text-red-400'
-                    }`}>
-                      {stats.lastTransaction.type === 'credit' ? (
-                        <ArrowUpRight className="w-4 h-4" />
-                      ) : (
-                        <ArrowDownLeft className="w-4 h-4" />
-                      )}
-                      Last: ₹{stats.lastTransaction.amount}
-                    </div>
-                  )}
+                  <p className="text-5xl font-bold text-purple-400">
+                    {balanceVisible ? `₹${walletData?.balance || 0}` : '₹****'}
+                  </p>
+                  <p className="text-gray-400 mt-2">
+                    Last updated: {new Date().toLocaleString()}
+                  </p>
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                {[
-                  { 
-                    label: "This Month", 
-                    value: `₹${stats.thisMonth.toLocaleString()}`, 
-                    icon: Calendar, 
-                    color: "text-purple-400",
-                    change: stats.thisMonth > 0 ? "spending" : "no activity"
-                  },
-                  { 
-                    label: "Daily Average", 
-                    value: `₹${Math.round(stats.avgPerDay).toLocaleString()}`, 
-                    icon: TrendingUp, 
-                    color: "text-blue-400",
-                    change: "per day"
-                  },
-                  { 
-                    label: "Active Projects", 
-                    value: stats.activeProjects.toString(), 
-                    icon: Zap, 
-                    color: "text-emerald-400",
-                    change: "running"
-                  },
-                  { 
-                    label: "Est. Monthly", 
-                    value: `₹${Math.round(stats.estimatedMonthly).toLocaleString()}`, 
-                    icon: Target, 
-                    color: "text-orange-400",
-                    change: "projects cost"
-                  },
-                ].map((stat, index) => (
-                  <div key={index} className="p-4 rounded-xl bg-gradient-to-r from-gray-800/30 to-black/30 border border-gray-700/30">
-                    <div className="flex items-center gap-3 mb-2">
-                      <stat.icon className={`w-5 h-5 ${stat.color}`} />
-                      <span className="text-gray-300 text-sm font-medium">{stat.label}</span>
-                    </div>
-                    <div className="text-xl font-bold text-gray-100">{stat.value}</div>
-                    <div className="text-xs text-gray-500">{stat.change}</div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
+            </div>
           </Card>
         </motion.div>
 
+        {/* Stats Grid */}
+        {stats && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+          >
+            <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black border border-purple-500/20">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-400 text-sm">Monthly Spent</p>
+                    <p className="text-2xl font-bold text-red-400">₹{stats.monthlySpent}</p>
+                  </div>
+                  <ArrowDownIcon className="w-8 h-8 text-red-400" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black border border-purple-500/20">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-400 text-sm">Monthly Added</p>
+                    <p className="text-2xl font-bold text-green-400">₹{stats.monthlyAdded}</p>
+                  </div>
+                  <ArrowUpIcon className="w-8 h-8 text-green-400" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black border border-purple-500/20">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-400 text-sm">Active Projects</p>
+                    <p className="text-2xl font-bold text-blue-400">{stats.activeProjects}</p>
+                  </div>
+                  <Activity className="w-8 h-8 text-blue-400" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black border border-purple-500/20">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-400 text-sm">Est. Monthly Cost</p>
+                    <p className="text-2xl font-bold text-orange-400">₹{stats.estimatedMonthlyCost}</p>
+                  </div>
+                  <TrendingUpIcon className="w-8 h-8 text-orange-400" />
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
         {/* Add Funds Section */}
-        <motion.div variants={fadeIn} className="mb-8">
-          <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-purple-500/20">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8"
+        >
+          <Card className="lg:col-span-2 bg-gradient-to-br from-black via-gray-900/90 to-black border border-purple-500/20">
             <CardHeader>
-              <CardTitle className="flex items-center gap-3">
+              <CardTitle className="text-gray-100 flex items-center gap-2">
                 <Plus className="w-5 h-5 text-purple-400" />
                 Add Funds
               </CardTitle>
               <CardDescription className="text-gray-400">
-                Add money to your DeployLite wallet using Razorpay
+                Add money to your DeployLite wallet for deployments
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
-                  <Label htmlFor="amount" className="text-gray-300 mb-2 block">
-                    Amount (INR)
-                  </Label>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {[100, 500, 1000, 2000].map((amount) => (
+                    <Button
+                      key={amount}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setAddFundsAmount(amount.toString())}
+                      className="border-purple-500/30 hover:bg-purple-500/10"
+                    >
+                      ₹{amount}
+                    </Button>
+                  ))}
+                </div>
+                <div className="flex gap-4">
                   <Input
-                    id="amount"
-                    type="number"
                     placeholder="Enter amount"
                     value={addFundsAmount}
                     onChange={(e) => setAddFundsAmount(e.target.value)}
-                    className="bg-black/50 border-gray-700 text-white placeholder-gray-500 focus:border-purple-500/50"
+                    className="bg-black/50 border-gray-700 text-white"
+                    type="number"
+                    min="1"
                   />
-                </div>
-                <div className="flex items-end">
                   <Button
                     onClick={handleRazorpayPayment}
                     disabled={loading || !addFundsAmount}
-                    className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-8"
+                    className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 min-w-[120px]"
                   >
                     {loading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Processing...
-                      </>
+                      <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
                       <>
                         <CreditCardIcon className="w-4 h-4 mr-2" />
@@ -668,86 +704,110 @@ export default function Wallet() {
               </div>
             </CardContent>
           </Card>
+
+          <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black border border-purple-500/20">
+            <CardHeader>
+              <CardTitle className="text-gray-100">Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button 
+                variant="outline" 
+                className="w-full border-purple-500/30 hover:bg-purple-500/10"
+                onClick={() => router.push('/settings')}
+              >
+                <SettingsIcon className="w-4 h-4 mr-2" />
+                Account Settings
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full border-purple-500/30 hover:bg-purple-500/10"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download Statement
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full border-purple-500/30 hover:bg-purple-500/10"
+              >
+                <AlertTriangleIcon className="w-4 h-4 mr-2" />
+                Usage Alerts
+              </Button>
+            </CardContent>
+          </Card>
         </motion.div>
 
         {/* Tabs Section */}
-        <motion.div variants={fadeIn}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
           <Tabs defaultValue="transactions" className="w-full">
-            <TabsList className="grid grid-cols-3 lg:grid-cols-4 mb-8 bg-gradient-to-r from-gray-900/50 to-black/50 backdrop-blur-xl border border-purple-500/20 rounded-xl p-1">
-              <TabsTrigger value="transactions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-blue-500/20 data-[state=active]:text-purple-300 data-[state=active]:border data-[state=active]:border-purple-500/30 rounded-lg transition-all duration-300">
+            <TabsList className="grid grid-cols-4 bg-gradient-to-r from-gray-900/50 to-black/50 border border-purple-500/20">
+              <TabsTrigger value="transactions" className="data-[state=active]:bg-purple-500/20">
                 Transactions
               </TabsTrigger>
-              <TabsTrigger value="analytics" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-blue-500/20 data-[state=active]:text-purple-300 data-[state=active]:border data-[state=active]:border-purple-500/30 rounded-lg transition-all duration-300">
+              <TabsTrigger value="analytics" className="data-[state=active]:bg-purple-500/20">
                 Analytics
               </TabsTrigger>
-              <TabsTrigger value="crypto" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-blue-500/20 data-[state=active]:text-purple-300 data-[state=active]:border data-[state=active]:border-purple-500/30 rounded-lg transition-all duration-300">
-                Crypto
-              </TabsTrigger>
-              <TabsTrigger value="projects" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-blue-500/20 data-[state=active]:text-purple-300 data-[state=active]:border data-[state=active]:border-purple-500/30 rounded-lg transition-all duration-300">
+              <TabsTrigger value="projects" className="data-[state=active]:bg-purple-500/20">
                 Projects
+              </TabsTrigger>
+              <TabsTrigger value="crypto" className="data-[state=active]:bg-purple-500/20">
+                Crypto
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="transactions" className="space-y-6">
-              <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-purple-500/20">
+            {/* Transactions Tab */}
+            <TabsContent value="transactions">
+              <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black border border-purple-500/20">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-3">
-                    <Activity className="w-5 h-5 text-purple-400" />
-                    Recent Transactions
-                  </CardTitle>
+                  <CardTitle className="text-gray-100">Transaction History</CardTitle>
+                  <CardDescription className="text-gray-400">
+                    All your wallet transactions
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {wallet?.transactions && wallet.transactions.length > 0 ? (
-                    <div className="space-y-3">
-                      {wallet.transactions
+                  {walletData?.transactions && walletData.transactions.length > 0 ? (
+                    <div className="space-y-4 max-h-96 overflow-y-auto">
+                      {walletData.transactions
                         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                        .slice(0, 10)
                         .map((tx, index) => (
-                          <motion.div
-                            key={index}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-800/30 to-black/30 border border-gray-700/30 hover:border-purple-500/30 transition-colors"
-                          >
-                            <div className="flex items-center gap-4">
-                              <div className={`p-2 rounded-lg ${
-                                tx.type === 'credit' 
-                                  ? 'bg-emerald-500/20 text-emerald-400' 
-                                  : 'bg-red-500/20 text-red-400'
-                              }`}>
-                                {tx.type === 'credit' ? (
-                                  <ArrowUpRight className="w-4 h-4" />
-                                ) : (
-                                  <ArrowDownLeft className="w-4 h-4" />
-                                )}
-                              </div>
-                              <div>
-                                <p className="font-medium text-gray-200">{tx.description}</p>
-                                <div className="flex items-center gap-2 text-sm text-gray-400">
-                                  <Calendar className="w-3 h-3" />
-                                  {formatDate(tx.date)}
-                                  <Clock className="w-3 h-3 ml-2" />
-                                  {formatTime(tx.date)}
-                                </div>
-                              </div>
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-4 rounded-lg bg-gray-800/50 border border-gray-700/50"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className={`p-2 rounded-lg ${
+                              tx.type === 'credit' 
+                                ? 'bg-green-500/20 text-green-400' 
+                                : 'bg-red-500/20 text-red-400'
+                            }`}>
+                              {tx.type === 'credit' ? 
+                                <ArrowUpIcon className="w-4 h-4" /> : 
+                                <ArrowDownIcon className="w-4 h-4" />
+                              }
                             </div>
-                            <div className="text-right">
-                              <p className={`font-bold text-lg ${
-                                tx.type === 'credit' ? 'text-emerald-400' : 'text-red-400'
-                              }`}>
-                                {tx.type === 'credit' ? '+' : '-'}₹{tx.amount.toLocaleString()}
+                            <div>
+                              <p className="font-medium text-gray-200">{tx.description}</p>
+                              <p className="text-sm text-gray-400">
+                                {new Date(tx.date).toLocaleDateString()} at{' '}
+                                {new Date(tx.date).toLocaleTimeString()}
                               </p>
-                              <Badge variant="secondary" className="bg-gray-700/50 text-gray-300 text-xs">
-                                {tx.type === 'credit' ? 'Credit' : 'Debit'}
-                              </Badge>
                             </div>
-                          </motion.div>
-                        ))}
+                          </div>
+                          <div className="text-right">
+                            <p className={`font-bold ${
+                              tx.type === 'credit' ? 'text-green-400' : 'text-red-400'
+                            }`}>
+                              {tx.type === 'credit' ? '+' : '-'}₹{tx.amount}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   ) : (
-                    <div className="text-center py-12">
-                      <Activity className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                    <div className="text-center py-8">
                       <p className="text-gray-400">No transactions found</p>
                     </div>
                   )}
@@ -755,332 +815,188 @@ export default function Wallet() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="analytics" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Spending Chart */}
-                <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-purple-500/20">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-3">
-                      <LineChart className="w-5 h-5 text-purple-400" />
-                      Daily Spending Trend
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-64">
-                      <Line data={generateChartData()} options={chartOptions} />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Categories Chart */}
-                <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-purple-500/20">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-3">
-                      <PieChart className="w-5 h-5 text-purple-400" />
-                      Spending Categories
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-64 flex items-center justify-center">
-                      {generateCategoriesChart().labels.length > 0 ? (
-                        <Doughnut 
-                          data={generateCategoriesChart()} 
-                          options={{
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                              legend: {
-                                position: 'bottom',
-                                labels: { color: '#9ca3af' }
-                              }
-                            }
-                          }} 
-                        />
-                      ) : (
-                        <div className="text-center">
-                          <PieChart className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-                          <p className="text-gray-400">No spending data available</p>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Monthly Statistics */}
-              <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-purple-500/20">
+            {/* Analytics Tab */}
+            <TabsContent value="analytics">
+              <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black border border-purple-500/20">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-3">
-                    <BarChart3 className="w-5 h-5 text-purple-400" />
-                    Monthly Overview
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div className="text-center p-6 rounded-xl bg-gradient-to-r from-purple-500/10 to-blue-500/10">
-                      <div className="text-3xl font-bold text-purple-400 mb-2">
-                        ₹{stats.thisMonth.toLocaleString()}
-                      </div>
-                      <p className="text-gray-300 text-sm">This Month</p>
-                      <p className="text-gray-500 text-xs mt-1">Total spent</p>
-                    </div>
-                    <div className="text-center p-6 rounded-xl bg-gradient-to-r from-blue-500/10 to-cyan-500/10">
-                      <div className="text-3xl font-bold text-blue-400 mb-2">
-                        ₹{Math.round(stats.avgPerDay).toLocaleString()}
-                      </div>
-                      <p className="text-gray-300 text-sm">Daily Average</p>
-                      <p className="text-gray-500 text-xs mt-1">Per day spending</p>
-                    </div>
-                    <div className="text-center p-6 rounded-xl bg-gradient-to-r from-emerald-500/10 to-green-500/10">
-                      <div className="text-3xl font-bold text-emerald-400 mb-2">
-                        {stats.activeProjects}
-                      </div>
-                      <p className="text-gray-300 text-sm">Active Projects</p>
-                      <p className="text-gray-500 text-xs mt-1">Running services</p>
-                    </div>
-                    <div className="text-center p-6 rounded-xl bg-gradient-to-r from-orange-500/10 to-red-500/10">
-                      <div className="text-3xl font-bold text-orange-400 mb-2">
-                        ₹{Math.round(stats.estimatedMonthly).toLocaleString()}
-                      </div>
-                      <p className="text-gray-300 text-sm">Estimated Cost</p>
-                      <p className="text-gray-500 text-xs mt-1">Monthly projection</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="crypto" className="space-y-6">
-              <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-purple-500/20">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-3">
-                    <WalletIcon className="w-5 h-5 text-purple-400" />
-                    Crypto Payments
-                  </CardTitle>
+                  <CardTitle className="text-gray-100">Spending Analytics</CardTitle>
                   <CardDescription className="text-gray-400">
-                    Pay with Ethereum using MetaMask
+                    Your spending patterns over time
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  {cryptoConnected ? (
-                    <>
-                      <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
-                          <span className="text-emerald-400 font-medium">Wallet Connected</span>
-                        </div>
-                        <p className="text-sm text-gray-300 mb-2">
-                          Address: <code className="text-xs bg-black/30 px-2 py-1 rounded">{cryptoWalletAddress.slice(0, 6)}...{cryptoWalletAddress.slice(-4)}</code>
-                        </p>
-                        <p className="text-sm text-gray-300">
-                          Balance: <span className="text-emerald-400 font-medium">{Number(cryptoBalance).toFixed(6)} ETH</span>
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="cryptoAmount" className="text-gray-300 mb-2 block">
-                            Amount (ETH)
-                          </Label>
-                          <Input
-                            id="cryptoAmount"
-                            type="number"
-                            step="0.0001"
-                            placeholder="0.01"
-                            value={cryptoAmount}
-                            onChange={(e) => setCryptoAmount(e.target.value)}
-                            className="bg-black/50 border-gray-700 text-white placeholder-gray-500 focus:border-purple-500/50"
-                          />
-                          {cryptoAmount && (
-                            <p className="text-xs text-gray-400 mt-1">
-                              ≈ ₹{(parseFloat(cryptoAmount) * 150000).toLocaleString()} INR
-                            </p>
-                          )}
-                        </div>
-                        <div className="flex items-end">
-                          <Button
-                            onClick={handleSendCryptoPayment}
-                            disabled={!cryptoAmount || parseFloat(cryptoAmount) <= 0}
-                            className="w-full bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white"
-                          >
-                            <ExternalLink className="w-4 h-4 mr-2" />
-                            Send Payment
-                          </Button>
-                        </div>
-                      </div>
-                    </>
+                <CardContent>
+                  {chartData ? (
+                    <div className="h-80">
+                      <Line data={chartData} options={chartOptions} />
+                    </div>
                   ) : (
-                    <div className="text-center py-12">
-                      <WalletIcon className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-200 mb-2">Connect MetaMask</h3>
-                      <p className="text-gray-400 mb-6">Connect your MetaMask wallet to pay with Ethereum</p>
-                      <Button
-                        onClick={handleConnectCryptoWallet}
-                        className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white px-8"
-                      >
-                        <WalletIcon className="w-4 h-4 mr-2" />
-                        Connect MetaMask
-                      </Button>
+                    <div className="h-80 flex items-center justify-center">
+                      <p className="text-gray-400">No data available for chart</p>
                     </div>
                   )}
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="projects" className="space-y-6">
-              <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-purple-500/20">
+            {/* Projects Tab */}
+            <TabsContent value="projects">
+              <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black border border-purple-500/20">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-3">
-                    <Zap className="w-5 h-5 text-purple-400" />
-                    Project Costs
-                  </CardTitle>
+                  <CardTitle className="text-gray-100">Project Costs</CardTitle>
                   <CardDescription className="text-gray-400">
-                    Billing information for your active projects
+                    Monthly costs for your active projects
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {projects && projects.length > 0 ? (
+                  {projects.length > 0 ? (
                     <div className="space-y-4">
-                      {projects.map((project, index) => (
-                        <motion.div
-                          key={index}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-800/30 to-black/30 border border-gray-700/30 hover:border-purple-500/30 transition-colors"
+                      {projects.map((project) => (
+                        <div
+                          key={project._id}
+                          className="flex items-center justify-between p-4 rounded-lg bg-gray-800/50 border border-gray-700/50"
                         >
-                          <div className="flex items-center gap-4">
-                            <div className={`p-2 rounded-lg ${
-                              project.projectstatus === 'live' 
-                                ? 'bg-emerald-500/20 text-emerald-400' 
-                                : project.projectstatus === 'failed'
-                                ? 'bg-red-500/20 text-red-400'
-                                : 'bg-orange-500/20 text-orange-400'
-                            }`}>
-                              <Zap className="w-4 h-4" />
-                            </div>
-                            <div>
-                              <p className="font-medium text-gray-200">{project.name}</p>
-                              <div className="flex items-center gap-2 text-sm text-gray-400">
-                                <Badge variant="secondary" className="bg-gray-700/50 text-gray-300 text-xs">
-                                  {project.planid?.name || 'Unknown Plan'}
-                                </Badge>
-                                <span className={`px-2 py-1 rounded-full text-xs ${
-                                  project.projectstatus === 'live' 
-                                    ? 'bg-emerald-500/20 text-emerald-400' 
-                                    : project.projectstatus === 'failed'
-                                    ? 'bg-red-500/20 text-red-400'
-                                    : 'bg-orange-500/20 text-orange-400'
-                                }`}>
-                                  {project.projectstatus}
-                                </span>
-                              </div>
-                            </div>
+                          <div>
+                            <p className="font-medium text-gray-200">{project.name}</p>
+                            <p className="text-sm text-gray-400">
+                              {project.planid?.name || 'Unknown Plan'} • Status: {project.projectstatus}
+                            </p>
                           </div>
                           <div className="text-right">
-                            <p className="font-bold text-gray-200">
-                              ₹{project.planid?.pricepmonth || '0'}/month
+                            <p className="font-bold text-purple-400">
+                              ₹{project.planid?.pricepmonth || 0}/month
                             </p>
                             <p className="text-sm text-gray-400">
-                              ₹{project.planid?.pricephour || '0'}/hour
+                              ₹{project.planid?.pricephour || 0}/hour
                             </p>
                           </div>
-                        </motion.div>
+                        </div>
                       ))}
-                      
-                      {/* Total Cost Summary */}
-                      <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-purple-400 font-medium">Total Estimated Monthly Cost</p>
-                            <p className="text-gray-400 text-sm">Based on active projects</p>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-400">No projects found</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Crypto Tab */}
+            <TabsContent value="crypto">
+              <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black border border-purple-500/20">
+                <CardHeader>
+                  <CardTitle className="text-gray-100 flex items-center gap-2">
+                    <WalletIcon className="w-5 h-5 text-purple-400" />
+                    Crypto Wallet
+                  </CardTitle>
+                  <CardDescription className="text-gray-400">
+                    Connect your MetaMask wallet for crypto payments
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {cryptoConnected ? (
+                    <div className="space-y-6">
+                      <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                          <span className="text-green-400 font-medium">Wallet Connected</span>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-300 text-sm">Address:</span>
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-xs text-gray-200">
+                                {cryptoWalletAddress.slice(0, 6)}...{cryptoWalletAddress.slice(-4)}
+                              </span>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(cryptoWalletAddress);
+                                  toast.success("Address copied to clipboard");
+                                }}
+                                className="h-6 w-6 p-0"
+                              >
+                                <CopyIcon className="w-3 h-3" />
+                              </Button>
+                            </div>
                           </div>
-                          <div className="text-right">
-                            <p className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                              ₹{Math.round(stats.estimatedMonthly).toLocaleString()}
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-300 text-sm">Balance:</span>
+                            <span className="text-purple-400 font-medium">
+                              {Number(cryptoBalance).toFixed(4)} ETH
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Label htmlFor="cryptoAmount" className="text-gray-200">
+                          Payment Amount (ETH)
+                        </Label>
+                        <div className="flex gap-2">
+                          <Input
+                            id="cryptoAmount"
+                            placeholder="0.001"
+                            value={cryptoAmount}
+                            onChange={(e) => setCryptoAmount(e.target.value)}
+                            className="bg-black/50 border-gray-700 text-white"
+                            type="number"
+                            step="0.001"
+                            min="0"
+                          />
+                          <Button
+                            onClick={handleSendCryptoPayment}
+                            disabled={!cryptoAmount || Number(cryptoAmount) <= 0}
+                            className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 min-w-[100px]"
+                          >
+                            Send ETH
+                          </Button>
+                        </div>
+                        {cryptoAmount && Number(cryptoAmount) > 0 && (
+                          <p className="text-sm text-gray-400">
+                            ≈ ₹{(Number(cryptoAmount) * 150000).toFixed(2)} INR
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                        <div className="flex items-start gap-3">
+                          <AlertTriangleIcon className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <h4 className="text-amber-400 font-medium">Important Notice</h4>
+                            <p className="text-amber-300/80 text-sm mt-1">
+                              Crypto payments are sent directly to our wallet address. 
+                              Please ensure you're sending from a compatible wallet and network.
                             </p>
-                            <p className="text-sm text-gray-400">per month</p>
                           </div>
                         </div>
                       </div>
                     </div>
                   ) : (
-                    <div className="text-center py-12">
-                      <Zap className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-                      <p className="text-gray-400">No projects found</p>
-                      <Button
-                        onClick={() => router.push('/project')}
-                        className="mt-4 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
-                      >
-                        Create Project
-                      </Button>
+                    <div className="text-center space-y-4">
+                      <div className="p-8">
+                        <WalletIcon className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-gray-200 mb-2">
+                          Connect MetaMask Wallet
+                        </h3>
+                        <p className="text-gray-400 mb-6">
+                          Connect your MetaMask wallet to make crypto payments for DeployLite services
+                        </p>
+                        <Button
+                          onClick={handleConnectCryptoWallet}
+                          className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                        >
+                          <WalletIcon className="w-4 h-4 mr-2" />
+                          Connect MetaMask
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
-        </motion.div>
-
-        {/* Quick Actions Footer */}
-        <motion.div variants={fadeIn} className="mt-8">
-          <Card className="bg-gradient-to-r from-gray-900/50 to-black/50 backdrop-blur-xl border border-purple-500/20">
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold text-gray-200 mb-4 flex items-center gap-2">
-                <Activity className="w-5 h-5 text-purple-400" />
-                Quick Actions
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Button
-                  onClick={() => router.push('/project')}
-                  className="justify-start h-auto p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20 hover:border-purple-500/40 hover:from-purple-500/20 hover:to-blue-500/20 text-left transition-all duration-300"
-                  variant="ghost"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-lg">
-                      <Zap className="w-4 h-4 text-purple-400" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-200">Create Project</div>
-                      <div className="text-sm text-gray-400">Deploy new services</div>
-                    </div>
-                  </div>
-                </Button>
-
-                <Button
-                  onClick={() => router.push('/settings')}
-                  className="justify-start h-auto p-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 hover:border-blue-500/40 hover:from-blue-500/20 hover:to-cyan-500/20 text-left transition-all duration-300"
-                  variant="ghost"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-lg">
-                      <SettingsIcon className="w-4 h-4 text-blue-400" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-200">Account Settings</div>
-                      <div className="text-sm text-gray-400">Manage your account</div>
-                    </div>
-                  </div>
-                </Button>
-
-                <Button
-                  onClick={fetchWalletData}
-                  className="justify-start h-auto p-4 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20 hover:border-emerald-500/40 hover:from-emerald-500/20 hover:to-green-500/20 text-left transition-all duration-300"
-                  variant="ghost"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-r from-emerald-500/20 to-green-500/20 rounded-lg">
-                      <RefreshCwIcon className="w-4 h-4 text-emerald-400" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-200">Refresh Data</div>
-                      <div className="text-sm text-gray-400">Update wallet balance</div>
-                    </div>
-                  </div>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
         </motion.div>
       </motion.div>
     </div>
