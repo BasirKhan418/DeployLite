@@ -7,6 +7,7 @@ import { Checkip } from "../applogics/enquiry/Checkip.js";
 import { FullStackHost } from "../applogics/host/FullStackHost.js";
 import { Delete } from "../applogics/delete/Delete.js";
 import { WebBuilder } from "../applogics/host/webbuilder.js";
+import { VirtualSpace } from "../applogics/host/virtualspace.js";
 const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -14,6 +15,7 @@ router.get('/', (req, res) => {
 });
 
 router.post('/react',reactHost);
+router.post('/virtualspace', VirtualSpace);
 router.post('/angular',angularHost);
 router.post('/frontend',frontendHost);
 router.post('/webbuilder',WebBuilder);

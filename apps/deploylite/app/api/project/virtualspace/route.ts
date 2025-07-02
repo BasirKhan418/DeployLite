@@ -30,7 +30,7 @@ export const GET = async () => {
             }, { status: 404 });
         }
         
-        const projectdata = await WebBuilder.find({ userid: user._id }).populate("userid");
+        const projectdata = await VirtualSpace.find({ userid: user._id }).populate("userid");
         
         if (!projectdata || projectdata.length === 0) {
             return NextResponse.json({
@@ -47,7 +47,7 @@ export const GET = async () => {
         });
         
     } catch (err) {
-        console.error("Error in GET /api/project/wordpress:", err);
+        console.error("Error in GET /api/project/virtualspace:", err);
         return NextResponse.json({
             success: false,
             message: "Something went wrong please try again later!"
@@ -81,12 +81,7 @@ export const POST = async (req: NextRequest) => {
             }, { status: 400 });
         }
 
-        if (!data.dbname || !data.dbuser || !data.dbpass) {
-            return NextResponse.json({
-                message: "Database credentials (dbname, dbuser, dbpass) are required",
-                success: false,
-            }, { status: 400 });
-        }
+     
 
         if (!data.planid) {
             return NextResponse.json({
@@ -127,7 +122,7 @@ export const POST = async (req: NextRequest) => {
                 virtualspacename: "exists"
             }, { status: 409 });
         }
-
+        
         console.log("Checking plan:", data.planid);
         const checkplan = await PricingPlan.findOne({ _id: data.planid });
         
@@ -163,7 +158,7 @@ export const POST = async (req: NextRequest) => {
         console.log('End Billing Date (Next day, 12:00 AM local time):', endbilingdate.toLocaleString());
         
        
-        const project = new WebBuilder({
+        const project = new VirtualSpace({
             name: name,
             planid: data.planid,
             userid: user._id,
@@ -172,10 +167,6 @@ export const POST = async (req: NextRequest) => {
             billstatus: "pending",
             startbilingdate: startbilingdate,
             endbilingdate: endbilingdate,
-            webbuilder: data.webbuilder || "WordPress",
-            dbname: data.dbname,        
-            dbuser: data.dbuser,
-            dbpass: data.dbpass,
         });
         
         console.log("Project object before save:", project);
@@ -185,7 +176,7 @@ export const POST = async (req: NextRequest) => {
         console.log("Project saved successfully:", project._id);
         
         // Call deployment API
-        const createdep = await fetch(`${process.env.DEPLOYMENT_API}/createdeployment/webbuilder`, {
+        const createdep = await fetch(`${process.env.DEPLOYMENT_API}/createdeployment/virtualspace`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -195,9 +186,7 @@ export const POST = async (req: NextRequest) => {
                 projectid: project._id,
                 userid: user._id,
                 name: name,
-                dbname: data.dbname,
-                dbuser: data.dbuser,
-                dbpass: data.dbpass
+                passwd: data.password || "",
             })
         });
         
@@ -245,7 +234,7 @@ export const DELETE = async (req: NextRequest) => {
             }, { status: 401 });
         }
         
-        const projectdelete = await WebBuilder.findOneAndDelete({ _id: data.id });
+        const projectdelete = await VirtualSpace.findOneAndDelete({ _id: data.id });
         console.log("Project to delete:", projectdelete);
         
         if(projectdelete !== null && (projectdelete.arn !== null && projectdelete.arn !== undefined && projectdelete.arn !== "")) {
@@ -275,7 +264,7 @@ export const DELETE = async (req: NextRequest) => {
         
         return NextResponse.json({
             success: true,
-            message: "WebBuilder Deleted Successfully"
+            message: "Virtual Space Deleted Successfully"
         });
         
     } catch (err) {
