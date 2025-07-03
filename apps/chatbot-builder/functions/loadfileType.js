@@ -61,8 +61,10 @@ const loadFileByType=async(url)=> {
     if (lowerUrl.endsWith('.html') || lowerUrl.endsWith('.htm')) {
       return await webLoaderFromUrl(url);
     }
+    else{
+        return await webLoaderFromUrl(url);
+    }
 
-    throw new Error('Unsupported file type or unrecognized URL format.');
   } catch (error) {
     console.error('Error while loading file:', error);
     throw error;

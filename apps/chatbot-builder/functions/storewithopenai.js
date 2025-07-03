@@ -11,7 +11,8 @@ export async function storeWithOpenAI(splitDocs) {
 
   const vectorStore = await QdrantVectorStore.fromDocuments(splitDocs, embeddings, {
     url: process.env.QDRANT_URL ,
-    collectionName:process.env.QDRANT_COLLECTION_NAME 
+    dimensions: 3072,
+    collectionName:process.env.QDRANT_COLLECTION_NAME_openai 
   });
 
   console.log("✅ Documents embedded and stored with OpenAI.");
