@@ -45,7 +45,7 @@ const CreateDatabase = async (req, res) => {
             });
         }
         
-        console.log("Updated project:", updateproject.name);
+        
         
         // Call deployment API for webbuilder (WordPress container)
         const result = await fetch(`${process.env.DEPLOYMENT_API}/deploy/mysql`, {
@@ -55,7 +55,6 @@ const CreateDatabase = async (req, res) => {
                 Authorization: token,
             },
             body: JSON.stringify({
-                projectid: projectname,
                 dbname,
                 dbuser,
                 dbpass,
@@ -112,7 +111,7 @@ const CreateDatabase = async (req, res) => {
                     success: true,
                     message: "Database Deployment Started Successfully",
                     data: {
-                        projectUrl: `https://${projectname}.host.deploylite.tech`,
+                        projecturl:`mysql://${dbuser}:${dbpass}@${data2.url}:3306/${dbname}`,
                         publicIp: data2.url,
                         taskArn: data.data.tasks[0].taskArn
                     }
@@ -176,7 +175,7 @@ const CreateDatabase = async (req, res) => {
             });
         }
         
-        console.log("Updated project:", updateproject.name);
+        
         
         // Call deployment API for webbuilder (WordPress container)
         const result = await fetch(`${process.env.DEPLOYMENT_API}/deploy/mongodb`, {
@@ -186,7 +185,7 @@ const CreateDatabase = async (req, res) => {
                 Authorization: token,
             },
             body: JSON.stringify({
-                projectid: projectname,
+               
                 dbname,
                 dbuser,
                 dbpass,
@@ -301,7 +300,7 @@ const CreateDatabase = async (req, res) => {
             });
         }
         
-        console.log("Updated project:", updateproject.name);
+       
         
         // Call deployment API for webbuilder (WordPress container)
         const result = await fetch(`${process.env.DEPLOYMENT_API}/deploy/redis`, {
@@ -311,7 +310,6 @@ const CreateDatabase = async (req, res) => {
                 Authorization: token,
             },
             body: JSON.stringify({
-                projectid: projectname,
                 dbname,
                 dbuser,
                 dbpass,
@@ -427,7 +425,7 @@ const CreateDatabase = async (req, res) => {
             });
         }
         
-        console.log("Updated project:", updateproject.name);
+        
         
         // Call deployment API for webbuilder (WordPress container)
         const result = await fetch(`${process.env.DEPLOYMENT_API}/deploy/qdrant`, {
@@ -437,7 +435,6 @@ const CreateDatabase = async (req, res) => {
                 Authorization: token,
             },
             body: JSON.stringify({
-                projectid: projectname,
                 dbname,
                 dbuser,
                 dbpass,

@@ -7,7 +7,7 @@ const Redis= async (req, res) => {
     task: process.env.task9,
   };
   //getting the giturl and projectid
-  const {  projectid,
+  const { 
                 dbname,
                 dbuser,
                 dbpass,

@@ -7,7 +7,7 @@ const MySql = async (req, res) => {
     task: process.env.task7,
   };
   //getting the giturl and projectid
-  const {  projectid,
+  const { 
                 dbname,
                 dbuser,
                 dbpass,

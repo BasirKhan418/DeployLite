@@ -7,7 +7,7 @@ const Qdrant= async (req, res) => {
     task: process.env.task10,
   };
   //getting the giturl and projectid
-  const {  projectid,
+  const {  
                 dbname,
                 dbuser,
                 dbpass,

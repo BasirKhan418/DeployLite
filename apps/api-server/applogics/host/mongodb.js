@@ -7,7 +7,7 @@ const MongoDb = async (req, res) => {
     task: process.env.task8,
   };
   //getting the giturl and projectid
-  const {  projectid,
+  const {  
                 dbname,
                 dbuser,
                 dbpass,
