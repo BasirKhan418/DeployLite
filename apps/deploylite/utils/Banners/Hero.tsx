@@ -23,7 +23,10 @@ import {
   Globe,
   Layers,
   Monitor,
-  Settings
+  Settings,
+  CloudLightning,
+  Terminal,
+  Shield,
 } from "lucide-react";
 import { useAppSelector } from "@/lib/hook";
 
@@ -48,20 +51,24 @@ interface ChartDataPoint {
   name: string;
   deployments: number;
   webbuilders: number;
+  virtualspaces: number;
 }
 
 interface DeploymentStats {
   chartData: ChartDataPoint[];
   totalDeployments: number;
   totalWebBuilders: number;
+  totalVirtualSpaces: number;
   activeProjects: number;
   activeWebBuilders: number;
+  activeVirtualSpaces: number;
 }
 
 interface BuildStats {
   successfulBuildPercentage: number;
   failedBuildPercentage: number;
   webBuilderSuccessRate: number;
+  virtualSpaceSuccessRate: number;
 }
 
 interface RecentDeployment {
@@ -71,7 +78,7 @@ interface RecentDeployment {
   timestamp: Date;
   techStack?: string;
   projectUrl?: string;
-  type: 'app-platform' | 'webbuilder';
+  type: 'app-platform' | 'webbuilder' | 'virtualspace';
   webBuilderType?: string;
 }
 
@@ -86,7 +93,7 @@ interface ProjectData {
   type: string;
   repourl?: string;
   planid?: string;
-  webbuilder?: string; // For WebBuilder projects
+  webbuilder?: string;
 }
 
 interface WebBuilderData {
@@ -98,6 +105,23 @@ interface WebBuilderData {
   updatedAt?: Date;
   webbuilder?: string;
   planid?: string;
+}
+
+interface VirtualSpaceData {
+  _id: string;
+  name: string;
+  projectstatus: string;
+  startdate?: Date;
+  updatedAt?: Date;
+  url?: string;
+  projecturl?: string;
+  cpuusage?: string;
+  memoryusage?: string;
+  storageusage?: string;
+  planid?: {
+    name: string;
+    pricephour: string;
+  };
 }
 
 // Professional animations
@@ -123,7 +147,8 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
   
   const maxDeployments = Math.max(...data.map(d => d.deployments), 1);
   const maxWebBuilders = Math.max(...data.map(d => d.webbuilders), 1);
-  const maxValue = Math.max(maxDeployments, maxWebBuilders);
+  const maxVirtualSpaces = Math.max(...data.map(d => d.virtualspaces), 1);
+  const maxValue = Math.max(maxDeployments, maxWebBuilders, maxVirtualSpaces);
   
   const width = 600;
   const height = 300;
@@ -141,11 +166,21 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
     return { x, y, value: item.webbuilders, name: item.name, index, type: 'webbuilders' };
   });
 
+  const virtualSpacePoints = data.map((item, index) => {
+    const x = padding + (index * (width - padding * 2)) / (data.length - 1);
+    const y = padding + (height - padding * 2) - (item.virtualspaces / maxValue) * (height - padding * 2);
+    return { x, y, value: item.virtualspaces, name: item.name, index, type: 'virtualspaces' };
+  });
+
   const deploymentPath = deploymentPoints.map((point, index) => 
     `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`
   ).join(' ');
 
   const webBuilderPath = webBuilderPoints.map((point, index) => 
+    `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`
+  ).join(' ');
+
+  const virtualSpacePath = virtualSpacePoints.map((point, index) => 
     `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`
   ).join(' ');
 
@@ -182,6 +217,11 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
             <stop offset="50%" stopColor="#8b5cf6" stopOpacity={0.15} />
             <stop offset="100%" stopColor="#06b6d4" stopOpacity={0.05} />
           </linearGradient>
+          <linearGradient id="virtualSpaceGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />
+            <stop offset="50%" stopColor="#f59e0b" stopOpacity={0.15} />
+            <stop offset="100%" stopColor="#10b981" stopOpacity={0.05} />
+          </linearGradient>
           <linearGradient id="deploymentLineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="#ec4899" />
             <stop offset="50%" stopColor="#a855f7" />
@@ -191,6 +231,11 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
             <stop offset="0%" stopColor="#06b6d4" />
             <stop offset="50%" stopColor="#8b5cf6" />
             <stop offset="100%" stopColor="#06b6d4" />
+          </linearGradient>
+          <linearGradient id="virtualSpaceLineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#10b981" />
+            <stop offset="50%" stopColor="#f59e0b" />
+            <stop offset="100%" stopColor="#10b981" />
           </linearGradient>
         </defs>
         
@@ -256,6 +301,20 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
           animate={{ pathLength: 1 }}
           transition={{ duration: 2, ease: "easeInOut", delay: 0.5 }}
         />
+
+        {/* Virtual Space line */}
+        <motion.path
+          d={virtualSpacePath}
+          fill="none"
+          stroke="url(#virtualSpaceLineGradient)"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeDasharray="3,3"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 2, ease: "easeInOut", delay: 1 }}
+        />
         
         {/* Deployment data points */}
         <AnimatePresence>
@@ -286,10 +345,10 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
                   transition={{ duration: 0.2 }}
                 >
                   <rect
-                    x={point.x - 60}
-                    y={point.y - 75}
-                    width="120"
-                    height="60"
+                    x={point.x - 70}
+                    y={point.y - 90}
+                    width="140"
+                    height="75"
                     fill="#000"
                     stroke="#ec4899"
                     strokeWidth="1"
@@ -298,7 +357,7 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
                   />
                   <text
                     x={point.x}
-                    y={point.y - 55}
+                    y={point.y - 70}
                     textAnchor="middle"
                     fill="#fff"
                     fontSize="12"
@@ -308,7 +367,7 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
                   </text>
                   <text
                     x={point.x}
-                    y={point.y - 40}
+                    y={point.y - 55}
                     textAnchor="middle"
                     fill="#ec4899"
                     fontSize="11"
@@ -318,13 +377,23 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
                   </text>
                   <text
                     x={point.x}
-                    y={point.y - 25}
+                    y={point.y - 40}
                     textAnchor="middle"
                     fill="#06b6d4"
                     fontSize="11"
                     fontWeight="600"
                   >
                     WebBuilders: {webBuilderPoints[index]?.value || 0}
+                  </text>
+                  <text
+                    x={point.x}
+                    y={point.y - 25}
+                    textAnchor="middle"
+                    fill="#10b981"
+                    fontSize="11"
+                    fontWeight="600"
+                  >
+                    Virtual Spaces: {virtualSpacePoints[index]?.value || 0}
                   </text>
                 </motion.g>
               )}
@@ -347,6 +416,26 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
               initial={{ scale: 0 }}
               animate={{ scale: animationComplete ? 1 : 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 + 2 }}
+              whileHover={{ scale: 1.3 }}
+            />
+          ))}
+        </AnimatePresence>
+
+        {/* Virtual Space data points */}
+        <AnimatePresence>
+          {virtualSpacePoints.map((point, index) => (
+            <motion.circle
+              key={`virtualspace-${index}`}
+              cx={point.x}
+              cy={point.y}
+              r={4}
+              fill="#10b981"
+              stroke="#000"
+              strokeWidth="1"
+              className="cursor-pointer"
+              initial={{ scale: 0 }}
+              animate={{ scale: animationComplete ? 1 : 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 + 2.5 }}
               whileHover={{ scale: 1.3 }}
             />
           ))}
@@ -381,12 +470,14 @@ const InteractiveLineChart = ({ data }: { data: ChartDataPoint[] }) => {
         ))}
 
         {/* Legend */}
-        <g transform="translate(450, 30)">
-          <rect x="0" y="0" width="140" height="50" fill="#000" stroke="#374151" strokeWidth="1" rx="4" opacity={0.9} />
+        <g transform="translate(420, 20)">
+          <rect x="0" y="0" width="170" height="70" fill="#000" stroke="#374151" strokeWidth="1" rx="4" opacity={0.9} />
           <circle cx="15" cy="15" r="4" fill="#ec4899" />
           <text x="25" y="19" fill="#fff" fontSize="11">App Platform</text>
           <circle cx="15" cy="35" r="4" fill="#06b6d4" />
           <text x="25" y="39" fill="#fff" fontSize="11">WebBuilder</text>
+          <circle cx="15" cy="55" r="4" fill="#10b981" />
+          <text x="25" y="59" fill="#fff" fontSize="11">Virtual Space</text>
         </g>
       </svg>
     </div>
@@ -465,19 +556,23 @@ const DashboardHero = () => {
     chartData: [],
     totalDeployments: 0,
     totalWebBuilders: 0,
+    totalVirtualSpaces: 0,
     activeProjects: 0,
     activeWebBuilders: 0,
+    activeVirtualSpaces: 0,
   });
 
   const [buildStats, setBuildStats] = useState<BuildStats>({
     successfulBuildPercentage: 0,
     failedBuildPercentage: 0,
     webBuilderSuccessRate: 0,
+    virtualSpaceSuccessRate: 0,
   });
 
   const [recentDeployments, setRecentDeployments] = useState<RecentDeployment[]>([]);
   const [activeProjects, setActiveProjects] = useState<ProjectData[]>([]);
   const [activeWebBuilders, setActiveWebBuilders] = useState<WebBuilderData[]>([]);
+  const [activeVirtualSpaces, setActiveVirtualSpaces] = useState<VirtualSpaceData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
@@ -496,9 +591,14 @@ const DashboardHero = () => {
       // Fetch WebBuilder projects
       const webBuildersRes = await fetch('/api/project/wordpress');
       const webBuildersData = await webBuildersRes.json();
+
+      // Fetch Virtual Space projects
+      const virtualSpacesRes = await fetch('/api/project/virtualspace');
+      const virtualSpacesData = await virtualSpacesRes.json();
       
       let projects: ProjectData[] = [];
       let webBuilders: WebBuilderData[] = [];
+      let virtualSpaces: VirtualSpaceData[] = [];
 
       if (projectsData.success && projectsData.projectdata) {
         projects = projectsData.projectdata;
@@ -509,24 +609,35 @@ const DashboardHero = () => {
         webBuilders = webBuildersData.projectdata;
         setActiveWebBuilders(webBuilders);
       }
+
+      if (virtualSpacesData.success && virtualSpacesData.projectdata) {
+        virtualSpaces = virtualSpacesData.projectdata;
+        setActiveVirtualSpaces(virtualSpaces);
+      }
       
       const totalDeployments = projects.length;
       const totalWebBuilders = webBuilders.length;
+      const totalVirtualSpaces = virtualSpaces.length;
       const activeProjectsCount = projects.filter((p: ProjectData) => 
         p.projectstatus === 'live' || p.projectstatus === 'building'
       ).length;
       const activeWebBuildersCount = webBuilders.filter((w: WebBuilderData) => 
         w.projectstatus === 'live' || w.projectstatus === 'building'
       ).length;
+      const activeVirtualSpacesCount = virtualSpaces.filter((v: VirtualSpaceData) => 
+        v.projectstatus === 'live' || v.projectstatus === 'creating'
+      ).length;
       
-      const chartData = generateChartDataFromProjects(projects, webBuilders);
+      const chartData = generateChartDataFromProjects(projects, webBuilders, virtualSpaces);
       
       setDeploymentStats({
         chartData,
         totalDeployments,
         totalWebBuilders,
+        totalVirtualSpaces,
         activeProjects: activeProjectsCount,
         activeWebBuilders: activeWebBuildersCount,
+        activeVirtualSpaces: activeVirtualSpacesCount,
       });
       
       // Calculate success rates
@@ -537,17 +648,23 @@ const DashboardHero = () => {
       const liveWebBuilders = webBuilders.filter((w: WebBuilderData) => w.projectstatus === 'live').length;
       const failedWebBuilders = webBuilders.filter((w: WebBuilderData) => w.projectstatus === 'failed').length;
       const totalFinishedWebBuilders = liveWebBuilders + failedWebBuilders;
+
+      const liveVirtualSpaces = virtualSpaces.filter((v: VirtualSpaceData) => v.projectstatus === 'live').length;
+      const failedVirtualSpaces = virtualSpaces.filter((v: VirtualSpaceData) => v.projectstatus === 'failed').length;
+      const totalFinishedVirtualSpaces = liveVirtualSpaces + failedVirtualSpaces;
       
       const projectSuccessRate = totalFinishedProjects > 0 ? Math.round((liveProjects / totalFinishedProjects) * 100) : 0;
       const webBuilderSuccessRate = totalFinishedWebBuilders > 0 ? Math.round((liveWebBuilders / totalFinishedWebBuilders) * 100) : 0;
+      const virtualSpaceSuccessRate = totalFinishedVirtualSpaces > 0 ? Math.round((liveVirtualSpaces / totalFinishedVirtualSpaces) * 100) : 0;
       
       setBuildStats({
         successfulBuildPercentage: projectSuccessRate,
         failedBuildPercentage: 100 - projectSuccessRate,
         webBuilderSuccessRate: webBuilderSuccessRate,
+        virtualSpaceSuccessRate: virtualSpaceSuccessRate,
       });
       
-      // Combine recent deployments from both sources
+      // Combine recent deployments from all sources
       const projectDeployments = projects
         .filter((p: ProjectData) => p.lastdeploy || p.startdate)
         .map((p: ProjectData) => ({
@@ -572,7 +689,18 @@ const DashboardHero = () => {
           webBuilderType: w.webbuilder,
         }));
 
-      const allDeployments = [...projectDeployments, ...webBuilderDeployments]
+      const virtualSpaceDeployments = virtualSpaces
+        .filter((v: VirtualSpaceData) => v.startdate || v.updatedAt)
+        .map((v: VirtualSpaceData) => ({
+          id: v._id,
+          projectName: v.name,
+          status: v.projectstatus as 'live' | 'failed' | 'building' | 'creating',
+          timestamp: new Date(v.updatedAt || v.startdate || new Date()),
+          projectUrl: v.url || v.projecturl,
+          type: 'virtualspace' as const,
+        }));
+
+      const allDeployments = [...projectDeployments, ...webBuilderDeployments, ...virtualSpaceDeployments]
         .sort((a: RecentDeployment, b: RecentDeployment) => b.timestamp.getTime() - a.timestamp.getTime())
         .slice(0, 10);
       
@@ -586,7 +714,7 @@ const DashboardHero = () => {
     }
   };
 
-  const generateChartDataFromProjects = (projects: ProjectData[], webBuilders: WebBuilderData[]) => {
+  const generateChartDataFromProjects = (projects: ProjectData[], webBuilders: WebBuilderData[], virtualSpaces: VirtualSpaceData[]) => {
     const last6Months: ChartDataPoint[] = [];
     const now = new Date();
     
@@ -605,11 +733,18 @@ const DashboardHero = () => {
         return webBuilderDate.getMonth() === date.getMonth() && 
                webBuilderDate.getFullYear() === date.getFullYear();
       }).length;
+
+      const virtualSpacesInMonth = virtualSpaces.filter((v: VirtualSpaceData) => {
+        const virtualSpaceDate = new Date(v.startdate || v.updatedAt || 0);
+        return virtualSpaceDate.getMonth() === date.getMonth() && 
+               virtualSpaceDate.getFullYear() === date.getFullYear();
+      }).length;
       
       last6Months.push({
         name: monthName,
         deployments: deploymentsInMonth,
         webbuilders: webBuildersInMonth,
+        virtualspaces: virtualSpacesInMonth,
       });
     }
     
@@ -636,7 +771,11 @@ const DashboardHero = () => {
     }
   };
 
-  const getTechStackIcon = (techStack?: string, webBuilderType?: string) => {
+  const getTechStackIcon = (techStack?: string, webBuilderType?: string, type?: string) => {
+    if (type === 'virtualspace') {
+      return '💻 Virtual Space';
+    }
+
     if (webBuilderType) {
       switch (webBuilderType.toLowerCase()) {
         case 'wordpress': return '🏗️ WordPress';
@@ -668,8 +807,8 @@ const DashboardHero = () => {
     if (deploymentStats.chartData.length < 2) return null;
     const current = deploymentStats.chartData[deploymentStats.chartData.length - 1];
     const previous = deploymentStats.chartData[deploymentStats.chartData.length - 2];
-    const currentTotal = (current?.deployments || 0) + (current?.webbuilders || 0);
-    const previousTotal = (previous?.deployments || 0) + (previous?.webbuilders || 0);
+    const currentTotal = (current?.deployments || 0) + (current?.webbuilders || 0) + (current?.virtualspaces || 0);
+    const previousTotal = (previous?.deployments || 0) + (previous?.webbuilders || 0) + (previous?.virtualspaces || 0);
     const change = previousTotal === 0 ? 0 : ((currentTotal - previousTotal) / previousTotal * 100);
     return { change: Math.abs(change).toFixed(1), isPositive: currentTotal >= previousTotal };
   };
@@ -734,8 +873,8 @@ const DashboardHero = () => {
             </motion.button>
           </motion.div>
 
-          {/* Key Metrics - Updated for both platforms */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Key Metrics - Updated for all three platforms */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             {/* Total App Platform Deployments */}
             <motion.div
               variants={scaleIn}
@@ -784,11 +923,6 @@ const DashboardHero = () => {
                       </div>
                       <span className="text-gray-300 font-medium">WebBuilder</span>
                     </div>
-                    <motion.div
-                      className="w-2 h-2 bg-purple-400 rounded-full"
-                      animate={{ opacity: [1, 0.3, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
                   </div>
                   <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
                     {deploymentStats.totalWebBuilders}
@@ -807,29 +941,57 @@ const DashboardHero = () => {
               </div>
             </motion.div>
 
-            {/* Combined Active Projects */}
+            {/* Total Virtual Spaces */}
             <motion.div
               variants={scaleIn}
               className="relative overflow-hidden"
             >
               <div className="relative bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-6 h-full group transition-all duration-300 hover:border-emerald-500/40">
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-green-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
                 <div className="relative">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 rounded-lg">
-                        <Activity className="w-5 h-5 text-emerald-400" />
+                      <div className="p-2 bg-gradient-to-r from-emerald-500/20 to-green-500/20 rounded-lg">
+                        <CloudLightning className="w-5 h-5 text-emerald-400" />
+                      </div>
+                      <span className="text-gray-300 font-medium">Virtual Space</span>
+                    </div>
+                  </div>
+                  <div className="text-3xl font-bold bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent mb-2">
+                    {deploymentStats.totalVirtualSpaces}
+                  </div>
+                  <div className="text-sm text-gray-400 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span>Live:</span>
+                      <span className="text-emerald-400 font-medium">{activeVirtualSpaces.filter(v => v.projectstatus === 'live').length}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Creating:</span>
+                      <span className="text-amber-400 font-medium">{activeVirtualSpaces.filter(v => v.projectstatus === 'creating').length}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Combined Active Projects */}
+            <motion.div
+              variants={scaleIn}
+              className="relative overflow-hidden"
+            >
+              <div className="relative bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-cyan-500/20 rounded-2xl p-6 h-full group transition-all duration-300 hover:border-cyan-500/40">
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-lg">
+                        <Activity className="w-5 h-5 text-cyan-400" />
                       </div>
                       <span className="text-gray-300 font-medium">Active Total</span>
                     </div>
-                    <motion.div
-                      className="w-2 h-2 bg-emerald-400 rounded-full"
-                      animate={{ opacity: [1, 0.3, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
                   </div>
-                  <div className="text-3xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent mb-2">
-                    {deploymentStats.activeProjects + deploymentStats.activeWebBuilders}
+                  <div className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-2">
+                    {deploymentStats.activeProjects + deploymentStats.activeWebBuilders + deploymentStats.activeVirtualSpaces}
                   </div>
                   <div className="text-sm text-gray-400 space-y-1">
                     <div className="flex items-center justify-between">
@@ -837,7 +999,7 @@ const DashboardHero = () => {
                       <span className="text-pink-400 font-medium">{deploymentStats.activeProjects}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span>WebBuilders:</span>
+                      <span>Web:</span>
                       <span className="text-purple-400 font-medium">{deploymentStats.activeWebBuilders}</span>
                     </div>
                   </div>
@@ -862,7 +1024,7 @@ const DashboardHero = () => {
                     </div>
                   </div>
                   <div className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent mb-2">
-                    {Math.round(((buildStats.successfulBuildPercentage + buildStats.webBuilderSuccessRate) / 2) || 0)}%
+                    {Math.round(((buildStats.successfulBuildPercentage + buildStats.webBuilderSuccessRate + buildStats.virtualSpaceSuccessRate) / 3) || 0)}%
                   </div>
                   <div className="text-sm text-gray-400 space-y-1">
                     <div className="flex items-center justify-between">
@@ -870,8 +1032,8 @@ const DashboardHero = () => {
                       <span className="text-emerald-400 font-medium">{buildStats.successfulBuildPercentage}%</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span>WebBuilders:</span>
-                      <span className="text-blue-400 font-medium">{buildStats.webBuilderSuccessRate}%</span>
+                      <span>V-Space:</span>
+                      <span className="text-emerald-400 font-medium">{buildStats.virtualSpaceSuccessRate}%</span>
                     </div>
                   </div>
                 </div>
@@ -935,21 +1097,21 @@ const DashboardHero = () => {
                 </div>
               </div>
 
-              {/* WebBuilder Success */}
+              {/* Virtual Space Success */}
               <div className="relative overflow-hidden">
-                <div className="relative bg-gradient-to-br from-blue-900/20 via-black to-black border border-blue-500/20 rounded-2xl p-6 group transition-all duration-300 hover:border-blue-500/40">
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+                <div className="relative bg-gradient-to-br from-emerald-900/20 via-black to-black border border-emerald-500/20 rounded-2xl p-6 group transition-all duration-300 hover:border-emerald-500/40">
+                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-green-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
                   <div className="relative">
-                    <h3 className="text-lg font-semibold text-blue-100 mb-4 flex items-center gap-3">
-                      <div className="p-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-lg">
-                        <Globe className="w-5 h-5 text-blue-400" />
+                    <h3 className="text-lg font-semibold text-emerald-100 mb-4 flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-r from-emerald-500/20 to-green-500/20 rounded-lg">
+                        <CloudLightning className="w-5 h-5 text-emerald-400" />
                       </div>
-                      WebBuilder
+                      Virtual Space
                     </h3>
                     <div className="flex justify-center">
                       <DonutChart 
-                        percentage={buildStats.webBuilderSuccessRate} 
-                        color="#06b6d4" 
+                        percentage={buildStats.virtualSpaceSuccessRate} 
+                        color="#22c55e" 
                         label="Success"
                       />
                     </div>
@@ -1012,13 +1174,16 @@ const DashboardHero = () => {
                                     <span className={`text-xs px-2 py-1 rounded-md border ${
                                       deployment.type === 'webbuilder' 
                                         ? 'bg-purple-500/10 border-purple-500/30 text-purple-300'
+                                        : deployment.type === 'virtualspace'
+                                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
                                         : 'bg-pink-500/10 border-pink-500/30 text-pink-300'
                                     }`}>
-                                      {deployment.type === 'webbuilder' ? 'WebBuilder' : 'App Platform'}
+                                      {deployment.type === 'webbuilder' ? 'WebBuilder' : 
+                                       deployment.type === 'virtualspace' ? 'Virtual Space' : 'App Platform'}
                                     </span>
                                     {(deployment.techStack || deployment.webBuilderType) && (
                                       <span className="text-xs px-2 py-1 bg-gray-700/50 text-gray-300 rounded-md">
-                                        {getTechStackIcon(deployment.techStack, deployment.webBuilderType)}
+                                        {getTechStackIcon(deployment.techStack, deployment.webBuilderType, deployment.type)}
                                       </span>
                                     )}
                                   </div>
@@ -1027,7 +1192,9 @@ const DashboardHero = () => {
                                   </div>
                                   {deployment.projectUrl && deployment.status === 'live' && (
                                     <motion.a 
-                                      href={`https://${deployment.projectUrl}`}
+                                      href={deployment.type === 'virtualspace' 
+                                        ? `http://${deployment.projectUrl}` 
+                                        : `https://${deployment.projectUrl}`}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="text-xs text-pink-400 hover:text-pink-300 flex items-center gap-1 mt-1 group-hover/item:translate-x-1 transition-transform"
@@ -1064,7 +1231,7 @@ const DashboardHero = () => {
               </div>
             </motion.div>
 
-            {/* Quick Actions - Updated for both platforms */}
+            {/* Quick Actions - Updated for all three platforms */}
             <motion.div
               variants={fadeIn}
               className="relative overflow-hidden"
@@ -1079,7 +1246,7 @@ const DashboardHero = () => {
                     Quick Actions
                   </h2>
                   <div className="space-y-4">
-                    <motion.button
+                   <motion.button
                       onClick={() => router.push("/project/createproject/app-platform")}
                       className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 rounded-xl transition-all duration-300 group/btn shadow-lg shadow-pink-500/25"
                       whileHover={{ scale: 1.02, y: -2 }}
@@ -1105,6 +1272,21 @@ const DashboardHero = () => {
                           <Globe className="w-4 h-4" />
                         </div>
                         <span className="font-medium">New WebBuilder Site</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                    </motion.button>
+
+                    <motion.button
+                      onClick={() => router.push("/project/createproject/virtualspace")}
+                      className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 rounded-xl transition-all duration-300 group/btn shadow-lg shadow-emerald-500/25"
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-1 bg-white/20 rounded-lg">
+                          <CloudLightning className="w-4 h-4" />
+                        </div>
+                        <span className="font-medium">New Virtual Space</span>
                       </div>
                       <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
                     </motion.button>
@@ -1146,7 +1328,7 @@ const DashboardHero = () => {
                       <div className="p-1 bg-gray-600/50 rounded-lg">
                         <Monitor className="w-4 h-4 text-pink-400" />
                       </div>
-                      Your Projects ({activeProjects.length + activeWebBuilders.length})
+                      Your Projects ({activeProjects.length + activeWebBuilders.length + activeVirtualSpaces.length})
                     </h3>
                     <div className="space-y-3 max-h-64 overflow-y-auto custom-scrollbar">
                       <AnimatePresence>
@@ -1219,9 +1401,44 @@ const DashboardHero = () => {
                             </div>
                           </motion.div>
                         ))}
+
+                        {/* Show Virtual Space projects */}
+                        {activeVirtualSpaces.slice(0, 2).map((virtualSpace, index) => (
+                          <motion.div 
+                            key={`vspace-${virtualSpace._id}`}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 10 }}
+                            transition={{ delay: (activeProjects.length + activeWebBuilders.length + index) * 0.05 }}
+                            className="group/project relative"
+                          >
+                            <div 
+                              className="relative flex items-center justify-between text-sm p-3 bg-gray-800/30 hover:bg-gray-800/50 rounded-lg transition-all duration-300 border border-transparent hover:border-emerald-500/20 cursor-pointer"
+                              onClick={() => router.push(`/project/overview?id=${virtualSpace._id}&type=virtualspace`)}
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="text-xs px-2 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 rounded-md">
+                                  VS
+                                </span>
+                                <span className="text-xs px-2 py-1 bg-gray-700/50 text-gray-300 rounded-md">
+                                  💻 IDE
+                                </span>
+                                <span className="truncate font-medium group-hover/project:text-emerald-300 transition-colors max-w-24">
+                                  {virtualSpace.name}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className={`text-xs px-2 py-1 rounded-full border ${getStatusBadgeColor(virtualSpace.projectstatus)}`}>
+                                  {virtualSpace.projectstatus}
+                                </span>
+                                <ArrowRight className="w-3 h-3 opacity-0 group-hover/project:opacity-100 transition-opacity text-emerald-400" />
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
                       </AnimatePresence>
                       
-                      {(activeProjects.length === 0 && activeWebBuilders.length === 0) && (
+                      {(activeProjects.length === 0 && activeWebBuilders.length === 0 && activeVirtualSpaces.length === 0) && (
                         <motion.div 
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
@@ -1233,13 +1450,13 @@ const DashboardHero = () => {
                         </motion.div>
                       )}
                       
-                      {(activeProjects.length + activeWebBuilders.length > 4) && (
+                      {(activeProjects.length + activeWebBuilders.length + activeVirtualSpaces.length > 6) && (
                         <motion.button 
                           onClick={() => router.push("/project")}
                           className="w-full text-center text-gray-400 text-sm py-3 hover:text-pink-400 transition-colors rounded-lg hover:bg-gray-800/30"
                           whileHover={{ scale: 1.02 }}
                         >
-                          View all {activeProjects.length + activeWebBuilders.length} projects →
+                          View all {activeProjects.length + activeWebBuilders.length + activeVirtualSpaces.length} projects →
                         </motion.button>
                       )}
                     </div>
@@ -1249,7 +1466,7 @@ const DashboardHero = () => {
             </motion.div>
           </div>
 
-          {/* Enhanced Stats Row - Updated for both platforms */}
+          {/* Enhanced Stats Row - Updated for all three platforms */}
           <motion.div variants={fadeIn} className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               {
@@ -1265,13 +1482,13 @@ const DashboardHero = () => {
                 gradient: "from-purple-400 to-blue-400"
               },
               {
-                value: activeProjects.filter(p => p.projectstatus === 'live').length + activeWebBuilders.filter(w => w.projectstatus === 'live').length,
-                label: "Live Projects",
-                iconComponent: <Server className="w-5 h-5 text-pink-400" />,
+                value: activeVirtualSpaces.filter(v => v.projectstatus === 'live').length,
+                label: "Live V-Spaces",
+                iconComponent: <CloudLightning className="w-5 h-5 text-pink-400" />,
                 gradient: "from-emerald-400 to-green-400"
               },
               {
-                value: deploymentStats.chartData.reduce((sum, month) => sum + month.deployments + month.webbuilders, 0),
+                value: deploymentStats.chartData.reduce((sum, month) => sum + month.deployments + month.webbuilders + month.virtualspaces, 0),
                 label: "Total This Year",
                 iconComponent: <BarChart3 className="w-5 h-5 text-pink-400" />,
                 gradient: "from-purple-400 to-pink-400"
@@ -1303,7 +1520,7 @@ const DashboardHero = () => {
 
           {/* Platform Comparison Section */}
           <motion.div variants={fadeIn}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* App Platform Summary */}
               <div className="relative overflow-hidden">
                 <div className="relative bg-gradient-to-br from-pink-900/20 via-black to-black border border-pink-500/20 rounded-2xl p-6 group transition-all duration-300 hover:border-pink-500/40">
@@ -1413,10 +1630,59 @@ const DashboardHero = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Virtual Space Summary */}
+              <div className="relative overflow-hidden">
+                <div className="relative bg-gradient-to-br from-emerald-900/20 via-black to-black border border-emerald-500/20 rounded-2xl p-6 group transition-all duration-300 hover:border-emerald-500/40">
+                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-green-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+                  <div className="relative">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-3 bg-gradient-to-r from-emerald-500/20 to-green-500/20 rounded-xl">
+                        <CloudLightning className="w-6 h-6 text-emerald-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-emerald-100">Virtual Space</h3>
+                        <p className="text-emerald-300/60 text-sm">Cloud development environments</p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div className="text-center p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                        <div className="text-2xl font-bold text-emerald-400">{deploymentStats.totalVirtualSpaces}</div>
+                        <div className="text-xs text-emerald-300">Total Spaces</div>
+                      </div>
+                      <div className="text-center p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                        <div className="text-2xl font-bold text-green-400">{deploymentStats.activeVirtualSpaces}</div>
+                        <div className="text-xs text-green-300">Active</div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400">Success Rate:</span>
+                        <span className="text-emerald-400 font-medium">{buildStats.virtualSpaceSuccessRate}%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400">Environment:</span>
+                        <span className="text-emerald-400 font-medium">VS Code IDE</span>
+                      </div>
+                    </div>
+
+                    <motion.button
+                      onClick={() => router.push("/vspace")}
+                      className="w-full mt-4 p-3 bg-gradient-to-r from-emerald-500/20 to-green-500/20 border border-emerald-500/30 hover:from-emerald-500/30 hover:to-green-500/30 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 group/btn"
+                      whileHover={{ scale: 1.02 }}
+                    >
+                      <span className="text-emerald-300 font-medium">View Virtual Space</span>
+                      <ArrowRight className="w-4 h-4 text-emerald-400 group-hover/btn:translate-x-1 transition-transform" />
+                    </motion.button>
+                  </div>
+                </div>
+              </div>
             </div>
           </motion.div>
 
-          {/* Technology Distribution */}
+          {/* Technology Distribution - Updated for all platforms */}
           <motion.div variants={fadeIn}>
             <div className="relative overflow-hidden">
               <div className="relative bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20 rounded-2xl p-6 group transition-all duration-300 hover:border-pink-500/40">
@@ -1479,9 +1745,37 @@ const DashboardHero = () => {
                         </motion.div>
                       );
                     })}
+
+                    {/* Virtual Space Technologies */}
+                    {activeVirtualSpaces.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: (activeProjects.length + activeWebBuilders.length) * 0.1 }}
+                        className="text-center p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg hover:bg-emerald-500/20 transition-all duration-300"
+                      >
+                        <div className="text-2xl mb-2">💻</div>
+                        <div className="font-semibold text-emerald-400">{activeVirtualSpaces.length}</div>
+                        <div className="text-xs text-gray-400 mt-1">Virtual Spaces</div>
+                      </motion.div>
+                    )}
+
+                    {/* Cloud IDE Environment */}
+                    {activeVirtualSpaces.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: (activeProjects.length + activeWebBuilders.length + 1) * 0.1 }}
+                        className="text-center p-4 bg-cyan-500/10 border border-cyan-500/20 rounded-lg hover:bg-cyan-500/20 transition-all duration-300"
+                      >
+                        <div className="text-2xl mb-2">☁️</div>
+                        <div className="font-semibold text-cyan-400">{activeVirtualSpaces.filter(v => v.projectstatus === 'live').length}</div>
+                        <div className="text-xs text-gray-400 mt-1">Cloud IDEs</div>
+                      </motion.div>
+                    )}
                   </div>
 
-                  {(activeProjects.length === 0 && activeWebBuilders.length === 0) && (
+                  {(activeProjects.length === 0 && activeWebBuilders.length === 0 && activeVirtualSpaces.length === 0) && (
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -1500,7 +1794,6 @@ const DashboardHero = () => {
           </motion.div>
         </motion.div>
       </div>
-
     </section>
   );
 };
