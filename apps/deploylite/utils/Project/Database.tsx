@@ -735,7 +735,13 @@ export default function DatabaseComp() {
                             <div className="flex items-center justify-between">
                               <div className="flex items-center space-x-4">
                                 <div className="p-3 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-xl text-2xl">
-                                  {getDatabaseIcon(database.dbtype)}
+                                  <Image 
+                                  src={getDatabaseIcon(database.dbtype)}
+                                  width={20}
+                                  height={20}
+                                  alt="logo"
+                                  />
+
                                 </div>
                                 <div>
                                   <h3 className="text-lg font-semibold text-gray-200">{database.dbname}</h3>
