@@ -62,11 +62,11 @@ export default function DatabaseOverview({ projectdata }: DatabaseOverviewProps)
 
   const databaseName = projectdata?.dbname?.toUpperCase() || 'DATABASE'
   const databaseType = projectdata?.dbtype?.toUpperCase() || 'UNKNOWN'
-  const connectionUrl = projectdata?.projecturl || ''
+  const connectionUrl = projectdata?.projecturl || projectdata?.url || ''
   const uiUrl = projectdata?.uiurl || ''
   
   const isHealthy = projectdata?.projectstatus === 'live'
-  const defaultTab = projectdata?.projectstatus === "creating" ? "runtimelogs" : "overview"
+  const defaultTab = projectdata?.projectstatus === "creating" ? "activity" : "overview"
   const estimatedCost = projectdata?.planid?.pricepmonth || projectdata?.planid?.price || 0
 
   // Check if this is first time access
@@ -83,13 +83,18 @@ export default function DatabaseOverview({ projectdata }: DatabaseOverviewProps)
     
     setIsRefreshing(true)
     try {
-      // Assuming there's a database details endpoint
-      const response = await fetch(`/api/project/database/details?id=${projectdata._id}`)
+      // Fetch fresh database data
+      const response = await fetch(`/api/project/database`)
       const result = await response.json()
       
-      if (result.success) {
-        setRefreshData(result.projectdata)
-        toast.success("Database data refreshed successfully")
+      if (result.success && result.projectdata) {
+        const updatedProject = result.projectdata.find((p: any) => p._id === projectdata._id)
+        if (updatedProject) {
+          setRefreshData(updatedProject)
+          toast.success("Database data refreshed successfully")
+        } else {
+          toast.error("Database not found")
+        }
       } else {
         toast.error("Failed to refresh database data")
       }
@@ -301,7 +306,7 @@ export default function DatabaseOverview({ projectdata }: DatabaseOverviewProps)
                           className="p-0 h-auto hover:text-purple-400 transition-colors"
                         >
                           <DatabaseIcon className="w-4 h-4 mr-2" />
-                          <span className="underline underline-offset-2 font-mono text-sm">{connectionUrl}</span>
+                          <span className="underline underline-offset-2 font-mono text-sm truncate max-w-md">{connectionUrl}</span>
                           <Copy className="w-4 h-4 ml-2" />
                         </Button>
                       ) : (
@@ -420,12 +425,12 @@ export default function DatabaseOverview({ projectdata }: DatabaseOverviewProps)
                 <div className="flex items-center justify-between p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
                   <div>
                     <p className="text-sm text-gray-400">Database Name</p>
-                    <p className="font-mono text-purple-300">{projectdata?.dbname || 'Not set'}</p>
+                    <p className="font-mono text-purple-300">{currentData?.dbname || 'Not set'}</p>
                   </div>
                   <Button 
                     size="sm" 
                     variant="ghost"
-                    onClick={() => copyToClipboard(projectdata?.dbname || '', 'Database name')}
+                    onClick={() => copyToClipboard(currentData?.dbname || '', 'Database name')}
                   >
                     <Copy className="w-4 h-4" />
                   </Button>
@@ -434,12 +439,12 @@ export default function DatabaseOverview({ projectdata }: DatabaseOverviewProps)
                 <div className="flex items-center justify-between p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
                   <div>
                     <p className="text-sm text-gray-400">Database User</p>
-                    <p className="font-mono text-purple-300">{projectdata?.dbuser || 'Not set'}</p>
+                    <p className="font-mono text-purple-300">{currentData?.dbuser || 'Not set'}</p>
                   </div>
                   <Button 
                     size="sm" 
                     variant="ghost"
-                    onClick={() => copyToClipboard(projectdata?.dbuser || '', 'Database user')}
+                    onClick={() => copyToClipboard(currentData?.dbuser || '', 'Database user')}
                   >
                     <Copy className="w-4 h-4" />
                   </Button>
@@ -453,7 +458,7 @@ export default function DatabaseOverview({ projectdata }: DatabaseOverviewProps)
                   <Button 
                     size="sm" 
                     variant="ghost"
-                    onClick={() => copyToClipboard(projectdata?.dbpass || '', 'Database password')}
+                    onClick={() => copyToClipboard(currentData?.dbpass || '', 'Database password')}
                   >
                     <Copy className="w-4 h-4" />
                   </Button>
@@ -462,12 +467,12 @@ export default function DatabaseOverview({ projectdata }: DatabaseOverviewProps)
                 <div className="flex items-center justify-between p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
                   <div>
                     <p className="text-sm text-gray-400">Database Host</p>
-                    <p className="font-mono text-purple-300">{projectdata?.url || 'localhost'}</p>
+                    <p className="font-mono text-purple-300">{currentData?.url || 'localhost'}</p>
                   </div>
                   <Button 
                     size="sm" 
                     variant="ghost"
-                    onClick={() => copyToClipboard(projectdata?.url || 'localhost', 'Database host')}
+                    onClick={() => copyToClipboard(currentData?.url || 'localhost', 'Database host')}
                   >
                     <Copy className="w-4 h-4" />
                   </Button>

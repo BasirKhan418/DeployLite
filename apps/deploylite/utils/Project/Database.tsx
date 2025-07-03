@@ -78,6 +78,7 @@ interface DatabaseProject {
   cpuusage?: string;
   memoryusage?: string;
   storageusage?: string;
+  arn?: string;
 }
 
 // Animation variants
@@ -228,7 +229,7 @@ export default function DatabaseComp() {
     }
     
     try {
-      const confirm = window.confirm('Are you sure you want to delete this database?');
+      const confirm = window.confirm('Are you sure you want to delete this database? This action cannot be undone.');
       if (!confirm) {
         return;
       }
@@ -246,7 +247,7 @@ export default function DatabaseComp() {
       
       if (result.success) {
         toast.success(result.message);
-        getDatabaseProjects();
+        getDatabaseProjects(); // Refresh the list
       } else {
         toast.error(result.message);
       }
@@ -258,6 +259,7 @@ export default function DatabaseComp() {
   };
 
   const handleViewDatabase = (database: DatabaseProject) => {
+    console.log('Navigating to database overview:', database._id);
     router.push(`/project/overview?id=${database._id}&type=database`);
   };
 
@@ -321,6 +323,11 @@ export default function DatabaseComp() {
 
   // Get unique database types for filter
   const databaseTypes = Array.from(new Set(databases.map(db => db.dbtype).filter(Boolean)));
+
+  const copyToClipboard = (text: string, type: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success(`${type} copied to clipboard`);
+  };
 
   if (!user?.connectgithub) {
     return <Connect />;
@@ -436,6 +443,7 @@ export default function DatabaseComp() {
                         <option value="all">All Status</option>
                         <option value="live">Live</option>
                         <option value="creating">Creating</option>
+                        <option value="building">Building</option>
                         <option value="failed">Failed</option>
                       </select>
 
@@ -578,6 +586,16 @@ export default function DatabaseComp() {
                                           View Details
                                         </DropdownMenuItem>
                                         <DropdownMenuItem 
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            copyToClipboard(database.projecturl || '', 'Connection URL');
+                                          }}
+                                          className="hover:bg-purple-500/10 hover:text-purple-300"
+                                        >
+                                          <Copy className="mr-2 h-4 w-4" />
+                                          Copy URL
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem 
                                           onClick={(e) => e.stopPropagation()}
                                           className="hover:bg-purple-500/10 hover:text-purple-300"
                                         >
@@ -591,6 +609,18 @@ export default function DatabaseComp() {
                                           <BarChart2 className="mr-2 h-4 w-4" />
                                           Monitoring
                                         </DropdownMenuItem>
+                                        {database.uiurl && (
+                                          <DropdownMenuItem 
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              window.open(database.uiurl, '_blank');
+                                            }}
+                                            className="hover:bg-purple-500/10 hover:text-purple-300"
+                                          >
+                                            <Monitor className="mr-2 h-4 w-4" />
+                                            Admin UI
+                                          </DropdownMenuItem>
+                                        )}
                                         <DropdownMenuItem 
                                           onClick={(e) => e.stopPropagation()}
                                           className="hover:bg-purple-500/10 hover:text-purple-300"
@@ -620,8 +650,7 @@ export default function DatabaseComp() {
                                       className="flex items-center text-sm mb-4 text-gray-400 hover:text-purple-400 transition-colors cursor-pointer"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        navigator.clipboard.writeText(database.projecturl || '');
-                                        toast.success('Connection URL copied to clipboard');
+                                        copyToClipboard(database.projecturl || '', 'Connection URL');
                                       }}
                                     >
                                       <Copy className="mr-2 h-3 w-3" />
@@ -691,7 +720,7 @@ export default function DatabaseComp() {
                         ))}
                       </motion.div>
                     ) : (
-                      // List view implementation would go here
+                      // List view implementation
                       <div className="space-y-4">
                         {filteredDatabases.map((database) => (
                           <Card 
