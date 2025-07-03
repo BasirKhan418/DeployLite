@@ -1,0 +1,3602 @@
+[
+  {
+    "timestamp": 1751522567595,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.06 MB"
+  },
+  {
+    "timestamp": 1751522570537,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.06 MB"
+  },
+  {
+    "timestamp": 1751522573633,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.06 MB"
+  },
+  {
+    "timestamp": 1751522576637,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.06 MB"
+  },
+  {
+    "timestamp": 1751522579590,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.06 MB"
+  },
+  {
+    "timestamp": 1751522582578,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.06 MB"
+  },
+  {
+    "timestamp": 1751522585530,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.06 MB"
+  },
+  {
+    "timestamp": 1751522588566,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.06 MB"
+  },
+  {
+    "timestamp": 1751522591544,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.06 MB"
+  },
+  {
+    "timestamp": 1751522594561,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.09 MB"
+  },
+  {
+    "timestamp": 1751522597564,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.09 MB"
+  },
+  {
+    "timestamp": 1751522600576,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.09 MB"
+  },
+  {
+    "timestamp": 1751522603618,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.09 MB"
+  },
+  {
+    "timestamp": 1751522606593,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.09 MB"
+  },
+  {
+    "timestamp": 1751522609676,
+    "logs": "[No logs available]",
+    "cpu": "1.07",
+    "memory": "49.09 MB"
+  },
+  {
+    "timestamp": 1751522612647,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.09 MB"
+  },
+  {
+    "timestamp": 1751522615621,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.11 MB"
+  },
+  {
+    "timestamp": 1751522618658,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.11 MB"
+  },
+  {
+    "timestamp": 1751522621625,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.11 MB"
+  },
+  {
+    "timestamp": 1751522624643,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.14 MB"
+  },
+  {
+    "timestamp": 1751522627654,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.14 MB"
+  },
+  {
+    "timestamp": 1751522630658,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.14 MB"
+  },
+  {
+    "timestamp": 1751522633675,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.22 MB"
+  },
+  {
+    "timestamp": 1751522636649,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.22 MB"
+  },
+  {
+    "timestamp": 1751522639701,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.22 MB"
+  },
+  {
+    "timestamp": 1751522642691,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.22 MB"
+  },
+  {
+    "timestamp": 1751522645675,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.22 MB"
+  },
+  {
+    "timestamp": 1751522648687,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.22 MB"
+  },
+  {
+    "timestamp": 1751522651724,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.22 MB"
+  },
+  {
+    "timestamp": 1751522654861,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.27 MB"
+  },
+  {
+    "timestamp": 1751522657709,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.27 MB"
+  },
+  {
+    "timestamp": 1751522660714,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.27 MB"
+  },
+  {
+    "timestamp": 1751522663737,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.24 MB"
+  },
+  {
+    "timestamp": 1751522666729,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.24 MB"
+  },
+  {
+    "timestamp": 1751522669748,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.24 MB"
+  },
+  {
+    "timestamp": 1751522672722,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.24 MB"
+  },
+  {
+    "timestamp": 1751522675731,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.24 MB"
+  },
+  {
+    "timestamp": 1751522678835,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.24 MB"
+  },
+  {
+    "timestamp": 1751522681787,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.24 MB"
+  },
+  {
+    "timestamp": 1751522684760,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.27 MB"
+  },
+  {
+    "timestamp": 1751522687792,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.36 MB"
+  },
+  {
+    "timestamp": 1751522690813,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.36 MB"
+  },
+  {
+    "timestamp": 1751522693782,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.36 MB"
+  },
+  {
+    "timestamp": 1751522696806,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.39 MB"
+  },
+  {
+    "timestamp": 1751522699790,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.39 MB"
+  },
+  {
+    "timestamp": 1751522702830,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.39 MB"
+  },
+  {
+    "timestamp": 1751522705853,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.39 MB"
+  },
+  {
+    "timestamp": 1751522708829,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.39 MB"
+  },
+  {
+    "timestamp": 1751522711791,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.39 MB"
+  },
+  {
+    "timestamp": 1751522714795,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.35 MB"
+  },
+  {
+    "timestamp": 1751522717819,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.41 MB"
+  },
+  {
+    "timestamp": 1751522720825,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.41 MB"
+  },
+  {
+    "timestamp": 1751522723834,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.41 MB"
+  },
+  {
+    "timestamp": 1751522726840,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.41 MB"
+  },
+  {
+    "timestamp": 1751522729923,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.41 MB"
+  },
+  {
+    "timestamp": 1751522732904,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.41 MB"
+  },
+  {
+    "timestamp": 1751522735887,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.41 MB"
+  },
+  {
+    "timestamp": 1751522738874,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.41 MB"
+  },
+  {
+    "timestamp": 1751522741904,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.51 MB"
+  },
+  {
+    "timestamp": 1751522744921,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.51 MB"
+  },
+  {
+    "timestamp": 1751522747902,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.50 MB"
+  },
+  {
+    "timestamp": 1751522750963,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.53 MB"
+  },
+  {
+    "timestamp": 1751522753890,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.53 MB"
+  },
+  {
+    "timestamp": 1751522756886,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.53 MB"
+  },
+  {
+    "timestamp": 1751522759911,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.53 MB"
+  },
+  {
+    "timestamp": 1751522762890,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.53 MB"
+  },
+  {
+    "timestamp": 1751522765918,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.53 MB"
+  },
+  {
+    "timestamp": 1751522768911,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.53 MB"
+  },
+  {
+    "timestamp": 1751522771940,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.53 MB"
+  },
+  {
+    "timestamp": 1751522774943,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.53 MB"
+  },
+  {
+    "timestamp": 1751522777940,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.53 MB"
+  },
+  {
+    "timestamp": 1751522780943,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.57 MB"
+  },
+  {
+    "timestamp": 1751522783967,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.57 MB"
+  },
+  {
+    "timestamp": 1751522786950,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.57 MB"
+  },
+  {
+    "timestamp": 1751522789990,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.57 MB"
+  },
+  {
+    "timestamp": 1751522792979,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.57 MB"
+  },
+  {
+    "timestamp": 1751522795967,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.57 MB"
+  },
+  {
+    "timestamp": 1751522799034,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.57 MB"
+  },
+  {
+    "timestamp": 1751522801994,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.57 MB"
+  },
+  {
+    "timestamp": 1751522805006,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.57 MB"
+  },
+  {
+    "timestamp": 1751522808051,
+    "logs": "[No logs available]",
+    "cpu": "1.03",
+    "memory": "49.57 MB"
+  },
+  {
+    "timestamp": 1751522810990,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.57 MB"
+  },
+  {
+    "timestamp": 1751522814014,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.66 MB"
+  },
+  {
+    "timestamp": 1751522816995,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.66 MB"
+  },
+  {
+    "timestamp": 1751522820009,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.66 MB"
+  },
+  {
+    "timestamp": 1751522823014,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.66 MB"
+  },
+  {
+    "timestamp": 1751522826036,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.66 MB"
+  },
+  {
+    "timestamp": 1751522829035,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.66 MB"
+  },
+  {
+    "timestamp": 1751522832045,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.66 MB"
+  },
+  {
+    "timestamp": 1751522835083,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.66 MB"
+  },
+  {
+    "timestamp": 1751522838062,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.66 MB"
+  },
+  {
+    "timestamp": 1751522841069,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.66 MB"
+  },
+  {
+    "timestamp": 1751522844073,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.66 MB"
+  },
+  {
+    "timestamp": 1751522847081,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.66 MB"
+  },
+  {
+    "timestamp": 1751522850102,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.66 MB"
+  },
+  {
+    "timestamp": 1751522853117,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.75 MB"
+  },
+  {
+    "timestamp": 1751522856110,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.75 MB"
+  },
+  {
+    "timestamp": 1751522859109,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.75 MB"
+  },
+  {
+    "timestamp": 1751522862117,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.75 MB"
+  },
+  {
+    "timestamp": 1751522865126,
+    "logs": "[No logs available]",
+    "cpu": "1.03",
+    "memory": "49.75 MB"
+  },
+  {
+    "timestamp": 1751522868170,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.75 MB"
+  },
+  {
+    "timestamp": 1751522871153,
+    "logs": "[No logs available]",
+    "cpu": "1.57",
+    "memory": "49.79 MB"
+  },
+  {
+    "timestamp": 1751522874162,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.79 MB"
+  },
+  {
+    "timestamp": 1751522877165,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.85 MB"
+  },
+  {
+    "timestamp": 1751522880287,
+    "logs": "[No logs available]",
+    "cpu": "0.40",
+    "memory": "49.85 MB"
+  },
+  {
+    "timestamp": 1751522883187,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.85 MB"
+  },
+  {
+    "timestamp": 1751522886196,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.85 MB"
+  },
+  {
+    "timestamp": 1751522889191,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.85 MB"
+  },
+  {
+    "timestamp": 1751522892209,
+    "logs": "[No logs available]",
+    "cpu": "0.40",
+    "memory": "50.17 MB"
+  },
+  {
+    "timestamp": 1751522895220,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.79 MB"
+  },
+  {
+    "timestamp": 1751522898279,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.79 MB"
+  },
+  {
+    "timestamp": 1751522901273,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.79 MB"
+  },
+  {
+    "timestamp": 1751522904251,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.79 MB"
+  },
+  {
+    "timestamp": 1751522907263,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.79 MB"
+  },
+  {
+    "timestamp": 1751522910275,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.86 MB"
+  },
+  {
+    "timestamp": 1751522913284,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.86 MB"
+  },
+  {
+    "timestamp": 1751522916360,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.86 MB"
+  },
+  {
+    "timestamp": 1751522919311,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.86 MB"
+  },
+  {
+    "timestamp": 1751522922333,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.86 MB"
+  },
+  {
+    "timestamp": 1751522925365,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.86 MB"
+  },
+  {
+    "timestamp": 1751522928552,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.86 MB"
+  },
+  {
+    "timestamp": 1751522931407,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.86 MB"
+  },
+  {
+    "timestamp": 1751522934350,
+    "logs": "[No logs available]",
+    "cpu": "1.03",
+    "memory": "49.86 MB"
+  },
+  {
+    "timestamp": 1751522937339,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.86 MB"
+  },
+  {
+    "timestamp": 1751522940458,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.86 MB"
+  },
+  {
+    "timestamp": 1751522943462,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.89 MB"
+  },
+  {
+    "timestamp": 1751522946511,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.89 MB"
+  },
+  {
+    "timestamp": 1751522949387,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.89 MB"
+  },
+  {
+    "timestamp": 1751522952395,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.89 MB"
+  },
+  {
+    "timestamp": 1751522955384,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.89 MB"
+  },
+  {
+    "timestamp": 1751522958400,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.89 MB"
+  },
+  {
+    "timestamp": 1751522961474,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.89 MB"
+  },
+  {
+    "timestamp": 1751522964454,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.89 MB"
+  },
+  {
+    "timestamp": 1751522967402,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.89 MB"
+  },
+  {
+    "timestamp": 1751522970399,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.89 MB"
+  },
+  {
+    "timestamp": 1751522973454,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.99 MB"
+  },
+  {
+    "timestamp": 1751522976590,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.99 MB"
+  },
+  {
+    "timestamp": 1751522979421,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.99 MB"
+  },
+  {
+    "timestamp": 1751522982434,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.99 MB"
+  },
+  {
+    "timestamp": 1751522985447,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.99 MB"
+  },
+  {
+    "timestamp": 1751522988468,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.99 MB"
+  },
+  {
+    "timestamp": 1751522991525,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.99 MB"
+  },
+  {
+    "timestamp": 1751522994466,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.99 MB"
+  },
+  {
+    "timestamp": 1751522997575,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.99 MB"
+  },
+  {
+    "timestamp": 1751523000549,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.99 MB"
+  },
+  {
+    "timestamp": 1751523003483,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.99 MB"
+  },
+  {
+    "timestamp": 1751523006595,
+    "logs": "[No logs available]",
+    "cpu": "1.07",
+    "memory": "50.04 MB"
+  },
+  {
+    "timestamp": 1751523009528,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.04 MB"
+  },
+  {
+    "timestamp": 1751523012571,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.04 MB"
+  },
+  {
+    "timestamp": 1751523015570,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.04 MB"
+  },
+  {
+    "timestamp": 1751523018568,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.04 MB"
+  },
+  {
+    "timestamp": 1751523021649,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.04 MB"
+  },
+  {
+    "timestamp": 1751523024542,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.04 MB"
+  },
+  {
+    "timestamp": 1751523027548,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.04 MB"
+  },
+  {
+    "timestamp": 1751523030544,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.04 MB"
+  },
+  {
+    "timestamp": 1751523033588,
+    "logs": "[No logs available]",
+    "cpu": "1.03",
+    "memory": "50.04 MB"
+  },
+  {
+    "timestamp": 1751523036705,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "50.08 MB"
+  },
+  {
+    "timestamp": 1751523039585,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "50.08 MB"
+  },
+  {
+    "timestamp": 1751523042588,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.08 MB"
+  },
+  {
+    "timestamp": 1751523045608,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.08 MB"
+  },
+  {
+    "timestamp": 1751523048624,
+    "logs": "[No logs available]",
+    "cpu": "1.07",
+    "memory": "50.08 MB"
+  },
+  {
+    "timestamp": 1751523051745,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.98 MB"
+  },
+  {
+    "timestamp": 1751523054608,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.98 MB"
+  },
+  {
+    "timestamp": 1751523057706,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.98 MB"
+  },
+  {
+    "timestamp": 1751523060733,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.98 MB"
+  },
+  {
+    "timestamp": 1751523063648,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.98 MB"
+  },
+  {
+    "timestamp": 1751523066738,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.98 MB"
+  },
+  {
+    "timestamp": 1751523069651,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.07 MB"
+  },
+  {
+    "timestamp": 1751523072647,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.07 MB"
+  },
+  {
+    "timestamp": 1751523075658,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.07 MB"
+  },
+  {
+    "timestamp": 1751523078673,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.07 MB"
+  },
+  {
+    "timestamp": 1751523081726,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "50.07 MB"
+  },
+  {
+    "timestamp": 1751523084690,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.07 MB"
+  },
+  {
+    "timestamp": 1751523087691,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.07 MB"
+  },
+  {
+    "timestamp": 1751523090713,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.07 MB"
+  },
+  {
+    "timestamp": 1751523093751,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.07 MB"
+  },
+  {
+    "timestamp": 1751523096774,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.07 MB"
+  },
+  {
+    "timestamp": 1751523099722,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523102737,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523105737,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523108752,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523111828,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523114763,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523117782,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523120832,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.49 MB"
+  },
+  {
+    "timestamp": 1751523123845,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523126903,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523129825,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523132842,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523135863,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523139148,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523142009,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523144876,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523147957,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523150884,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523153976,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523157005,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523159889,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523162939,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523165921,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523168958,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523171957,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523174954,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523177966,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523180977,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523183942,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523187006,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523189954,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523192949,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.14 MB"
+  },
+  {
+    "timestamp": 1751523195974,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "50.21 MB"
+  },
+  {
+    "timestamp": 1751523198975,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.21 MB"
+  },
+  {
+    "timestamp": 1751523202542,
+    "logs": "[No logs available]",
+    "cpu": "0.80",
+    "memory": "50.21 MB"
+  },
+  {
+    "timestamp": 1751523204990,
+    "logs": "[No logs available]",
+    "cpu": "0.75",
+    "memory": "50.21 MB"
+  },
+  {
+    "timestamp": 1751523208029,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.21 MB"
+  },
+  {
+    "timestamp": 1751523211182,
+    "logs": "[No logs available]",
+    "cpu": "1.07",
+    "memory": "50.38 MB"
+  },
+  {
+    "timestamp": 1751523214092,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.40 MB"
+  },
+  {
+    "timestamp": 1751523217068,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.40 MB"
+  },
+  {
+    "timestamp": 1751523220039,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "50.40 MB"
+  },
+  {
+    "timestamp": 1751523223135,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.40 MB"
+  },
+  {
+    "timestamp": 1751523226067,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.40 MB"
+  },
+  {
+    "timestamp": 1751523229052,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.46 MB"
+  },
+  {
+    "timestamp": 1751523232145,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.46 MB"
+  },
+  {
+    "timestamp": 1751523235033,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.46 MB"
+  },
+  {
+    "timestamp": 1751523238037,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.46 MB"
+  },
+  {
+    "timestamp": 1751523241072,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.46 MB"
+  },
+  {
+    "timestamp": 1751523244235,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.46 MB"
+  },
+  {
+    "timestamp": 1751523247302,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.46 MB"
+  },
+  {
+    "timestamp": 1751523250037,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.46 MB"
+  },
+  {
+    "timestamp": 1751523253049,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.46 MB"
+  },
+  {
+    "timestamp": 1751523256060,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.46 MB"
+  },
+  {
+    "timestamp": 1751523259132,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.49 MB"
+  },
+  {
+    "timestamp": 1751523262176,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.49 MB"
+  },
+  {
+    "timestamp": 1751523265069,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.49 MB"
+  },
+  {
+    "timestamp": 1751523268090,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.49 MB"
+  },
+  {
+    "timestamp": 1751523271092,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.49 MB"
+  },
+  {
+    "timestamp": 1751523274205,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.49 MB"
+  },
+  {
+    "timestamp": 1751523277127,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.49 MB"
+  },
+  {
+    "timestamp": 1751523280196,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.49 MB"
+  },
+  {
+    "timestamp": 1751523283136,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "50.49 MB"
+  },
+  {
+    "timestamp": 1751523286137,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.49 MB"
+  },
+  {
+    "timestamp": 1751523289219,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.49 MB"
+  },
+  {
+    "timestamp": 1751523292286,
+    "logs": "[No logs available]",
+    "cpu": "0.40",
+    "memory": "50.55 MB"
+  },
+  {
+    "timestamp": 1751523295163,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.55 MB"
+  },
+  {
+    "timestamp": 1751523298165,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.55 MB"
+  },
+  {
+    "timestamp": 1751523301225,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.55 MB"
+  },
+  {
+    "timestamp": 1751523304176,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.55 MB"
+  },
+  {
+    "timestamp": 1751523307241,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.55 MB"
+  },
+  {
+    "timestamp": 1751523310181,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.55 MB"
+  },
+  {
+    "timestamp": 1751523313246,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.55 MB"
+  },
+  {
+    "timestamp": 1751523316310,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.55 MB"
+  },
+  {
+    "timestamp": 1751523319199,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.55 MB"
+  },
+  {
+    "timestamp": 1751523322344,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.55 MB"
+  },
+  {
+    "timestamp": 1751523325223,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.62 MB"
+  },
+  {
+    "timestamp": 1751523328225,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.62 MB"
+  },
+  {
+    "timestamp": 1751523331236,
+    "logs": "[No logs available]",
+    "cpu": "1.00",
+    "memory": "50.62 MB"
+  },
+  {
+    "timestamp": 1751523334381,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.62 MB"
+  },
+  {
+    "timestamp": 1751523337378,
+    "logs": "[No logs available]",
+    "cpu": "1.07",
+    "memory": "50.63 MB"
+  },
+  {
+    "timestamp": 1751523340287,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.63 MB"
+  },
+  {
+    "timestamp": 1751523343278,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "50.63 MB"
+  },
+  {
+    "timestamp": 1751523346291,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.63 MB"
+  },
+  {
+    "timestamp": 1751523349285,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.63 MB"
+  },
+  {
+    "timestamp": 1751523352321,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "50.63 MB"
+  },
+  {
+    "timestamp": 1751523355314,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.63 MB"
+  },
+  {
+    "timestamp": 1751523358329,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.69 MB"
+  },
+  {
+    "timestamp": 1751523363492,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.69 MB"
+  },
+  {
+    "timestamp": 1751523364965,
+    "logs": "[No logs available]",
+    "cpu": "1.50",
+    "memory": "50.74 MB"
+  },
+  {
+    "timestamp": 1751523367503,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.45 MB"
+  },
+  {
+    "timestamp": 1751523370345,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.45 MB"
+  },
+  {
+    "timestamp": 1751523373340,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.45 MB"
+  },
+  {
+    "timestamp": 1751523376358,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.45 MB"
+  },
+  {
+    "timestamp": 1751523379339,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.45 MB"
+  },
+  {
+    "timestamp": 1751523382389,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.45 MB"
+  },
+  {
+    "timestamp": 1751523385363,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.45 MB"
+  },
+  {
+    "timestamp": 1751523388378,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.45 MB"
+  },
+  {
+    "timestamp": 1751523391393,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523394491,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523397386,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523400392,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523403412,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523406415,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523409435,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523412450,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523415494,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523418447,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523421499,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523424442,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523427465,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523430448,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523433457,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523436464,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523439474,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523442568,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523445493,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523448533,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523451532,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523454611,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.51 MB"
+  },
+  {
+    "timestamp": 1751523457563,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.56 MB"
+  },
+  {
+    "timestamp": 1751523460539,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "50.56 MB"
+  },
+  {
+    "timestamp": 1751523463528,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.56 MB"
+  },
+  {
+    "timestamp": 1751523466532,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.56 MB"
+  },
+  {
+    "timestamp": 1751523469544,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.56 MB"
+  },
+  {
+    "timestamp": 1751523472605,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.56 MB"
+  },
+  {
+    "timestamp": 1751523476142,
+    "logs": "[No logs available]",
+    "cpu": "1.03",
+    "memory": "50.98 MB"
+  },
+  {
+    "timestamp": 1751523479222,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.96 MB"
+  },
+  {
+    "timestamp": 1751523481681,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.96 MB"
+  },
+  {
+    "timestamp": 1751523484553,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.96 MB"
+  },
+  {
+    "timestamp": 1751523487562,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.96 MB"
+  },
+  {
+    "timestamp": 1751523490605,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "51.07 MB"
+  },
+  {
+    "timestamp": 1751523493590,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.07 MB"
+  },
+  {
+    "timestamp": 1751523496598,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.06 MB"
+  },
+  {
+    "timestamp": 1751523499592,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.07 MB"
+  },
+  {
+    "timestamp": 1751523502604,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.09 MB"
+  },
+  {
+    "timestamp": 1751523505612,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.09 MB"
+  },
+  {
+    "timestamp": 1751523508612,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.09 MB"
+  },
+  {
+    "timestamp": 1751523511626,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.09 MB"
+  },
+  {
+    "timestamp": 1751523514705,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.09 MB"
+  },
+  {
+    "timestamp": 1751523517634,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.09 MB"
+  },
+  {
+    "timestamp": 1751523520643,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.09 MB"
+  },
+  {
+    "timestamp": 1751523523644,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.09 MB"
+  },
+  {
+    "timestamp": 1751523526675,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.09 MB"
+  },
+  {
+    "timestamp": 1751523529749,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.09 MB"
+  },
+  {
+    "timestamp": 1751523532721,
+    "logs": "[No logs available]",
+    "cpu": "1.03",
+    "memory": "51.09 MB"
+  },
+  {
+    "timestamp": 1751523535684,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.09 MB"
+  },
+  {
+    "timestamp": 1751523538716,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.09 MB"
+  },
+  {
+    "timestamp": 1751523541763,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.09 MB"
+  },
+  {
+    "timestamp": 1751523544692,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.09 MB"
+  },
+  {
+    "timestamp": 1751523547722,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.09 MB"
+  },
+  {
+    "timestamp": 1751523550726,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.09 MB"
+  },
+  {
+    "timestamp": 1751523553728,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.09 MB"
+  },
+  {
+    "timestamp": 1751523556748,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.15 MB"
+  },
+  {
+    "timestamp": 1751523559747,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "51.15 MB"
+  },
+  {
+    "timestamp": 1751523562769,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "51.15 MB"
+  },
+  {
+    "timestamp": 1751523565752,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.15 MB"
+  },
+  {
+    "timestamp": 1751523568767,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.15 MB"
+  },
+  {
+    "timestamp": 1751523571754,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.15 MB"
+  },
+  {
+    "timestamp": 1751523574840,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.15 MB"
+  },
+  {
+    "timestamp": 1751523577794,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.15 MB"
+  },
+  {
+    "timestamp": 1751523580772,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.15 MB"
+  },
+  {
+    "timestamp": 1751523583783,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.15 MB"
+  },
+  {
+    "timestamp": 1751523586782,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.15 MB"
+  },
+  {
+    "timestamp": 1751523589842,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.20 MB"
+  },
+  {
+    "timestamp": 1751523592838,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.20 MB"
+  },
+  {
+    "timestamp": 1751523595824,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.20 MB"
+  },
+  {
+    "timestamp": 1751523598834,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.20 MB"
+  },
+  {
+    "timestamp": 1751523601948,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "51.20 MB"
+  },
+  {
+    "timestamp": 1751523604855,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.20 MB"
+  },
+  {
+    "timestamp": 1751523607870,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.20 MB"
+  },
+  {
+    "timestamp": 1751523610887,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.20 MB"
+  },
+  {
+    "timestamp": 1751523613889,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.20 MB"
+  },
+  {
+    "timestamp": 1751523616893,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "51.20 MB"
+  },
+  {
+    "timestamp": 1751523619900,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.21 MB"
+  },
+  {
+    "timestamp": 1751523622909,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.29 MB"
+  },
+  {
+    "timestamp": 1751523625925,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.29 MB"
+  },
+  {
+    "timestamp": 1751523628938,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.29 MB"
+  },
+  {
+    "timestamp": 1751523631939,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.29 MB"
+  },
+  {
+    "timestamp": 1751523635048,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.29 MB"
+  },
+  {
+    "timestamp": 1751523637961,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.29 MB"
+  },
+  {
+    "timestamp": 1751523640967,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.29 MB"
+  },
+  {
+    "timestamp": 1751523643968,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.29 MB"
+  },
+  {
+    "timestamp": 1751523646961,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.29 MB"
+  },
+  {
+    "timestamp": 1751523649970,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.29 MB"
+  },
+  {
+    "timestamp": 1751523652984,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.29 MB"
+  },
+  {
+    "timestamp": 1751523656013,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.36 MB"
+  },
+  {
+    "timestamp": 1751523659013,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.36 MB"
+  },
+  {
+    "timestamp": 1751523662073,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.36 MB"
+  },
+  {
+    "timestamp": 1751523665016,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "51.36 MB"
+  },
+  {
+    "timestamp": 1751523668021,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.36 MB"
+  },
+  {
+    "timestamp": 1751523671028,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "51.36 MB"
+  },
+  {
+    "timestamp": 1751523674032,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.36 MB"
+  },
+  {
+    "timestamp": 1751523677045,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.36 MB"
+  },
+  {
+    "timestamp": 1751523680056,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.33 MB"
+  },
+  {
+    "timestamp": 1751523683064,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.33 MB"
+  },
+  {
+    "timestamp": 1751523686064,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.33 MB"
+  },
+  {
+    "timestamp": 1751523689075,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523692068,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523695197,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523698087,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523701090,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523704100,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523707108,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523710113,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523713124,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523716133,
+    "logs": "[No logs available]",
+    "cpu": "1.07",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523719146,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523722222,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523725164,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523728173,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523731180,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523734193,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523737205,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523740213,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523743229,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523746237,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523749235,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523752248,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523755360,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.39 MB"
+  },
+  {
+    "timestamp": 1751523758273,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.43 MB"
+  },
+  {
+    "timestamp": 1751523761276,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.43 MB"
+  },
+  {
+    "timestamp": 1751523764303,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.12 MB"
+  },
+  {
+    "timestamp": 1751523767411,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.16 MB"
+  },
+  {
+    "timestamp": 1751523770314,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.16 MB"
+  },
+  {
+    "timestamp": 1751523773350,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.17 MB"
+  },
+  {
+    "timestamp": 1751523776496,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.17 MB"
+  },
+  {
+    "timestamp": 1751523779360,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.17 MB"
+  },
+  {
+    "timestamp": 1751523782458,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.17 MB"
+  },
+  {
+    "timestamp": 1751523785381,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.17 MB"
+  },
+  {
+    "timestamp": 1751523788376,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.26 MB"
+  },
+  {
+    "timestamp": 1751523791369,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.28 MB"
+  },
+  {
+    "timestamp": 1751523794371,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.28 MB"
+  },
+  {
+    "timestamp": 1751523797410,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "51.28 MB"
+  },
+  {
+    "timestamp": 1751523800405,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.28 MB"
+  },
+  {
+    "timestamp": 1751523803423,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.28 MB"
+  },
+  {
+    "timestamp": 1751523806347,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.28 MB"
+  },
+  {
+    "timestamp": 1751523809449,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "51.28 MB"
+  },
+  {
+    "timestamp": 1751523812430,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.28 MB"
+  },
+  {
+    "timestamp": 1751523815458,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.28 MB"
+  },
+  {
+    "timestamp": 1751523818429,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.28 MB"
+  },
+  {
+    "timestamp": 1751523821408,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.35 MB"
+  },
+  {
+    "timestamp": 1751523824422,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.35 MB"
+  },
+  {
+    "timestamp": 1751523827422,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "51.35 MB"
+  },
+  {
+    "timestamp": 1751523830417,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.35 MB"
+  },
+  {
+    "timestamp": 1751523833427,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.35 MB"
+  },
+  {
+    "timestamp": 1751523836420,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.35 MB"
+  },
+  {
+    "timestamp": 1751523839437,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.35 MB"
+  },
+  {
+    "timestamp": 1751523842463,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "51.35 MB"
+  },
+  {
+    "timestamp": 1751523845456,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.35 MB"
+  },
+  {
+    "timestamp": 1751523848455,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.35 MB"
+  },
+  {
+    "timestamp": 1751523851473,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.35 MB"
+  },
+  {
+    "timestamp": 1751523854473,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.41 MB"
+  },
+  {
+    "timestamp": 1751523857480,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.41 MB"
+  },
+  {
+    "timestamp": 1751523860525,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.41 MB"
+  },
+  {
+    "timestamp": 1751523863502,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.41 MB"
+  },
+  {
+    "timestamp": 1751523866495,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.41 MB"
+  },
+  {
+    "timestamp": 1751523869514,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.41 MB"
+  },
+  {
+    "timestamp": 1751523872516,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.41 MB"
+  },
+  {
+    "timestamp": 1751523875617,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "51.41 MB"
+  },
+  {
+    "timestamp": 1751523878613,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.41 MB"
+  },
+  {
+    "timestamp": 1751523881570,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.41 MB"
+  },
+  {
+    "timestamp": 1751523884623,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.41 MB"
+  },
+  {
+    "timestamp": 1751523887627,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.48 MB"
+  },
+  {
+    "timestamp": 1751523890577,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.48 MB"
+  },
+  {
+    "timestamp": 1751523893581,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.48 MB"
+  },
+  {
+    "timestamp": 1751523896571,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.48 MB"
+  },
+  {
+    "timestamp": 1751523899595,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.48 MB"
+  },
+  {
+    "timestamp": 1751523902588,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.43 MB"
+  },
+  {
+    "timestamp": 1751523905626,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.43 MB"
+  },
+  {
+    "timestamp": 1751523908675,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.43 MB"
+  },
+  {
+    "timestamp": 1751523911613,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.43 MB"
+  },
+  {
+    "timestamp": 1751523914610,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.43 MB"
+  },
+  {
+    "timestamp": 1751523917614,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "51.43 MB"
+  },
+  {
+    "timestamp": 1751523920623,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.43 MB"
+  },
+  {
+    "timestamp": 1751523923650,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.43 MB"
+  },
+  {
+    "timestamp": 1751523926744,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.43 MB"
+  },
+  {
+    "timestamp": 1751523929632,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "51.43 MB"
+  },
+  {
+    "timestamp": 1751523932638,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.43 MB"
+  },
+  {
+    "timestamp": 1751523935675,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.43 MB"
+  },
+  {
+    "timestamp": 1751523938667,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.43 MB"
+  },
+  {
+    "timestamp": 1751523941813,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.43 MB"
+  },
+  {
+    "timestamp": 1751523944708,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.43 MB"
+  },
+  {
+    "timestamp": 1751523947731,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.53 MB"
+  },
+  {
+    "timestamp": 1751523950695,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.53 MB"
+  },
+  {
+    "timestamp": 1751523953804,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.61 MB"
+  },
+  {
+    "timestamp": 1751523956758,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.61 MB"
+  },
+  {
+    "timestamp": 1751523959771,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "51.61 MB"
+  },
+  {
+    "timestamp": 1751523962733,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.61 MB"
+  },
+  {
+    "timestamp": 1751523965751,
+    "logs": "[No logs available]",
+    "cpu": "1.03",
+    "memory": "51.61 MB"
+  },
+  {
+    "timestamp": 1751523968744,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "51.61 MB"
+  },
+  {
+    "timestamp": 1751523971761,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.61 MB"
+  },
+  {
+    "timestamp": 1751523974770,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.61 MB"
+  },
+  {
+    "timestamp": 1751523977765,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "51.61 MB"
+  },
+  {
+    "timestamp": 1751523980780,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.34 MB"
+  },
+  {
+    "timestamp": 1751523983780,
+    "logs": "[No logs available]",
+    "cpu": "1.03",
+    "memory": "49.34 MB"
+  },
+  {
+    "timestamp": 1751523986814,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.41 MB"
+  },
+  {
+    "timestamp": 1751523989792,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.41 MB"
+  },
+  {
+    "timestamp": 1751523992788,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.41 MB"
+  },
+  {
+    "timestamp": 1751523995810,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.41 MB"
+  },
+  {
+    "timestamp": 1751523998820,
+    "logs": "[No logs available]",
+    "cpu": "1.03",
+    "memory": "49.41 MB"
+  },
+  {
+    "timestamp": 1751524001819,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.41 MB"
+  },
+  {
+    "timestamp": 1751524004832,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.41 MB"
+  },
+  {
+    "timestamp": 1751524007856,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.41 MB"
+  },
+  {
+    "timestamp": 1751524010834,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.41 MB"
+  },
+  {
+    "timestamp": 1751524013845,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.41 MB"
+  },
+  {
+    "timestamp": 1751524016858,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.41 MB"
+  },
+  {
+    "timestamp": 1751524019863,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.48 MB"
+  },
+  {
+    "timestamp": 1751524022871,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.48 MB"
+  },
+  {
+    "timestamp": 1751524025889,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.48 MB"
+  },
+  {
+    "timestamp": 1751524028880,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.48 MB"
+  },
+  {
+    "timestamp": 1751524031881,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.48 MB"
+  },
+  {
+    "timestamp": 1751524034885,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.48 MB"
+  },
+  {
+    "timestamp": 1751524037883,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.48 MB"
+  },
+  {
+    "timestamp": 1751524040883,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.48 MB"
+  },
+  {
+    "timestamp": 1751524043884,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.48 MB"
+  },
+  {
+    "timestamp": 1751524046888,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.48 MB"
+  },
+  {
+    "timestamp": 1751524049896,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.48 MB"
+  },
+  {
+    "timestamp": 1751524052896,
+    "logs": "[No logs available]",
+    "cpu": "1.00",
+    "memory": "49.49 MB"
+  },
+  {
+    "timestamp": 1751524055911,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.49 MB"
+  },
+  {
+    "timestamp": 1751524058927,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.49 MB"
+  },
+  {
+    "timestamp": 1751524061926,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.49 MB"
+  },
+  {
+    "timestamp": 1751524064928,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.49 MB"
+  },
+  {
+    "timestamp": 1751524067950,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.49 MB"
+  },
+  {
+    "timestamp": 1751524071048,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.49 MB"
+  },
+  {
+    "timestamp": 1751524073947,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.49 MB"
+  },
+  {
+    "timestamp": 1751524076951,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.49 MB"
+  },
+  {
+    "timestamp": 1751524079966,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.49 MB"
+  },
+  {
+    "timestamp": 1751524082966,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.49 MB"
+  },
+  {
+    "timestamp": 1751524085959,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.54 MB"
+  },
+  {
+    "timestamp": 1751524088975,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.54 MB"
+  },
+  {
+    "timestamp": 1751524091976,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.54 MB"
+  },
+  {
+    "timestamp": 1751524094983,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.54 MB"
+  },
+  {
+    "timestamp": 1751524097981,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.54 MB"
+  },
+  {
+    "timestamp": 1751524100997,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.54 MB"
+  },
+  {
+    "timestamp": 1751524103991,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.54 MB"
+  },
+  {
+    "timestamp": 1751524107005,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.54 MB"
+  },
+  {
+    "timestamp": 1751524110022,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.54 MB"
+  },
+  {
+    "timestamp": 1751524113031,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.55 MB"
+  },
+  {
+    "timestamp": 1751524116042,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.55 MB"
+  },
+  {
+    "timestamp": 1751524119051,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.60 MB"
+  },
+  {
+    "timestamp": 1751524122055,
+    "logs": "[No logs available]",
+    "cpu": "1.07",
+    "memory": "49.60 MB"
+  },
+  {
+    "timestamp": 1751524125065,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.60 MB"
+  },
+  {
+    "timestamp": 1751524128066,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.60 MB"
+  },
+  {
+    "timestamp": 1751524131073,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.60 MB"
+  },
+  {
+    "timestamp": 1751524134076,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.60 MB"
+  },
+  {
+    "timestamp": 1751524137071,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.60 MB"
+  },
+  {
+    "timestamp": 1751524140095,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.60 MB"
+  },
+  {
+    "timestamp": 1751524143095,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.60 MB"
+  },
+  {
+    "timestamp": 1751524146108,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.60 MB"
+  },
+  {
+    "timestamp": 1751524149110,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.60 MB"
+  },
+  {
+    "timestamp": 1751524152113,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.75 MB"
+  },
+  {
+    "timestamp": 1751524155108,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.75 MB"
+  },
+  {
+    "timestamp": 1751524158118,
+    "logs": "[No logs available]",
+    "cpu": "1.03",
+    "memory": "49.75 MB"
+  },
+  {
+    "timestamp": 1751524161134,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.75 MB"
+  },
+  {
+    "timestamp": 1751524164126,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.75 MB"
+  },
+  {
+    "timestamp": 1751524167123,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.75 MB"
+  },
+  {
+    "timestamp": 1751524170141,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.75 MB"
+  },
+  {
+    "timestamp": 1751524173142,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.75 MB"
+  },
+  {
+    "timestamp": 1751524176168,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.75 MB"
+  },
+  {
+    "timestamp": 1751524179156,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.75 MB"
+  },
+  {
+    "timestamp": 1751524182164,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.75 MB"
+  },
+  {
+    "timestamp": 1751524185171,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.84 MB"
+  },
+  {
+    "timestamp": 1751524188210,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.84 MB"
+  },
+  {
+    "timestamp": 1751524191199,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.84 MB"
+  },
+  {
+    "timestamp": 1751524194199,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.84 MB"
+  },
+  {
+    "timestamp": 1751524197199,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.84 MB"
+  },
+  {
+    "timestamp": 1751524200277,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.84 MB"
+  },
+  {
+    "timestamp": 1751524203231,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.84 MB"
+  },
+  {
+    "timestamp": 1751524206238,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.84 MB"
+  },
+  {
+    "timestamp": 1751524209225,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.84 MB"
+  },
+  {
+    "timestamp": 1751524212230,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.84 MB"
+  },
+  {
+    "timestamp": 1751524215230,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.84 MB"
+  },
+  {
+    "timestamp": 1751524218244,
+    "logs": "[No logs available]",
+    "cpu": "1.03",
+    "memory": "49.90 MB"
+  },
+  {
+    "timestamp": 1751524221279,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.63 MB"
+  },
+  {
+    "timestamp": 1751524224256,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.63 MB"
+  },
+  {
+    "timestamp": 1751524227259,
+    "logs": "[No logs available]",
+    "cpu": "1.07",
+    "memory": "49.63 MB"
+  },
+  {
+    "timestamp": 1751524230255,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.63 MB"
+  },
+  {
+    "timestamp": 1751524233265,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.63 MB"
+  },
+  {
+    "timestamp": 1751524236301,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.63 MB"
+  },
+  {
+    "timestamp": 1751524239266,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.63 MB"
+  },
+  {
+    "timestamp": 1751524242278,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.63 MB"
+  },
+  {
+    "timestamp": 1751524245280,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.63 MB"
+  },
+  {
+    "timestamp": 1751524248328,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.63 MB"
+  },
+  {
+    "timestamp": 1751524251367,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "49.98 MB"
+  },
+  {
+    "timestamp": 1751524254309,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.95 MB"
+  },
+  {
+    "timestamp": 1751524257311,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.00 MB"
+  },
+  {
+    "timestamp": 1751524260395,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.00 MB"
+  },
+  {
+    "timestamp": 1751524263341,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.00 MB"
+  },
+  {
+    "timestamp": 1751524266414,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.00 MB"
+  },
+  {
+    "timestamp": 1751524269333,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.00 MB"
+  },
+  {
+    "timestamp": 1751524272347,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "50.00 MB"
+  },
+  {
+    "timestamp": 1751524275361,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "50.00 MB"
+  },
+  {
+    "timestamp": 1751524278360,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "50.00 MB"
+  },
+  {
+    "timestamp": 1751524281458,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "46.85 MB"
+  },
+  {
+    "timestamp": 1751524284388,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "46.91 MB"
+  },
+  {
+    "timestamp": 1751524287386,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "46.91 MB"
+  },
+  {
+    "timestamp": 1751524290391,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "46.91 MB"
+  },
+  {
+    "timestamp": 1751524293407,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "46.91 MB"
+  },
+  {
+    "timestamp": 1751524296499,
+    "logs": "[No logs available]",
+    "cpu": "1.07",
+    "memory": "46.91 MB"
+  },
+  {
+    "timestamp": 1751524299431,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "46.91 MB"
+  },
+  {
+    "timestamp": 1751524302442,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "46.91 MB"
+  },
+  {
+    "timestamp": 1751524305453,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "46.91 MB"
+  },
+  {
+    "timestamp": 1751524308466,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "46.91 MB"
+  },
+  {
+    "timestamp": 1751524311727,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "46.91 MB"
+  },
+  {
+    "timestamp": 1751524314514,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "46.91 MB"
+  },
+  {
+    "timestamp": 1751524317498,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "46.98 MB"
+  },
+  {
+    "timestamp": 1751524320604,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "46.98 MB"
+  },
+  {
+    "timestamp": 1751524323509,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "46.98 MB"
+  },
+  {
+    "timestamp": 1751524326632,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "46.98 MB"
+  },
+  {
+    "timestamp": 1751524329518,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "46.98 MB"
+  },
+  {
+    "timestamp": 1751524332565,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "46.98 MB"
+  },
+  {
+    "timestamp": 1751524335552,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "46.92 MB"
+  },
+  {
+    "timestamp": 1751524338567,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "46.92 MB"
+  },
+  {
+    "timestamp": 1751524341665,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "46.92 MB"
+  },
+  {
+    "timestamp": 1751524344573,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "46.92 MB"
+  },
+  {
+    "timestamp": 1751524347569,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "46.92 MB"
+  },
+  {
+    "timestamp": 1751524350618,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "47.01 MB"
+  },
+  {
+    "timestamp": 1751524353647,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "47.01 MB"
+  },
+  {
+    "timestamp": 1751524356709,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "47.01 MB"
+  },
+  {
+    "timestamp": 1751524359597,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "47.01 MB"
+  },
+  {
+    "timestamp": 1751524362605,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "47.01 MB"
+  },
+  {
+    "timestamp": 1751524365609,
+    "logs": "[No logs available]",
+    "cpu": "0.50",
+    "memory": "47.01 MB"
+  },
+  {
+    "timestamp": 1751524368615,
+    "logs": "[No logs available]",
+    "cpu": "1.07",
+    "memory": "47.01 MB"
+  }
+]
