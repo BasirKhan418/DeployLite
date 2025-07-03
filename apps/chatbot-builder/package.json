@@ -1,0 +1,31 @@
+{
+  "name": "chatbot-builder",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@langchain/community": "^0.3.47",
+    "@langchain/core": "^0.3.61",
+    "cheerio": "^1.1.0",
+    "csv-parse": "^5.6.0",
+    "d3-dsv": "^2.0.0",
+    "dotenv": "^17.0.1",
+    "langchain": "^0.3.29",
+    "mammoth": "^1.9.1",
+    "officeparser": "^4.2.0",
+    "openai": "^4.104.0",
+    "pdf-parse": "^1.1.1",
+    "srt-parser-2": "^1.2.3",
+    "word-extractor": "^1.0.4",
+    "youtube-dl-exec": "^3.0.22"
+  }
+}
