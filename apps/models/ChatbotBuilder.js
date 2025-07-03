@@ -2,14 +2,11 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
 
-const DatabaseSchema = Schema({
+const ChatbotBuilderSchema = Schema({
 
 userid:{ type: Schema.Types.ObjectId,ref:'User', required: true},
-dbname:{type:String,required:true},
-dbuser:{type:String,required:true},
-dbpass:{type:String,required:true},
-dbport:{type:String,required:true},
-dbtype:{type:String,required:true},
+name:{type:String,required:true},
+dburl:{type:String,required:true},
 startdate:{type:Date,required:true},
 projectstatus:{type:String, default: "creating"},
 deploymentstatus:{type:String},
@@ -23,8 +20,9 @@ endbilingdate:{type:Date},
 billstatus:{type:String, default: "pending"},
 arn:{type:String,default:""},
 projecturl:{type:String,default:""},
-uiurl:{type:String,default:""},
+knowledgebase:{type:Array,default:[]},
+
 },{timestamps:true})
 
 mongoose.models = {}
-export default mongoose.model.Database||mongoose.model('Database',DatabaseSchema);
+export default mongoose.model.ChatbotBuilder || mongoose.model('ChatbotBuilder',ChatbotBuilderSchema);

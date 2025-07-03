@@ -12,6 +12,7 @@ import { MySql } from "../applogics/host/mysql.js";
 import { MongoDb } from "../applogics/host/mongodb.js";
 import { Redis } from "../applogics/host/redis.js";
 import { Qdrant } from "../applogics/host/qdrant.js";
+import { Chatbot } from "../applogics/host/chatbot.js";
 const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -30,5 +31,6 @@ router.post('/mysql', MySql);
 router.post('/mongodb', MongoDb);
 router.post('/redis', Redis);
 router.post('/qdrant', Qdrant);
+router.post('/chatbot', Chatbot);
 
 export default { router };
