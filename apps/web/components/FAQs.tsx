@@ -1,13 +1,13 @@
 "use client"
 import { useState } from "react";
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Minus, HelpCircle, MessageCircle, Shield, Zap, CreditCard, Users, Settings, Globe } from "lucide-react";
+import { Plus, Minus, HelpCircle, MessageCircle, Shield, Zap, CreditCard, Settings } from "lucide-react";
 
 const faqData = [
   {
     category: "Getting Started",
     icon: Zap,
-    color: "from-blue-500 to-purple-600",
+    color: "from-pink-500 to-purple-600",
     questions: [
       {
         question: "How do I get started with DeployLite?",
@@ -34,11 +34,11 @@ const faqData = [
       },
       {
         question: "How is pricing structured for teams?",
-        answer: "Our pricing is per seat, per month with unlimited projects. Team plans start at $25/month per user and include advanced collaboration tools, priority support, and enhanced security features. Volume discounts available for 10+ users."
+        answer: "Our pricing is per seat, per month with unlimited projects. Team plans start at $25/month per user and include advanced collaboration tools, priority support, and enhanced security features."
       },
       {
         question: "Can I switch plans at any time?",
-        answer: "Absolutely! Upgrade or downgrade your plan instantly. Changes are prorated automatically, and you'll only pay for what you use. Downgrades take effect at the next billing cycle to ensure uninterrupted service."
+        answer: "Absolutely! Upgrade or downgrade your plan instantly. Changes are prorated automatically, and you'll only pay for what you use. Downgrades take effect at the next billing cycle."
       }
     ]
   },
@@ -49,15 +49,15 @@ const faqData = [
     questions: [
       {
         question: "How do you ensure data security?",
-        answer: "Security is our top priority. We use AES-256 encryption at rest and in transit, SOC 2 Type II certified infrastructure, regular security audits, and zero-trust architecture. All data is isolated per tenant with complete encryption."
+        answer: "Security is our top priority. We use AES-256 encryption at rest and in transit, SOC 2 Type II certified infrastructure, regular security audits, and zero-trust architecture."
       },
       {
         question: "Are you compliant with GDPR and other regulations?",
-        answer: "Yes, we're fully GDPR, CCPA, and HIPAA compliant. Our platform includes built-in data governance tools, audit logging, right-to-delete functionality, and data residency controls for international compliance."
+        answer: "Yes, we're fully GDPR, CCPA, and HIPAA compliant. Our platform includes built-in data governance tools, audit logging, and data residency controls for international compliance."
       },
       {
         question: "What about backup and disaster recovery?",
-        answer: "We maintain automated backups across multiple geographic regions with point-in-time recovery. Our 99.99% uptime SLA is backed by redundant infrastructure, automatic failover, and 24/7 monitoring."
+        answer: "We maintain automated backups across multiple geographic regions with point-in-time recovery. Our 99.99% uptime SLA is backed by redundant infrastructure and 24/7 monitoring."
       }
     ]
   },
@@ -68,15 +68,15 @@ const faqData = [
     questions: [
       {
         question: "What kind of support do you provide?",
-        answer: "Free tier includes community support and documentation. Paid plans get email support with <24hr response time. Pro and Enterprise plans include priority support with <1hr response, dedicated success managers, and optional phone support."
+        answer: "Free tier includes community support and documentation. Paid plans get email support with <24hr response time. Pro and Enterprise plans include priority support with <1hr response."
       },
       {
         question: "Do you offer SLA guarantees?",
-        answer: "Yes! We offer 99.9% uptime SLA for Pro plans and 99.99% for Enterprise plans. SLA breaches result in automatic service credits. Our average uptime exceeds 99.97% across all regions."
+        answer: "Yes! We offer 99.9% uptime SLA for Pro plans and 99.99% for Enterprise plans. SLA breaches result in automatic service credits. Our average uptime exceeds 99.97%."
       },
       {
         question: "Can I integrate with my existing tools?",
-        answer: "Absolutely! We offer native integrations with GitHub, GitLab, Bitbucket, Slack, Jira, Datadog, and 100+ other tools. Our REST API and webhooks enable custom integrations with any platform."
+        answer: "Absolutely! We offer native integrations with GitHub, GitLab, Bitbucket, Slack, Jira, Datadog, and 100+ other tools. Our REST API enables custom integrations with any platform."
       }
     ]
   }
@@ -86,8 +86,8 @@ const CategoryCard = ({ category, isActive, onClick, icon: Icon, color }) => (
   <motion.button
     className={`w-full p-4 rounded-xl text-left relative overflow-hidden group transition-all duration-300 ${
       isActive 
-        ? 'card-pro border-pink-500/30' 
-        : 'glass-pro border-white/10 hover:border-pink-500/20'
+        ? 'bg-gray-800/60 border border-pink-500/30' 
+        : 'bg-gray-900/50 border border-gray-800 hover:border-pink-500/20'
     }`}
     onClick={onClick}
     whileHover={{ scale: 1.02, y: -2 }}
@@ -100,10 +100,10 @@ const CategoryCard = ({ category, isActive, onClick, icon: Icon, color }) => (
         <Icon className="w-5 h-5 text-white" />
       </div>
       <div>
-        <h3 className={`font-semibold transition-colors ${isActive ? 'text-glow-pink' : 'text-white group-hover:text-glow-pink'}`}>
+        <h3 className={`font-semibold transition-colors ${isActive ? 'text-pink-300' : 'text-white group-hover:text-pink-300'}`}>
           {category}
         </h3>
-        <p className="text-xs text-white/60 group-hover:text-white/80 transition-colors">
+        <p className="text-xs text-gray-400 group-hover:text-gray-300 transition-colors">
           {category === "Getting Started" && "Setup & Configuration"}
           {category === "Pricing & Plans" && "Billing & Subscriptions"}
           {category === "Security & Compliance" && "Data Protection & Audits"}
@@ -112,10 +112,9 @@ const CategoryCard = ({ category, isActive, onClick, icon: Icon, color }) => (
       </div>
     </div>
     
-    {/* Active Indicator */}
     {isActive && (
       <motion.div
-        className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-pink-500 to-cyan-500 rounded-r-full"
+        className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-pink-500 to-purple-500 rounded-r-full"
         layoutId="activeIndicator"
         transition={{ duration: 0.3 }}
       />
@@ -125,24 +124,24 @@ const CategoryCard = ({ category, isActive, onClick, icon: Icon, color }) => (
 
 const AccordionItem = ({ question, answer, index, isOpen, onToggle }) => (
   <motion.div 
-    className="card-pro mb-4 relative overflow-hidden group"
+    className="bg-gray-900/50 border border-gray-800 rounded-xl mb-4 relative overflow-hidden group hover:border-gray-700 transition-all duration-300"
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5, delay: index * 0.1 }}
     whileHover={{ scale: 1.01, y: -2 }}
   >
-    <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+    <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
     
     <motion.button
       className="w-full p-6 text-left flex items-center justify-between relative z-10"
       onClick={onToggle}
       whileTap={{ scale: 0.99 }}
     >
-      <span className="text-lg font-semibold text-white pr-8 group-hover:text-glow-pink transition-all duration-300">
+      <span className="text-lg font-semibold text-white pr-8 group-hover:text-pink-200 transition-all duration-300">
         {question}
       </span>
       <motion.div
-        className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-pink-500 to-cyan-500 rounded-full flex items-center justify-center"
+        className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full flex items-center justify-center"
         animate={{ rotate: isOpen ? 180 : 0 }}
         transition={{ duration: 0.3 }}
         whileHover={{ scale: 1.1 }}
@@ -165,17 +164,14 @@ const AccordionItem = ({ question, answer, index, isOpen, onToggle }) => (
           className="overflow-hidden"
         >
           <div className="px-6 pb-6 relative z-10">
-            <div className="h-px bg-gradient-to-r from-pink-500 to-cyan-500 mb-4 opacity-30"></div>
-            <p className="text-white/80 leading-relaxed group-hover:text-white/90 transition-colors">
+            <div className="h-px bg-gradient-to-r from-pink-500 to-purple-500 mb-4 opacity-30"></div>
+            <p className="text-gray-300 leading-relaxed group-hover:text-gray-200 transition-colors">
               {answer}
             </p>
           </div>
         </motion.div>
       )}
     </AnimatePresence>
-    
-    {/* Shimmer Effect */}
-    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 skew-x-12 transform translate-x-full group-hover:-translate-x-full transition-all duration-1000"></div>
   </motion.div>
 );
 
@@ -193,46 +189,18 @@ export default function Faqs() {
   const currentCategory = faqData[activeCategory];
 
   return (
-    <div className="bg-black py-16 sm:py-24 relative overflow-hidden" id="faq">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-purple-900/5 to-black"></div>
-      
-      {/* Animated Particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {Array.from({ length: 20 }).map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-gradient-to-r from-pink-500 to-cyan-500 rounded-full opacity-40"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -120, 0],
-              opacity: [0, 0.6, 0],
-              scale: [0, 1.2, 0],
-            }}
-            transition={{
-              duration: Math.random() * 15 + 10,
-              repeat: Infinity,
-              delay: Math.random() * 5,
-              ease: "easeInOut"
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="container mx-auto px-6 relative z-10">
+    <div className="bg-gray-950 py-20" id="faq">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <motion.div
-          className="text-center mb-16 sm:mb-20"
+          className="text-center mb-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
           <motion.div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-pro border border-purple-500/20 text-purple-400 text-sm mb-6"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-900/50 border border-purple-500/20 text-purple-400 text-sm mb-6"
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -243,20 +211,16 @@ export default function Faqs() {
             Support Center
           </motion.div>
 
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
-            <span className="text-white">Frequently Asked </span>
-            <span className="text-shimmer">Questions</span>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            Frequently Asked Questions
           </h2>
-          <div className="max-w-3xl mx-auto">
-            <p className="text-lg sm:text-xl text-white/70 leading-relaxed">
-              Find answers to common questions about our platform, pricing, security, and more. 
-              Can't find what you're looking for? Our support team is here to help.
-            </p>
-          </div>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            Find answers to common questions about our platform, pricing, security, and more.
+          </p>
         </motion.div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Category Sidebar */}
           <motion.div
             className="lg:col-span-1 space-y-4"
@@ -297,7 +261,7 @@ export default function Faqs() {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-white">{currentCategory.category}</h3>
-                  <p className="text-white/60">{currentCategory.questions.length} questions</p>
+                  <p className="text-gray-400">{currentCategory.questions.length} questions</p>
                 </div>
               </div>
             </div>
@@ -316,50 +280,6 @@ export default function Faqs() {
             </div>
           </motion.div>
         </div>
-
-        {/* Contact Support Section */}
-        <motion.div
-          className="mt-16 sm:mt-20 text-center card-pro p-8 sm:p-12 max-w-4xl mx-auto relative overflow-hidden group"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          whileHover={{ scale: 1.02, y: -5 }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-          
-          <div className="relative z-10">
-            <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-              <MessageCircle className="w-8 h-8 text-white" />
-            </div>
-            
-            <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4 group-hover:text-glow-pink transition-all duration-300">
-              Still have questions?
-            </h3>
-            <p className="text-white/70 mb-8 max-w-2xl mx-auto group-hover:text-white/90 transition-colors">
-              Our support team is available 24/7 to help you with any questions or issues. 
-              Get personalized assistance from our experts.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <motion.button
-                className="btn-glow px-8 py-4 rounded-xl text-lg font-semibold"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Contact Support
-              </motion.button>
-              
-              <motion.button
-                className="btn-outline-glow px-8 py-4 rounded-xl text-lg font-semibold"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Schedule Demo
-              </motion.button>
-            </div>
-          </div>
-        </motion.div>
       </div>
     </div>
   );
