@@ -88,6 +88,25 @@ const page = () => {
           toast.error(data.message || "Failed to load virtual space details");
         }
         return;
+      } else if (projectType === 'database') {
+        // Handle database project
+        const response = await fetch(`/api/project/database`);
+        const data = await response.json();
+        setLoading(false);
+        
+        if (data.success && data.projectdata) {
+          const project = data.projectdata.find((p: any) => p._id === id);
+          if (project) {
+            toast.success("Database details loaded successfully");
+            setProjectData(project);
+            setDeploymentdata([]);
+          } else {
+            toast.error("Database not found");
+          }
+        } else {
+          toast.error(data.message || "Failed to load database details");
+        }
+        return;
       }
       
       let data = await fetch(apiUrl)

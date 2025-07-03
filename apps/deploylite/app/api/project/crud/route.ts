@@ -10,6 +10,7 @@ import { cookies } from "next/headers"
 import CryptoJS from "crypto-js"
 import VirtualSpace from "../../../../../models/VirtualSpace"
 import WebBuilder from "../../../../../models/WebBuilder"
+
 export const GET = async () => {
     try {
         await ConnectDb();
@@ -139,6 +140,8 @@ export const POST = async (req: NextRequest) => {
                 user: "notfound"
             }, { status: 404 });
         }
+
+
 
         console.log("creating project");
         
