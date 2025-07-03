@@ -1,4 +1,4 @@
-import Database from "../../../models/Database";
+import Database from "../../../models/Database.js";
 
 
 const CreateDatabase = async (req, res) => {
