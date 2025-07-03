@@ -12,6 +12,7 @@
   "type": "commonjs",
   "dependencies": {
     "dockerode": "^4.0.7",
+    "dotenv": "^17.0.1",
     "nodemailer": "^6.10.1"
   }
 }

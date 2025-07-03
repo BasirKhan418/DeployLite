@@ -1,0 +1,26 @@
+[
+  {
+    "timestamp": 1751522501435,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.05 MB"
+  },
+  {
+    "timestamp": 1751522504366,
+    "logs": "[No logs available]",
+    "cpu": "0.00",
+    "memory": "49.05 MB"
+  },
+  {
+    "timestamp": 1751522507415,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.05 MB"
+  },
+  {
+    "timestamp": 1751522510393,
+    "logs": "[No logs available]",
+    "cpu": "0.53",
+    "memory": "49.05 MB"
+  }
+]

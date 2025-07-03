@@ -1,0 +1,12 @@
+[
+  {
+    "projectId": "test-project",
+    "action": "fix_ignored",
+    "timestamp": "2025-07-03T06:14:16.596Z"
+  },
+  {
+    "projectId": "test-project",
+    "action": "fix_failed",
+    "timestamp": "2025-07-03T06:14:28.156Z"
+  }
+]

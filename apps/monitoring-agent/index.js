@@ -6,7 +6,7 @@ const { checkHealthAndPersist } = require('./healthChecker');
     await subscribeToMetrics();
 
     // Run health + DB write every 30 minutes
-    setInterval(checkHealthAndPersist, 10 * 1000);
+    setInterval(checkHealthAndPersist, 30*60 * 1000);
 
     console.log(`[Monitor] Service started`);
 })();
