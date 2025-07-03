@@ -36,6 +36,8 @@ import {
   BarChart3,
   Server,
   Globe,
+  MemoryStick,
+  AlertTriangle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -43,6 +45,13 @@ import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/lib/hook";
 import Connect from "@/utils/Project/Connect";
 import NoProject from "@/utils/Project/NoProject";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Virtual Space Interface based on the actual model
 interface VirtualSpace {
@@ -168,8 +177,9 @@ const QuickStats: React.FC<{ spaces: VirtualSpace[] }> = ({ spaces }) => {
 
 const VirtualSpaceCard: React.FC<{ 
   workspace: VirtualSpace; 
-  onAction: (action: string, workspace: VirtualSpace) => void 
-}> = ({ workspace, onAction }) => {
+  onAction: (action: string, workspace: VirtualSpace) => void;
+  onCardClick: (workspace: VirtualSpace) => void;
+}> = ({ workspace, onAction, onCardClick }) => {
   
   const getUptime = (startdate: string) => {
     const start = new Date(startdate);
@@ -180,11 +190,22 @@ const VirtualSpaceCard: React.FC<{
     return `${hours}h ${minutes}m`;
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Only trigger card click if not clicking on buttons or dropdown
+    if (
+      !(e.target as HTMLElement).closest('button') &&
+      !(e.target as HTMLElement).closest('[role="menuitem"]')
+    ) {
+      onCardClick(workspace);
+    }
+  };
+
   return (
     <motion.div
       variants={itemVariants}
       whileHover={{ scale: 1.02, y: -4 }}
-      className="group relative overflow-hidden bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20 hover:border-pink-500/40 rounded-xl transition-all duration-300"
+      className="group relative overflow-hidden bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20 hover:border-pink-500/40 rounded-xl transition-all duration-300 cursor-pointer"
+      onClick={handleCardClick}
     >
       <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       
@@ -205,12 +226,86 @@ const VirtualSpaceCard: React.FC<{
           
           <div className="flex items-center gap-2">
             <StatusBadge status={workspace.projectstatus} />
-            <button
-              onClick={() => onAction("menu", workspace)}
-              className="p-1 hover:bg-gray-700/50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-            >
-              <MoreHorizontal className="w-4 h-4 text-gray-400" />
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="p-1 hover:bg-gray-700/50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MoreHorizontal className="w-4 h-4 text-gray-400" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-black/95 backdrop-blur-xl border-pink-500/20">
+                <DropdownMenuItem 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCardClick(workspace);
+                  }}
+                  className="hover:bg-pink-500/10 hover:text-pink-300"
+                >
+                  <Eye className="mr-2 h-4 w-4" />
+                  View Details
+                </DropdownMenuItem>
+                {workspace.projectstatus === 'live' && (
+                  <DropdownMenuItem 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onAction("access", workspace);
+                    }}
+                    className="hover:bg-pink-500/10 hover:text-pink-300"
+                  >
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    Access IDE
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAction("settings", workspace);
+                  }}
+                  className="hover:bg-pink-500/10 hover:text-pink-300"
+                >
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-pink-500/20" />
+                {workspace.projectstatus === 'live' && (
+                  <DropdownMenuItem 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onAction("pause", workspace);
+                    }}
+                    className="hover:bg-amber-500/10 hover:text-amber-300"
+                  >
+                    <Pause className="mr-2 h-4 w-4" />
+                    Pause
+                  </DropdownMenuItem>
+                )}
+                {workspace.projectstatus === 'failed' && (
+                  <DropdownMenuItem 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onAction("retry", workspace);
+                    }}
+                    className="hover:bg-amber-500/10 hover:text-amber-300"
+                  >
+                    <Play className="mr-2 h-4 w-4" />
+                    Retry Deploy
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator className="bg-pink-500/20" />
+                <DropdownMenuItem 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAction("delete", workspace);
+                  }}
+                  className="text-red-400 hover:bg-red-500/10"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
@@ -260,14 +355,20 @@ const VirtualSpaceCard: React.FC<{
           {workspace.projectstatus === "live" ? (
             <>
               <button
-                onClick={() => onAction("access", workspace)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAction("access", workspace);
+                }}
                 className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white text-sm py-2 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
               >
                 <ExternalLink className="w-4 h-4" />
                 Access IDE
               </button>
               <button
-                onClick={() => onAction("pause", workspace)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAction("pause", workspace);
+                }}
                 className="p-2 bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 rounded-lg transition-colors"
               >
                 <Pause className="w-4 h-4" />
@@ -283,7 +384,10 @@ const VirtualSpaceCard: React.FC<{
             </button>
           ) : workspace.projectstatus === "failed" ? (
             <button
-              onClick={() => onAction("retry", workspace)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onAction("retry", workspace);
+              }}
               className="flex-1 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white text-sm py-2 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
             >
               <Play className="w-4 h-4" />
@@ -291,7 +395,10 @@ const VirtualSpaceCard: React.FC<{
             </button>
           ) : (
             <button
-              onClick={() => onAction("start", workspace)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onAction("start", workspace);
+              }}
               className="flex-1 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white text-sm py-2 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
             >
               <Play className="w-4 h-4" />
@@ -335,6 +442,7 @@ export default function VirtualSpace() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [loading, setLoading] = useState(true);
   const [hasProjectsLoaded, setHasProjectsLoaded] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
 
   // Fetch virtual spaces
   const fetchVirtualSpaces = async () => {
@@ -381,7 +489,7 @@ export default function VirtualSpace() {
     return matchesSearch && matchesStatus;
   });
 
-  const handleVirtualSpaceAction = (action: string, workspace: VirtualSpace) => {
+  const handleVirtualSpaceAction = async (action: string, workspace: VirtualSpace) => {
     console.log(`Action: ${action} on virtual space:`, workspace.name);
     
     switch (action) {
@@ -395,37 +503,55 @@ export default function VirtualSpace() {
         }
         break;
       case "pause":
-        // Implement pause functionality
         toast.info("Pause functionality coming soon");
         break;
       case "start":
-        // Implement start functionality
         toast.info("Start functionality coming soon");
         break;
       case "retry":
-        // Implement retry functionality
         toast.info("Retry functionality coming soon");
+        break;
+      case "settings":
+        toast.info("Settings functionality coming soon");
+        break;
+      case "delete":
+        await handleDeleteVirtualSpace(workspace._id, workspace.name);
         break;
       default:
         break;
     }
   };
 
+  const handleCardClick = (workspace: VirtualSpace) => {
+    // Navigate to overview page
+    router.push(`/project/overview?id=${workspace._id}&type=virtualspace`);
+  };
+
   const handleCreateVirtualSpace = () => {
     router.push("/project/createproject/virtualspace");
   };
 
-  const handleDeleteVirtualSpace = async (id: string) => {
+  const handleDeleteVirtualSpace = async (id: string, name: string) => {
     if (!id) {
       toast.error('Virtual space ID is missing');
       return;
     }
     
+    // Show confirmation dialog
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete "${name}"?\n\nThis action cannot be undone and will permanently delete the virtual space and all its data.`
+    );
+    
+    if (!confirmDelete) {
+      return;
+    }
+    
     try {
-      const confirm = window.confirm('Are you sure you want to delete this virtual space?');
-      if (!confirm) return;
+      setDeleteLoading(id);
       
-      setLoading(true);
+      // Show loading toast
+      const loadingToast = toast.loading('Deleting virtual space...');
+      
       const response = await fetch(`/api/project/virtualspace`, {
         method: 'DELETE',
         headers: {
@@ -435,18 +561,22 @@ export default function VirtualSpace() {
       });
       
       const result = await response.json();
-      setLoading(false);
+      
+      // Dismiss loading toast
+      toast.dismiss(loadingToast);
       
       if (result.success) {
-        toast.success(result.message);
+        toast.success(`Virtual space "${name}" deleted successfully`);
+        // Refresh the list
         fetchVirtualSpaces();
       } else {
-        toast.error(result.message);
+        toast.error(result.message || 'Failed to delete virtual space');
       }
     } catch (err) {
       console.error('Error while deleting virtual space:', err);
-      setLoading(false);
       toast.error('Error while deleting virtual space');
+    } finally {
+      setDeleteLoading(null);
     }
   };
 
@@ -598,6 +728,7 @@ export default function VirtualSpace() {
                         key={workspace._id}
                         workspace={workspace}
                         onAction={handleVirtualSpaceAction}
+                        onCardClick={handleCardClick}
                       />
                     ))}
                   </motion.div>
@@ -609,33 +740,228 @@ export default function VirtualSpace() {
                     exit={{ opacity: 0 }}
                     className="space-y-4"
                   >
-                    {filteredSpaces.map((workspace) => (
-                      <div key={workspace._id} className="bg-gradient-to-r from-gray-900/50 to-black/50 backdrop-blur-xl border border-pink-500/20 rounded-xl p-6">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <Terminal className="w-6 h-6 text-pink-400" />
-                            <div>
-                              <h3 className="text-lg font-semibold text-gray-100">{workspace.name}</h3>
-                              <p className="text-sm text-gray-400">Virtual Development Space</p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <StatusBadge status={workspace.projectstatus} />
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteVirtualSpace(workspace._id)}
-                              className="text-red-400 hover:text-red-300"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
+                    {/* Create Button for List View */}
+                    <motion.div
+                      variants={itemVariants}
+                      whileHover={{ scale: 1.01, x: 4 }}
+                      className="group relative overflow-hidden bg-gradient-to-r from-gray-900/50 to-black/50 backdrop-blur-xl border-2 border-dashed border-pink-500/30 hover:border-pink-500/60 rounded-xl p-6 cursor-pointer transition-all duration-300"
+                      onClick={handleCreateVirtualSpace}
+                    >
+                      <div className="relative flex items-center justify-center gap-4 text-gray-400 hover:text-pink-300 transition-colors">
+                        <div className="p-2 bg-gradient-to-r from-pink-500/10 to-purple-500/10 rounded-lg">
+                          <Plus className="w-6 h-6 text-pink-400" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold">Create Virtual Space</h3>
+                          <p className="text-sm text-gray-500">Set up your cloud development environment</p>
                         </div>
                       </div>
+                    </motion.div>
+
+                    {/* Virtual Space List Items */}
+                    {filteredSpaces.map((workspace) => (
+                      <motion.div
+                        key={workspace._id}
+                        variants={itemVariants}
+                        whileHover={{ scale: 1.01, x: 4 }}
+                        className="group relative overflow-hidden bg-gradient-to-r from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20 hover:border-pink-500/40 rounded-xl p-6 cursor-pointer transition-all duration-300"
+                        onClick={() => handleCardClick(workspace)}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        
+                        <div className="relative flex items-center justify-between">
+                          <div className="flex items-center space-x-4 flex-1 min-w-0">
+                            <div className="p-3 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-xl">
+                              <Terminal className="w-6 h-6 text-pink-400" />
+                            </div>
+                            
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-3 mb-2">
+                                <h3 className="text-lg font-semibold text-gray-200 group-hover:text-pink-300 transition-colors truncate">
+                                  {workspace.name}
+                                </h3>
+                                <StatusBadge status={workspace.projectstatus} />
+                              </div>
+                              
+                              <div className="flex items-center gap-6 text-sm text-gray-400">
+                                <div className="flex items-center gap-2">
+                                  <CloudLightning className="h-4 w-4" />
+                                  <span>Development Environment</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Calendar className="h-4 w-4" />
+                                  <span>
+                                    {workspace.updatedAt 
+                                      ? new Date(workspace.updatedAt).toLocaleDateString("en-GB", { 
+                                          day: "2-digit", 
+                                          month: "short", 
+                                          year: "numeric" 
+                                        })
+                                      : "Never updated"
+                                    }
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center space-x-6">
+                            {/* Metrics */}
+                            <div className="hidden md:flex items-center space-x-4 text-sm">
+                              <div className="flex items-center space-x-2">
+                                <Cpu className="h-4 w-4 text-pink-400" />
+                                <span className="text-gray-300">{workspace.cpuusage || "0"}%</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <MemoryStick className="h-4 w-4 text-purple-400" />
+                                <span className="text-gray-300">{workspace.memoryusage || "0"}%</span>
+                              </div>
+                            </div>
+
+                            {/* Access Button */}
+                            {workspace.projectstatus === 'live' && (workspace.url || workspace.projecturl) && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-gray-400 hover:text-pink-300 transition-colors"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleVirtualSpaceAction("access", workspace);
+                                }}
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                              </Button>
+                            )}
+
+                            {/* Actions Menu */}
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="bg-black/95 backdrop-blur-xl border-pink-500/20">
+                                <DropdownMenuItem 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleCardClick(workspace);
+                                  }}
+                                  className="hover:bg-pink-500/10 hover:text-pink-300"
+                                >
+                                  <Eye className="mr-2 h-4 w-4" />
+                                  View Details
+                                </DropdownMenuItem>
+                                {workspace.projectstatus === 'live' && (
+                                  <DropdownMenuItem 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleVirtualSpaceAction("access", workspace);
+                                    }}
+                                    className="hover:bg-pink-500/10 hover:text-pink-300"
+                                  >
+                                    <ExternalLink className="mr-2 h-4 w-4" />
+                                    Access IDE
+                                  </DropdownMenuItem>
+                                )}
+                                <DropdownMenuItem 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleVirtualSpaceAction("settings", workspace);
+                                  }}
+                                  className="hover:bg-pink-500/10 hover:text-pink-300"
+                                >
+                                  <Settings className="mr-2 h-4 w-4" />
+                                  Settings
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator className="bg-pink-500/20" />
+                                {workspace.projectstatus === 'live' && (
+                                  <DropdownMenuItem 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleVirtualSpaceAction("pause", workspace);
+                                    }}
+                                    className="hover:bg-amber-500/10 hover:text-amber-300"
+                                  >
+                                    <Pause className="mr-2 h-4 w-4" />
+                                    Pause
+                                  </DropdownMenuItem>
+                                )}
+                                {workspace.projectstatus === 'failed' && (
+                                  <DropdownMenuItem 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleVirtualSpaceAction("retry", workspace);
+                                    }}
+                                    className="hover:bg-amber-500/10 hover:text-amber-300"
+                                  >
+                                    <Play className="mr-2 h-4 w-4" />
+                                    Retry Deploy
+                                  </DropdownMenuItem>
+                                )}
+                                <DropdownMenuSeparator className="bg-pink-500/20" />
+                                <DropdownMenuItem 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleVirtualSpaceAction("delete", workspace);
+                                  }}
+                                  className="text-red-400 hover:bg-red-500/10"
+                                  disabled={deleteLoading === workspace._id}
+                                >
+                                  {deleteLoading === workspace._id ? (
+                                    <>
+                                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                      Deleting...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Trash2 className="mr-2 h-4 w-4" />
+                                      Delete
+                                    </>
+                                  )}
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </div>
+                      </motion.div>
                     ))}
                   </motion.div>
                 )}
               </AnimatePresence>
+            </motion.div>
+          )}
+
+          {/* No Results State */}
+          {!loading && hasProjectsLoaded && filteredSpaces.length === 0 && virtualSpaces.length > 0 && (
+            <motion.div
+              variants={itemVariants}
+              className="text-center py-20"
+            >
+              <div className="relative bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20 rounded-2xl p-12 max-w-md mx-auto">
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 to-purple-500/5 rounded-2xl" />
+                <div className="relative">
+                  <div className="text-6xl opacity-20 mb-6">🔍</div>
+                  <h3 className="text-xl font-semibold text-gray-200 mb-2">No virtual spaces found</h3>
+                  <p className="text-gray-400 mb-6">
+                    Try adjusting your search or filter criteria to find what you&apos;re looking for.
+                  </p>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setSearchQuery("");
+                      setStatusFilter("all");
+                    }}
+                    className="text-pink-400 hover:text-pink-300 hover:bg-pink-500/10"
+                  >
+                    Clear Filters
+                  </Button>
+                </div>
+              </div>
             </motion.div>
           )}
 
@@ -693,6 +1019,17 @@ export default function VirtualSpace() {
                     </div>
                   </button>
                 </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Footer */}
+          {virtualSpaces.length > 0 && (
+            <motion.div variants={itemVariants}>
+              <div className="text-center text-gray-400 text-sm">
+                <p>
+                  Showing {filteredSpaces.length} of {virtualSpaces.length} virtual spaces
+                </p>
               </div>
             </motion.div>
           )}
