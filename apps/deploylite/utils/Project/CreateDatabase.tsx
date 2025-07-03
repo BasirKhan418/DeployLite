@@ -48,6 +48,7 @@ import { Separator } from "@/components/ui/separator";
 import { useAppSelector } from "@/lib/hook";
 import { Toaster, toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import  Image  from 'next/image';
 
 // Animation variants
 const containerVariants = {
@@ -90,27 +91,17 @@ const databaseTypes = [
     name: 'MySQL',
     key: 'mysql',
     description: 'Most popular relational database',
-    icon: '🐬',
+    icon: '/sql.svg',
     features: ['ACID Compliance', 'Replication', 'Partitioning', 'JSON Support'],
     useCase: 'Web applications, E-commerce',
     port: '3306',
     complexity: 'Beginner Friendly'
   },
   {
-    name: 'PostgreSQL',
-    key: 'postgresql',
-    description: 'Advanced open-source relational database',
-    icon: '🐘',
-    features: ['ACID Compliance', 'JSON/JSONB', 'Full-text Search', 'Extensions'],
-    useCase: 'Analytics, GIS applications',
-    port: '5432',
-    complexity: 'Intermediate'
-  },
-  {
     name: 'MongoDB',
     key: 'mongodb',
     description: 'Leading NoSQL document database',
-    icon: '🍃',
+    icon: '/MongoDB.svg',
     features: ['Document Store', 'Flexible Schema', 'Aggregation', 'GridFS'],
     useCase: 'Content management, IoT',
     port: '27017',
@@ -120,7 +111,7 @@ const databaseTypes = [
     name: 'Redis',
     key: 'redis',
     description: 'In-memory data structure store',
-    icon: '⚡',
+    icon: '/redis.svg',
     features: ['Key-Value Store', 'Pub/Sub', 'Lua Scripts', 'Clustering'],
     useCase: 'Caching, Session store',
     port: '6379',
@@ -130,7 +121,7 @@ const databaseTypes = [
     name: 'Qdrant',
     key: 'qdrant',
     description: 'Vector similarity search engine',
-    icon: '🧠',
+    icon: '/qdrant.svg',
     features: ['Vector Search', 'Filtering', 'Payload Support', 'REST API'],
     useCase: 'AI/ML, Semantic search',
     port: '6333',
@@ -597,7 +588,14 @@ export default function CreateDatabase() {
 
                                   <Label htmlFor={database.key} className="cursor-pointer">
                                     <div className="text-center">
-                                      <div className="text-4xl mb-4">{database.icon}</div>
+                                      <div className="text-4xl mb-4">
+                                        <Image
+                                        src={database.icon}
+                                        width={50}
+                                        height={50}
+                                        alt="logo"
+                                        />
+                                        </div>
                                       <h4 className="text-xl font-bold text-gray-100 mb-2">{database.name}</h4>
                                       <p className="text-gray-400 text-sm mb-4">{database.description}</p>
                                       

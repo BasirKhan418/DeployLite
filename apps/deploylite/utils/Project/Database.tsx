@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -296,17 +297,15 @@ export default function DatabaseComp() {
   const getDatabaseIcon = (type: string) => {
     switch (type?.toLowerCase()) {
       case 'mysql':
-        return '🐬';
-      case 'postgresql':
-        return '🐘';
+        return '/sql.svg';
       case 'mongodb':
-        return '🍃';
+        return '/MongoDB.svg';
       case 'redis':
-        return '⚡';
+        return '/redis.svg';
       case 'qdrant':
-        return '🧠';
+        return '/qdrant.svg';
       default:
-        return '🗄️';
+        return '/MongoDB.svg';
     }
   };
 
@@ -543,7 +542,12 @@ export default function DatabaseComp() {
                                   <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-3">
                                       <div className="p-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-lg text-xl">
-                                        {getDatabaseIcon(database.dbtype)}
+                                        <Image
+                                         src={getDatabaseIcon(database.dbtype)}
+                                         width={50}
+                                         height={50}
+                                         alt="logo"
+                                         />
                                       </div>
                                       <div>
                                         <CardTitle className="text-lg font-semibold text-gray-200 group-hover:text-purple-300 transition-colors line-clamp-1">
