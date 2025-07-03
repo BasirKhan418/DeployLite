@@ -146,17 +146,17 @@ const VirtualSpaceOverview: React.FC<VirtualSpaceOverviewProps> = ({ projectdata
 
   const handleAccessIDE = () => {
     if (projectdata.url) {
-      window.open(`http://${projectdata.projecturl}`, '_blank', 'noopener,noreferrer');
-    } else if (projectdata.projecturl) {
-      window.open(`https://${projectdata.projecturl}`, '_blank', 'noopener,noreferrer');
+      window.open(`http://${projectdata.url}`, '_blank', 'noopener,noreferrer');
+    } else if (projectdata.url) {
+      window.open(`https://${projectdata.url}`, '_blank', 'noopener,noreferrer');
     } else {
       toast.error("Virtual space is not yet accessible");
     }
   };
 
   const handleCopyUrl = () => {
-    const url = projectdata.url ? `http://${projectdata.projecturl}` : 
-                 projectdata.projecturl ? `https://${projectdata.projecturl}` : '';
+    const url = projectdata.url ? `http://${projectdata.url}` : 
+                 projectdata.url ? `https://${projectdata.url}` : '';
     if (url) {
       navigator.clipboard.writeText(url);
       toast.success("URL copied to clipboard");
@@ -286,7 +286,7 @@ const VirtualSpaceOverview: React.FC<VirtualSpaceOverviewProps> = ({ projectdata
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Access Information */}
-                  {(projectdata.url || projectdata.projecturl) && (
+                  {(projectdata.url || projectdata.url) && (
                     <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-lg p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -294,7 +294,7 @@ const VirtualSpaceOverview: React.FC<VirtualSpaceOverviewProps> = ({ projectdata
                           <div>
                             <h4 className="text-blue-400 font-medium">IDE Access</h4>
                             <p className="text-blue-300/80 text-sm">
-                              {projectdata.url ? `http://${projectdata.url}:8080` : `https://${projectdata.projecturl}`}
+                              {projectdata.url ? `http://${projectdata.url}` : `https://${projectdata.url}`}
                             </p>
                           </div>
                         </div>
