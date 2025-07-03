@@ -80,9 +80,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
-  };
+  
 
   const markAllAsRead = () => {
     setUnreadNotifications(0);
@@ -157,14 +155,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </Link>
 
       {/* ML Models */}
-      <Link href="/mlmodel" passHref>
+      <Link href="/vspace" passHref>
         <Button
           variant="ghost"
           className={cn(
             "w-full justify-start rounded-xl transition-all duration-300 group relative overflow-hidden",
             "h-12 text-sm font-medium",
             isMobile ? "h-14 text-base" : "",
-            isActiveRoute("/mlmodel")
+            isActiveRoute("/vspace")
               ? "bg-gradient-to-r from-pink-500/20 to-purple-500/20 text-pink-400 border border-pink-500/30 shadow-lg shadow-pink-500/10"
               : "text-gray-300 hover:text-pink-300 hover:bg-gradient-to-r hover:from-pink-500/10 hover:to-purple-500/10 hover:border-pink-500/20 border border-transparent",
             !isSidebarCollapsed || isMobile ? "px-4" : "px-2"
@@ -174,12 +172,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="absolute inset-0 bg-gradient-to-r from-pink-600/0 to-purple-600/0 group-hover:from-pink-600/5 group-hover:to-purple-600/5 transition-all duration-300" />
           <Bot className={cn("shrink-0 transition-all duration-300", 
             isMobile ? "h-6 w-6" : "h-5 w-5",
-            isActiveRoute("/mlmodel") ? "text-pink-400" : "text-gray-400 group-hover:text-pink-300"
+            isActiveRoute("/vspace") ? "text-pink-400" : "text-gray-400 group-hover:text-pink-300"
           )} />
           {(!isSidebarCollapsed || isMobile) && (
             <span className="ml-3 transition-all duration-300">Virtual Space</span>
           )}
-          {isActiveRoute("/mlmodel") && (
+          {isActiveRoute("/vspace") && (
             <div className="absolute right-2 w-1 h-6 bg-gradient-to-b from-pink-400 to-purple-400 rounded-full" />
           )}
         </Button>
@@ -706,20 +704,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-
-            {/* Theme Toggle */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl hover:bg-pink-500/10 hover:text-pink-300 transition-all duration-300"
-            >
-              {theme === "light" ? (
-                <MoonIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-              ) : (
-                <SunIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-              )}
-            </Button>
 
             {/* Avatar Dropdown */}
             <DropdownMenu>

@@ -1,445 +1,214 @@
-'use client'
+"use client";
 
-import { motion } from 'framer-motion'
+import React from "react";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
 import { 
-  Plus, 
+  PlusCircle, 
   Rocket, 
-  Code, 
+  CloudLightning, 
   Globe, 
-  Server, 
-  Cloud, 
   Database,
+  Terminal,
+  Code,
+  Monitor,
   Sparkles,
-  ArrowRight,
-  Zap,
-  Shield,
-  GitBranch,
-  Activity,
-  Settings,
-  PlayCircle,
-  CheckCircle,
-  Star,
-  ExternalLink,
-  Layers,
-  Terminal
-} from 'lucide-react'
-import Link from 'next/link'
-import { useState } from 'react'
+  ArrowRight 
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 
-// Animation variants
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
+interface NoProjectProps {
+  name: string;
+}
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.25, 0.4, 0.25, 1],
-    },
-  },
-};
+const NoProject: React.FC<NoProjectProps> = ({ name }) => {
+  const router = useRouter();
 
-const floatingAnimation = {
-  animate: {
-    y: [-10, 10, -10],
-    transition: {
-      duration: 3,
-      repeat: Infinity,
-      ease: "easeInOut",
-    },
-  },
-};
+  const getProjectConfig = () => {
+    switch (name) {
+      case "webbuilder":
+        return {
+          title: "Web Builder",
+          subtitle: "Create websites with popular web builders",
+          description: "Deploy WordPress, Joomla, Drupal, and other web builders with zero configuration. Get your website online in minutes with database integration.",
+          icon: <Globe className="w-16 h-16 text-purple-400" />,
+          gradient: "from-purple-400 to-blue-400",
+          buttonText: "Create Website",
+          features: [
+            { text: "WordPress, Joomla, Drupal", icon: <Globe className="w-4 h-4" /> },
+            { text: "Database Integration", icon: <Database className="w-4 h-4" /> },
+            { text: "SSL Certificates", icon: <Monitor className="w-4 h-4" /> },
+            { text: "Domain Mapping", icon: <ArrowRight className="w-4 h-4" /> }
+          ]
+        };
+      case "virtualspace":
+        return {
+          title: "Virtual Space",
+          subtitle: "Cloud development environments",
+          description: "Set up containerized development environments with VS Code in the browser. Perfect for coding, testing, and collaboration from anywhere.",
+          icon: <CloudLightning className="w-16 h-16 text-pink-400" />,
+          gradient: "from-pink-400 to-purple-400",
+          buttonText: "Create Virtual Space",
+          features: [
+            { text: "VS Code in Browser", icon: <Code className="w-4 h-4" /> },
+            { text: "Full Linux Terminal", icon: <Terminal className="w-4 h-4" /> },
+            { text: "Persistent Storage", icon: <Database className="w-4 h-4" /> },
+            { text: "Secure Access", icon: <Monitor className="w-4 h-4" /> }
+          ]
+        };
+      default:
+        return {
+          title: "App Platform",
+          subtitle: "Deploy web applications",
+          description: "Deploy React, Next.js, Angular, Vue.js and other web applications with automatic CI/CD from your GitHub repositories.",
+          icon: <Rocket className="w-16 h-16 text-blue-400" />,
+          gradient: "from-blue-400 to-cyan-400",
+          buttonText: "Create Project",
+          features: [
+            { text: "Auto Deployments", icon: <Rocket className="w-4 h-4" /> },
+            { text: "GitHub Integration", icon: <Code className="w-4 h-4" /> },
+            { text: "Custom Domains", icon: <Globe className="w-4 h-4" /> },
+            { text: "SSL & CDN", icon: <Monitor className="w-4 h-4" /> }
+          ]
+        };
+    }
+  };
 
-const pulseAnimation = {
-  animate: {
-    scale: [1, 1.05, 1],
-    transition: {
-      duration: 2,
-      repeat: Infinity,
-      ease: "easeInOut",
-    },
-  },
-};
+  const config = getProjectConfig();
 
-export default function NoProject({ name }: { name: string }) {
-  const [isHovered, setIsHovered] = useState(false)
+  const handleCreateProject = () => {
+    router.push(`/project/createproject/${name}`);
+  };
+
+  const handleViewDocs = () => {
+    router.push(`/docs/${name}`);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900/50 to-black">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900/50 to-black flex items-center justify-center px-4">
       <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-        className="container mx-auto px-4 py-8 sm:px-6 lg:px-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="max-w-4xl mx-auto text-center"
       >
-        {/* Hero Section */}
-        <motion.div variants={itemVariants} className="text-center mb-16">
-          <div className="flex items-center justify-center mb-8">
-            <motion.div 
-              className="relative"
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <div className="p-6 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-3xl border border-pink-500/30">
-                <Rocket className="h-16 w-16 text-pink-400" />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-pink-400/20 to-purple-400/20 rounded-3xl blur-xl -z-10" />
-            </motion.div>
-          </div>
+        {/* Main Card */}
+        <div className="relative bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-purple-500/20 rounded-3xl p-12 shadow-2xl">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5 rounded-3xl" />
           
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
-              Welcome to DeployLite
-            </span>
-          </h1>
-          
-          <p className="text-xl sm:text-2xl text-gray-400 mb-8 max-w-3xl mx-auto">
-            Your journey to seamless deployment starts here. Create your first project and experience the power of AI-driven deployments.
-          </p>
-
-          <div className="flex items-center justify-center gap-4 mb-8">
-            <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20 rounded-full">
-              <Sparkles className="w-4 h-4 text-pink-400" />
-              <span className="text-sm text-gray-300">AI Powered</span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-full">
-              <Zap className="w-4 h-4 text-blue-400" />
-              <span className="text-sm text-gray-300">Lightning Fast</span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-full">
-              <Shield className="w-4 h-4 text-green-400" />
-              <span className="text-sm text-gray-300">Secure</span>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
-          {/* Empty State Card */}
-          <motion.div
-            variants={itemVariants}
-            className="relative overflow-hidden bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20 rounded-2xl p-8 shadow-2xl"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 to-purple-500/5" />
-            <div className="relative">
-              <h2 className="text-3xl font-bold mb-4 text-gray-100">
-                No {name.charAt(0).toUpperCase() + name.slice(1)} Projects Yet
-              </h2>
-              
-              <p className="text-gray-400 mb-8 text-lg">
-                You haven't created any projects. Let's get started on your first deployment and unlock the full potential of our platform!
-              </p>
-
-              {/* Floating Animation Section */}
-              <div className="relative h-48 mb-8 overflow-hidden">
-                <motion.div
-                  className="absolute top-4 left-8 w-16 h-16 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-2xl flex items-center justify-center"
-                  variants={floatingAnimation}
-                  animate="animate"
-                >
-                  <Code className="text-blue-400" size={28} />
-                </motion.div>
-                
-                <motion.div
-                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-2xl flex items-center justify-center"
-                  variants={pulseAnimation}
-                  animate="animate"
-                >
-                  <Rocket className="text-pink-400" size={36} />
-                </motion.div>
-                
-                <motion.div
-                  className="absolute bottom-4 right-8 w-16 h-16 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 border border-purple-500/30 rounded-2xl flex items-center justify-center"
-                  variants={floatingAnimation}
-                  animate="animate"
-                  transition={{ delay: 1 }}
-                >
-                  <Globe className="text-purple-400" size={28} />
-                </motion.div>
-
-                {/* Connecting Lines */}
-                <svg className="absolute inset-0 w-full h-full">
-                  <motion.path
-                    d="M 80 60 Q 200 120 320 100"
-                    stroke="url(#gradient1)"
-                    strokeWidth="2"
-                    fill="none"
-                    strokeDasharray="5,5"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  />
-                  <motion.path
-                    d="M 320 140 Q 200 180 80 160"
-                    stroke="url(#gradient2)"
-                    strokeWidth="2"
-                    fill="none"
-                    strokeDasharray="5,5"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 2, delay: 1, repeat: Infinity, ease: "easeInOut" }}
-                  />
-                  <defs>
-                    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#ec4899" stopOpacity="0.6" />
-                      <stop offset="100%" stopColor="#a855f7" stopOpacity="0.6" />
-                    </linearGradient>
-                    <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.6" />
-                      <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.6" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
-
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Link
-                  href={`/project/createproject/${name}`}
-                  className="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-pink-500/25 transition-all duration-300"
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
-                >
-                  <Plus className={`mr-3 transition-transform duration-300 ${isHovered ? 'rotate-90' : ''}`} size={24} />
-                  Create Your First {name.charAt(0).toUpperCase() + name.slice(1)} Project
-                  <ArrowRight className="ml-3 group-hover:translate-x-1 transition-transform duration-300" size={20} />
-                </Link>
-              </motion.div>
-            </div>
-          </motion.div>
-
-          {/* Features Card */}
-          <motion.div
-            variants={itemVariants}
-            className="relative overflow-hidden bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20 rounded-2xl p-8 shadow-2xl"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5" />
-            <div className="relative">
-              <h2 className="text-3xl font-bold mb-8 text-gray-100">Why Choose DeployLite?</h2>
-              
-              <div className="space-y-6">
-                {[
-                  {
-                    icon: <Server className="text-blue-400" size={28} />,
-                    title: "Scalable Infrastructure",
-                    description: "Deploy and scale your applications with our auto-scaling cloud infrastructure",
-                    gradient: "from-blue-500/10 to-cyan-500/10",
-                    border: "border-blue-500/20"
-                  },
-                  {
-                    icon: <Sparkles className="text-pink-400" size={28} />,
-                    title: "AI-Powered Optimization",
-                    description: "Get intelligent build optimization and performance recommendations",
-                    gradient: "from-pink-500/10 to-purple-500/10",
-                    border: "border-pink-500/20"
-                  },
-                  {
-                    icon: <Database className="text-purple-400" size={28} />,
-                    title: "Integrated Services",
-                    description: "Seamlessly connect databases, storage, and third-party services",
-                    gradient: "from-purple-500/10 to-indigo-500/10",
-                    border: "border-purple-500/20"
-                  },
-                  {
-                    icon: <Shield className="text-green-400" size={28} />,
-                    title: "Enterprise Security",
-                    description: "Built-in security features with SSL certificates and DDoS protection",
-                    gradient: "from-green-500/10 to-emerald-500/10",
-                    border: "border-green-500/20"
-                  }
-                ].map((feature, index) => (
-                  <motion.div
-                    key={index}
-                    className={`flex items-start p-4 bg-gradient-to-r ${feature.gradient} border ${feature.border} rounded-xl transition-all duration-300 hover:shadow-lg`}
-                    whileHover={{ scale: 1.02, x: 4 }}
-                  >
-                    <div className="flex-shrink-0 mr-4">
-                      <div className={`p-2 bg-gradient-to-r ${feature.gradient} border ${feature.border} rounded-lg`}>
-                        {feature.icon}
-                      </div>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-100 mb-2">{feature.title}</h3>
-                      <p className="text-gray-400 text-sm leading-relaxed">{feature.description}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Getting Started Steps */}
-        <motion.div
-          variants={itemVariants}
-          className="relative overflow-hidden bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20 rounded-2xl p-8 shadow-2xl mb-16"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 to-purple-500/5" />
           <div className="relative">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4 text-gray-100">Getting Started is Simple</h2>
-              <p className="text-gray-400 text-lg">Follow these three easy steps to deploy your first project</p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                {
-                  step: "01",
-                  icon: <Plus className="text-pink-400" size={32} />,
-                  title: "Create Project",
-                  description: "Set up your project with our intuitive creation wizard and connect your repository",
-                  gradient: "from-pink-500/10 to-purple-500/10",
-                  border: "border-pink-500/20"
-                },
-                {
-                  step: "02", 
-                  icon: <GitBranch className="text-blue-400" size={32} />,
-                  title: "Configure & Connect",
-                  description: "Connect your GitHub repository and configure build settings with AI assistance",
-                  gradient: "from-blue-500/10 to-cyan-500/10",
-                  border: "border-blue-500/20"
-                },
-                {
-                  step: "03",
-                  icon: <Rocket className="text-purple-400" size={32} />,
-                  title: "Deploy & Scale",
-                  description: "Launch your application with one click and scale automatically based on traffic",
-                  gradient: "from-purple-500/10 to-indigo-500/10",
-                  border: "border-purple-500/20"
-                }
-              ].map((step, index) => (
+            {/* Icon */}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              className="flex justify-center mb-8"
+            >
+              <div className="p-6 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-full">
+                {config.icon}
+              </div>
+            </motion.div>
+
+            {/* Title */}
+            <motion.h1
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className={`text-5xl md:text-6xl font-bold bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent mb-4`}
+            >
+              {config.title}
+            </motion.h1>
+
+            {/* Subtitle */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="text-xl text-gray-400 mb-8"
+            >
+              {config.subtitle}
+            </motion.p>
+
+            {/* Description */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="text-gray-300 text-lg leading-relaxed mb-12 max-w-2xl mx-auto"
+            >
+              {config.description}
+            </motion.p>
+
+            {/* Features Grid */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12"
+            >
+              {config.features.map((feature, index) => (
                 <motion.div
                   key={index}
-                  className={`relative text-center p-6 bg-gradient-to-br ${step.gradient} border ${step.border} rounded-xl transition-all duration-300`}
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  transition={{ type: "spring", stiffness: 300 }}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.7 + index * 0.1 }}
+                  className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-700/50 rounded-xl p-4 hover:border-purple-500/30 transition-all duration-300"
                 >
-                  <div className="absolute top-4 right-4 text-6xl font-bold text-white/5">
-                    {step.step}
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="text-purple-400">
+                      {feature.icon}
+                    </div>
+                    <span className="text-sm text-gray-300 text-center">
+                      {feature.text}
+                    </span>
                   </div>
-                  
-                  <div className={`relative rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 bg-gradient-to-r ${step.gradient} border ${step.border}`}>
-                    {step.icon}
-                  </div>
-                  
-                  <h3 className="font-bold text-xl mb-4 text-gray-100">{step.title}</h3>
-                  <p className="text-gray-400 leading-relaxed">{step.description}</p>
-                  
-                  {index < 2 && (
-                    <motion.div
-                      className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2"
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.5 + index * 0.2 }}
-                    >
-                      <ArrowRight className="text-pink-400/50" size={24} />
-                    </motion.div>
-                  )}
                 </motion.div>
               ))}
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Platform Features Grid */}
-        <motion.div variants={itemVariants} className="mb-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
-              Powerful Platform Features
-            </h2>
-            <p className="text-gray-400 text-lg">Everything you need to build, deploy, and scale modern applications</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { icon: <Terminal className="w-6 h-6 text-pink-400" />, title: "CLI Tools", description: "Deploy from command line" },
-              { icon: <GitBranch className="w-6 h-6 text-blue-400" />, title: "Git Integration", description: "Auto-deploy on push" },
-              { icon: <Activity className="w-6 h-6 text-green-400" />, title: "Real-time Monitoring", description: "Track performance metrics" },
-              { icon: <Globe className="w-6 h-6 text-purple-400" />, title: "Global CDN", description: "Fast worldwide delivery" },
-              { icon: <Settings className="w-6 h-6 text-yellow-400" />, title: "Custom Domains", description: "Use your own domain" },
-              { icon: <Database className="w-6 h-6 text-cyan-400" />, title: "Database Support", description: "Connect any database" },
-              { icon: <Shield className="w-6 h-6 text-red-400" />, title: "SSL Certificates", description: "Automatic HTTPS" },
-              { icon: <Layers className="w-6 h-6 text-indigo-400" />, title: "Environment Variables", description: "Secure config management" }
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                className="relative p-6 bg-gradient-to-br from-gray-900/50 to-black/50 border border-gray-700/50 rounded-xl text-center transition-all duration-300 hover:border-pink-500/30 group"
-                whileHover={{ scale: 1.02, y: -2 }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl" />
-                <div className="relative">
-                  <div className="inline-flex p-3 bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 rounded-lg mb-4 group-hover:border-pink-500/30 transition-colors duration-300">
-                    {feature.icon}
-                  </div>
-                  <h3 className="font-semibold text-gray-100 mb-2">{feature.title}</h3>
-                  <p className="text-gray-400 text-sm">{feature.description}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Call to Action */}
-        <motion.div
-          variants={itemVariants}
-          className="text-center bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20 rounded-2xl p-12"
-        >
-          <h2 className="text-3xl font-bold mb-4 text-gray-100">Ready to Get Started?</h2>
-          <p className="text-gray-400 text-lg mb-8 max-w-2xl mx-auto">
-            Join thousands of developers who trust DeployLite for their deployment needs. Create your first project today and experience the difference.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link
-                href={`/project/createproject/${name}`}
-                className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-pink-500/25 transition-all duration-300"
-              >
-                <Rocket className="mr-2" size={20} />
-                Start Your Project
-              </Link>
             </motion.div>
-            
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link
-                href="/docs"
-                className="inline-flex items-center px-8 py-4 bg-transparent border border-pink-500/30 text-pink-400 hover:bg-pink-500/10 font-semibold rounded-xl transition-all duration-300"
+
+            {/* Action Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            >
+              <Button
+                onClick={handleCreateProject}
+                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white border-0 rounded-xl px-8 py-4 text-lg font-semibold shadow-lg shadow-purple-500/25 transition-all duration-300 flex items-center gap-3"
               >
-                <ExternalLink className="mr-2" size={20} />
+                <PlusCircle className="w-5 h-5" />
+                {config.buttonText}
+              </Button>
+              
+              <Button
+                onClick={handleViewDocs}
+                variant="outline"
+                className="border-gray-600 text-gray-300 hover:bg-gray-800 rounded-xl px-8 py-4 text-lg transition-all duration-300 flex items-center gap-3"
+              >
+                <Sparkles className="w-5 h-5" />
                 View Documentation
-              </Link>
+              </Button>
             </motion.div>
-          </div>
-        </motion.div>
 
-        {/* Footer */}
-        <motion.footer variants={itemVariants} className="mt-16 text-center">
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <div className="flex items-center gap-2 text-gray-400">
-              <Star className="w-4 h-4 text-yellow-400" />
-              <span className="text-sm">Trusted by 10,000+ developers</span>
-            </div>
-            <div className="w-1 h-1 bg-gray-600 rounded-full" />
-            <div className="flex items-center gap-2 text-gray-400">
-              <CheckCircle className="w-4 h-4 text-green-400" />
-              <span className="text-sm">99.9% uptime guaranteed</span>
-            </div>
+            {/* Bottom Text */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.9 }}
+              className="text-gray-500 text-sm mt-8"
+            >
+              Get started in less than 2 minutes with our guided setup process
+            </motion.p>
           </div>
-          <p className="text-gray-500">© 2024 DeployLite. All rights reserved.</p>
-        </motion.footer>
+        </div>
+
+        {/* Background Elements */}
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </motion.div>
     </div>
-  )
-}
+  );
+};
+
+export default NoProject;

@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Download, RefreshCw, XCircle, Rocket,Copy, Play, Pause, Terminal, Filter, ChevronDown, Code, AlertCircle, CheckCircle2, Clock } from "lucide-react";
+import { Search, Download, RefreshCw, XCircle, Rocket, Copy, Play, Pause, Terminal, Filter, ChevronDown, Code, AlertCircle, CheckCircle2, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -8,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { io, Socket } from 'socket.io-client';
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-// Animation variants
+
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.4, 0.25, 1] } }
@@ -26,7 +27,7 @@ const slideIn = {
   visible: { opacity: 1, x: 0, transition: { duration: 0.3 } }
 };
 
-// Type Definitions
+
 interface ProjectData {
   _id: string;
   name: string;
@@ -324,14 +325,110 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [autoScroll, setAutoScroll] = useState<boolean>(true);
 
-  // Refs for auto-scroll functionality
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  const [pendingScrolls, setPendingScrolls] = useState(0);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [messageQueue, setMessageQueue] = useState<LogMessage[]>([]);
+  
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastScrollTime = useRef<number>(0);
+  const flushTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const logsContainerRef = useRef<HTMLDivElement>(null);
   const formattedLogsContainerRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<string>("logs");
 
-  // Enhanced message parsing
-  const parseLogMessage = (content: any): LogMessage => {
+  const fetchProjectData = async (id: string): Promise<void> => {
+    try {
+      const response = await fetch(`/api/project/details?id=${id}`);
+      const result = await response.json();
+      
+      if (result.success) {
+        setProjectData(result.projectdata);
+        setError(null);
+      } else {
+        setError(result.message || "An error occurred");
+      }
+    } catch (err) {
+      setError("Service temporarily unavailable");
+    }
+  };
+
+
+  const scrollToBottomSmooth = useCallback(() => {
+    if (!autoScroll || isScrolling) return;
+
+    const currentContainer = activeTab === 'logs' ? logsContainerRef.current : formattedLogsContainerRef.current;
+    
+    if (currentContainer) {
+      const now = Date.now();
+      const timeSinceLastScroll = now - lastScrollTime.current;
+      
+    
+      if (timeSinceLastScroll < 200) {
+        setPendingScrolls(prev => prev + 1);
+        return;
+      }
+
+      setIsScrolling(true);
+      lastScrollTime.current = now;
+
+     
+      requestAnimationFrame(() => {
+        if (currentContainer) {
+          currentContainer.scrollTo({
+            top: currentContainer.scrollHeight,
+            behavior: 'smooth'
+          });
+
+      
+          setTimeout(() => {
+            setIsScrolling(false);
+         
+            if (pendingScrolls > 0) {
+              setPendingScrolls(0);
+              setTimeout(() => {
+                if (autoScroll && currentContainer) {
+                  currentContainer.scrollTo({
+                    top: currentContainer.scrollHeight,
+                    behavior: 'smooth'
+                  });
+                }
+              }, 100);
+            }
+          }, 400); 
+        }
+      });
+    }
+  }, [autoScroll, activeTab, pendingScrolls]);
+
+  const flushMessageQueue = useCallback(() => {
+    if (messageQueue.length > 0) {
+      setMessages(prev => [...prev, ...messageQueue]);
+      setMessageQueue([]);
+      
+     
+      setTimeout(() => {
+        scrollToBottomSmooth();
+      }, 50);
+    }
+  }, [messageQueue, scrollToBottomSmooth]);
+
+
+  const addMessageToQueue = useCallback((message: LogMessage) => {
+    setMessageQueue(prev => [...prev, message]);
+    
+
+    if (flushTimeoutRef.current) {
+      clearTimeout(flushTimeoutRef.current);
+    }
+    
+    flushTimeoutRef.current = setTimeout(() => {
+      flushMessageQueue();
+    }, 150);
+  }, [flushMessageQueue]);
+
+  
+  const parseLogMessage = useCallback((content: any): LogMessage => {
     let message = '';
     let type: LogMessage['type'] = 'info';
     let timestamp = new Date().toISOString();
@@ -353,7 +450,7 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
         timestamp = content.timestamp || timestamp;
       }
 
-      // Determine log type from message content
+     
       if (message.toLowerCase().includes('error') || message.toLowerCase().includes('failed')) {
         type = 'error';
       } else if (message.toLowerCase().includes('warning') || message.toLowerCase().includes('warn')) {
@@ -375,54 +472,8 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
       type,
       projectId: projectdata._id
     };
-  };
+  }, [projectdata._id]);
 
-  const fetchProjectData = async (id: string): Promise<void> => {
-    try {
-      const response = await fetch(`/api/project/details?id=${id}`);
-      const result = await response.json();
-      
-      if (result.success) {
-        setProjectData(result.projectdata);
-        setError(null);
-      } else {
-        setError(result.message || "An error occurred");
-      }
-    } catch (err) {
-      setError("Service temporarily unavailable");
-    }
-  };
-
-  // Auto-scroll functionality
-  const scrollToBottom = () => {
-    if (!autoScroll) return;
-
-    const currentContainer = activeTab === 'logs' ? logsContainerRef.current : formattedLogsContainerRef.current;
-    
-    if (currentContainer) {
-      // Use setTimeout to ensure DOM has updated
-      setTimeout(() => {
-        currentContainer.scrollTo({
-          top: currentContainer.scrollHeight,
-          behavior: 'smooth'
-        });
-      }, 100);
-    }
-  };
-
-  // Auto-scroll when new messages are added
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, activeTab, autoScroll]);
-
-  // Auto-scroll when filtered logs change (for search/filter)
-  useEffect(() => {
-    if (autoScroll) {
-      scrollToBottom();
-    }
-  }, [searchQuery, filterType]);
-
-  // Socket connection and message handling
   useEffect(() => {
     if (!projectdata?._id) return;
 
@@ -456,7 +507,8 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
         const logMessage = parseLogMessage(msg);
         
         if (!logMessage.projectId || logMessage.projectId === projectdata._id) {
-          setMessages(prev => [...prev, logMessage]);
+          // Add to queue instead of directly to messages
+          addMessageToQueue(logMessage);
           
           // Check for deployment status updates
           if (logMessage.message.toLowerCase().includes('deployment status updated')) {
@@ -471,24 +523,26 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
     socket.on('connect', () => {
       setIsConnected(true);
       socket.emit('subscribe', `logs:${projectdata.name}`);
-      setMessages(prev => [...prev, {
+      const connectMessage = {
         timestamp: new Date().toISOString(),
         message: `Connected to log stream for ${projectdata.name}`,
-        type: 'success',
+        type: 'success' as LogMessage['type'],
         projectId: projectdata._id
-      }]);
+      };
+      addMessageToQueue(connectMessage);
     });
 
     socket.on('message', handleMessage);
     
     socket.on('disconnect', () => {
       setIsConnected(false);
-      setMessages(prev => [...prev, {
+      const disconnectMessage = {
         timestamp: new Date().toISOString(),
         message: 'Disconnected from log stream',
-        type: 'warning',
+        type: 'warning' as LogMessage['type'],
         projectId: projectdata._id
-      }]);
+      };
+      addMessageToQueue(disconnectMessage);
     });
 
     return () => {
@@ -496,7 +550,66 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
       socket.off('message');
       socket.off('disconnect');
     };
-  }, [socket, projectdata?.name, projectdata?._id, isPaused]);
+  }, [socket, projectdata?.name, projectdata?._id, isPaused, parseLogMessage, addMessageToQueue]);
+
+  // Enhanced scroll detection to pause auto-scroll when user manually scrolls up
+  useEffect(() => {
+    const currentContainer = activeTab === 'logs' ? logsContainerRef.current : formattedLogsContainerRef.current;
+    
+    if (!currentContainer) return;
+
+    let scrollTimeout: NodeJS.Timeout;
+    
+    const handleScroll = () => {
+      if (!autoScroll) return;
+      
+      const { scrollTop, scrollHeight, clientHeight } = currentContainer;
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+      
+      // Clear existing timeout
+      clearTimeout(scrollTimeout);
+      
+      // If user scrolled away from bottom, temporarily disable auto-scroll
+      if (!isNearBottom && !isScrolling) {
+        setAutoScroll(false);
+        toast.info("Auto-scroll paused. Scroll to bottom or click the button to resume.");
+        
+        // Re-enable auto-scroll after 10 seconds of no manual scrolling
+        scrollTimeout = setTimeout(() => {
+          setAutoScroll(true);
+          toast.success("Auto-scroll resumed");
+        }, 10000);
+      }
+    };
+
+    currentContainer.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      currentContainer.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimeout);
+    };
+  }, [activeTab, autoScroll, isScrolling]);
+
+  // Scroll when tab changes or auto-scroll is toggled
+  useEffect(() => {
+    if (autoScroll && messages.length > 0) {
+      setTimeout(() => {
+        scrollToBottomSmooth();
+      }, 100);
+    }
+  }, [activeTab, autoScroll, scrollToBottomSmooth]);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (flushTimeoutRef.current) {
+        clearTimeout(flushTimeoutRef.current);
+      }
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Filter logs based on search and type
   const filteredLogs = useMemo(() => {
@@ -529,6 +642,7 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
     a.download = `deployment-logs-${projectData.name}-${new Date().toISOString()}.txt`;
     a.click();
     URL.revokeObjectURL(url);
+    toast.success("Logs exported successfully");
   };
 
   const formatMessage = (message: string) => {
@@ -562,6 +676,33 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
       case 'debug': return 'text-purple-400 bg-purple-500/10 border-purple-500/20';
       default: return 'text-gray-300 bg-gray-500/10 border-gray-500/20';
     }
+  };
+
+  // Scroll indicator component
+  const ScrollIndicator = () => {
+    if (!autoScroll && messages.length > 0) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          className="fixed bottom-6 right-6 z-50"
+        >
+          <Button
+            onClick={() => {
+              setAutoScroll(true);
+              scrollToBottomSmooth();
+              toast.success("Auto-scroll enabled");
+            }}
+            className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white shadow-lg shadow-pink-500/25 rounded-full px-6 py-3 font-medium"
+          >
+            <ChevronDown className="w-4 h-4 mr-2" />
+            Jump to bottom
+          </Button>
+        </motion.div>
+      );
+    }
+    return null;
   };
 
   const StatusCard = STATUS_CARDS[projectData.projectstatus];
@@ -612,16 +753,24 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
                     )}
                     <span className="text-gray-400 text-sm">•</span>
                     <span className="text-gray-400 text-sm">{filteredLogs.length} logs</span>
+                    {isPaused && (
+                      <>
+                        <span className="text-gray-400 text-sm">•</span>
+                        <span className="text-amber-400 text-sm">Paused</span>
+                      </>
+                    )}
                   </div>
                 </div>
               </CardTitle>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setAutoScroll(!autoScroll)}
-                  className={`bg-black/50 border-pink-500/30 hover:bg-pink-500/10 text-gray-200 ${autoScroll ? 'bg-pink-500/20' : ''}`}
+                  className={`bg-black/50 border-pink-500/30 hover:bg-pink-500/10 text-gray-200 transition-all duration-300 ${
+                    autoScroll ? 'bg-pink-500/20 border-pink-500/50 text-pink-300' : ''
+                  }`}
                 >
                   <Terminal className="w-4 h-4 mr-2" />
                   Auto-scroll {autoScroll ? 'ON' : 'OFF'}
@@ -658,7 +807,7 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
                   size="sm"
                   onClick={handleExport}
                   disabled={messages.length === 0}
-                  className="bg-black/50 border-pink-500/30 hover:bg-pink-500/10 text-gray-200"
+                  className="bg-black/50 border-pink-500/30 hover:bg-pink-500/10 text-gray-200 disabled:opacity-50"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Export
@@ -682,7 +831,7 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
                 </TabsList>
 
                 {/* Controls */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
                   {/* Search */}
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -727,7 +876,11 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setMessages([])}
+                    onClick={() => {
+                      setMessages([]);
+                      setMessageQueue([]);
+                      toast.success("Logs cleared");
+                    }}
                     disabled={messages.length === 0}
                     className="bg-black/50 border-gray-700 text-red-400 hover:bg-red-500/10 hover:border-red-500/30"
                   >
@@ -737,9 +890,13 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
               </div>
 
               <TabsContent value="logs" className="mt-0">
-                <div className="h-[70vh] overflow-auto" ref={logsContainerRef}>
+                <div 
+                  className="h-[70vh] overflow-auto scroll-smooth" 
+                  ref={logsContainerRef}
+                  style={{ scrollBehavior: 'smooth' }}
+                >
                   <div className="p-4 space-y-2 font-mono text-sm">
-                    <AnimatePresence initial={false}>
+                    <AnimatePresence mode="popLayout">
                       {filteredLogs.length > 0 ? (
                         filteredLogs.map((log, index) => (
                           <motion.div
@@ -748,6 +905,7 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
                             initial="hidden"
                             animate="visible"
                             exit="hidden"
+                            layout
                             className={`group relative p-3 rounded-lg border transition-all duration-200 hover:bg-opacity-80 ${getLogTypeColor(log.type)}`}
                           >
                             <div className="flex items-start gap-3">
@@ -771,7 +929,10 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
                                 variant="ghost"
                                 size="sm"
                                 className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
-                                onClick={() => navigator.clipboard.writeText(log.message)}
+                                onClick={() => {
+                                  navigator.clipboard.writeText(log.message);
+                                  toast.success("Log message copied to clipboard");
+                                }}
                               >
                                 <Copy className="w-3 h-3" />
                               </Button>
@@ -794,6 +955,18 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
                                 : 'Try adjusting your search or filter criteria'
                               }
                             </p>
+                            {(searchQuery || filterType !== 'all') && (
+                              <Button
+                                variant="ghost"
+                                onClick={() => {
+                                  setSearchQuery("");
+                                  setFilterType("all");
+                                }}
+                                className="text-pink-400 hover:text-pink-300 hover:bg-pink-500/10 mt-4"
+                              >
+                                Clear Filters
+                              </Button>
+                            )}
                           </div>
                         </motion.div>
                       )}
@@ -803,41 +976,68 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
               </TabsContent>
 
               <TabsContent value="formatted" className="mt-0">
-                <div className="h-[70vh] overflow-auto" ref={formattedLogsContainerRef}>
+                <div 
+                  className="h-[70vh] overflow-auto scroll-smooth" 
+                  ref={formattedLogsContainerRef}
+                  style={{ scrollBehavior: 'smooth' }}
+                >
                   <div className="p-4 space-y-4">
-                    {filteredLogs.length > 0 ? (
-                      filteredLogs.map((log, index) => (
+                    <AnimatePresence mode="popLayout">
+                      {filteredLogs.length > 0 ? (
+                        filteredLogs.map((log, index) => (
+                          <motion.div
+                            key={`formatted-${log.timestamp}-${index}`}
+                            variants={slideIn}
+                            initial="hidden"
+                            animate="visible"
+                            exit="hidden"
+                            layout
+                            className="relative p-4 rounded-lg bg-gray-800/30 border border-gray-700/50 hover:border-pink-500/30 transition-all duration-200"
+                          >
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                <Badge variant="outline" className={getLogTypeColor(log.type)}>
+                                  {log.type?.toUpperCase()}
+                                </Badge>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-gray-400">
+                                    {new Date(log.timestamp).toLocaleString()}
+                                  </span>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 w-6 p-0 opacity-70 hover:opacity-100"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(log.message);
+                                      toast.success("Log message copied to clipboard");
+                                    }}
+                                  >
+                                    <Copy className="w-3 h-3" />
+                                  </Button>
+                                </div>
+                              </div>
+                              <div className="bg-black/50 p-4 rounded-lg border border-gray-700/50 font-mono text-sm overflow-x-auto">
+                                {formatMessage(log.message)}
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))
+                      ) : (
                         <motion.div
-                          key={`formatted-${log.timestamp}-${index}`}
-                          variants={slideIn}
-                          initial="hidden"
-                          animate="visible"
-                          className="relative p-4 rounded-lg bg-gray-800/30 border border-gray-700/50 hover:border-pink-500/30 transition-all duration-200"
+                          variants={fadeIn}
+                          className="text-center text-gray-400 py-12"
                         >
-                          <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                              <Badge variant="outline" className={getLogTypeColor(log.type)}>
-                                {log.type?.toUpperCase()}
-                              </Badge>
-                              <span className="text-xs text-gray-400">
-                                {new Date(log.timestamp).toLocaleString()}
-                              </span>
-                            </div>
-                            <div className="bg-black/50 p-4 rounded-lg border border-gray-700/50 font-mono text-sm overflow-x-auto">
-                              {formatMessage(log.message)}
-                            </div>
-                          </div>
+                          <Code className="w-16 h-16 mx-auto mb-4 opacity-30" />
+                          <p className="text-lg font-medium">No formatted logs available</p>
+                          <p className="text-sm text-gray-500 mt-2">
+                            {messages.length === 0 
+                              ? 'Logs will appear here as your deployment progresses'
+                              : 'Try adjusting your search or filter criteria'
+                            }
+                          </p>
                         </motion.div>
-                      ))
-                    ) : (
-                      <motion.div
-                        variants={fadeIn}
-                        className="text-center text-gray-400 py-12"
-                      >
-                        <Code className="w-16 h-16 mx-auto mb-4 opacity-30" />
-                        <p className="text-lg font-medium">No formatted logs available</p>
-                      </motion.div>
-                    )}
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
               </TabsContent>
@@ -849,19 +1049,74 @@ const RuntimeLogs: React.FC<RuntimeLogsProps> = ({ projectdata }) => {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           {['info', 'error', 'warning', 'success', 'debug'].map((type) => {
             const count = messages.filter(m => m.type === type).length;
+            const percentage = messages.length > 0 ? Math.round((count / messages.length) * 100) : 0;
             return (
-              <Card key={type} className="bg-gradient-to-br from-black via-gray-900/90 to-black border border-pink-500/20 hover:border-pink-500/40 transition-all duration-300">
-                <CardContent className="p-4 text-center">
-                  <div className={`text-2xl font-bold ${getLogTypeColor(type as LogMessage['type']).split(' ')[0]}`}>
-                    {count}
-                  </div>
-                  <div className="text-xs text-gray-400 capitalize mt-1">{type}</div>
-                </CardContent>
-              </Card>
+              <motion.div
+                key={type}
+                variants={fadeIn}
+                whileHover={{ scale: 1.02 }}
+                className="relative overflow-hidden"
+              >
+                <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black border border-pink-500/20 hover:border-pink-500/40 transition-all duration-300 group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <CardContent className="relative p-4 text-center">
+                    <div className={`text-2xl font-bold ${getLogTypeColor(type as LogMessage['type']).split(' ')[0]} mb-1`}>
+                      {count}
+                    </div>
+                    <div className="text-xs text-gray-400 capitalize mb-2">{type}</div>
+                    <div className="w-full bg-gray-700 rounded-full h-1.5">
+                      <div 
+                        className={`h-1.5 rounded-full transition-all duration-500 ${
+                          type === 'error' ? 'bg-red-400' :
+                          type === 'warning' ? 'bg-yellow-400' :
+                          type === 'success' ? 'bg-emerald-400' :
+                          type === 'debug' ? 'bg-purple-400' :
+                          'bg-gray-400'
+                        }`}
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">{percentage}%</div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             );
           })}
         </div>
+
+        {/* Connection Status Footer */}
+        <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20">
+          <CardContent className="p-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`} />
+                  <span className="text-sm text-gray-300">
+                    {isConnected ? 'Connected to log stream' : 'Disconnected from log stream'}
+                  </span>
+                </div>
+                {messageQueue.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                    <span className="text-sm text-amber-300">
+                      Processing {messageQueue.length} messages...
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-6 text-sm text-gray-400">
+                <span>Project: <span className="text-gray-300">{projectData.name}</span></span>
+                <span>Status: <span className="text-gray-300 capitalize">{projectData.projectstatus}</span></span>
+                <span>Total Logs: <span className="text-gray-300">{messages.length}</span></span>
+                <span>Filtered: <span className="text-gray-300">{filteredLogs.length}</span></span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </motion.div>
+
+      {/* Scroll Indicator */}
+      <ScrollIndicator />
     </div>
   );
 };

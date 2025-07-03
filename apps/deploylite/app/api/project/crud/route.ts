@@ -8,7 +8,8 @@ import User from "../../../../../models/User"
 import Deployment from "../../../../../models/Deployment"
 import { cookies } from "next/headers"
 import CryptoJS from "crypto-js"
-
+import VirtualSpace from "../../../../../models/VirtualSpace"
+import WebBuilder from "../../../../../models/WebBuilder"
 export const GET = async () => {
     try {
         await ConnectDb();
@@ -87,6 +88,8 @@ export const POST = async (req: NextRequest) => {
         console.log(name);
         
         const projectname = await Project.findOne({ name: name });
+        const webbuilder = await WebBuilder.findOne({ name: name });
+        const virtualspace = await VirtualSpace.findOne({ name: name });
         
         // If project name already exists
         if (projectname != null) {
@@ -94,6 +97,23 @@ export const POST = async (req: NextRequest) => {
                 message: "Project name already exists. Select a different name",
                 success: false,
                 projectname: "exists"
+            }, { status: 409 });
+        }
+        // If webbuilder name already exists
+        if (webbuilder != null) {
+            return NextResponse.json({
+                message: "WebBuilder name already exists. Select a different name",
+                success: false,
+                webbuildername: "exists"
+            }, { status: 409 });
+        }
+
+        //check in virtual space
+        if (virtualspace != null) {
+            return NextResponse.json({
+                message: "Virtual Space name already exists. Select a different name",
+                success: false,
+                virtualspacename: "exists"
             }, { status: 409 });
         }
         
