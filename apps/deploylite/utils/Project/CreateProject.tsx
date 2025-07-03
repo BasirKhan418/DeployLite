@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import OpenAI from "openai";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -75,6 +76,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { motion, AnimatePresence } from "framer-motion";
+import { set } from "mongoose";
 
 
 const containerVariants = {
@@ -138,6 +140,11 @@ export default function CreateProject({ name }: { name: string }) {
   const user = useAppSelector((state) => state.user.user);
   const router = useRouter();
 
+  const client = new OpenAI({
+    apiKey:process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+    dangerouslyAllowBrowser: true
+  });
+
   const [stage, setStage] = useState(1);
   const [buildScore, setBuildScore] = useState("");
   const [buildText, setBuildText] = useState("");
@@ -169,32 +176,18 @@ export default function CreateProject({ name }: { name: string }) {
 
 
   async function queryAiAgent(message: string) {
-    const API_URL = 'https://agent-9bce58c1b5878cb58d14-brwoz.ondigitalocean.app/api/v1/chat/completions';
-
-    const payload = {
-      messages: [{ role: 'user', content: message }],
-      temperature: 0.7,
-      stream: false
-    };
 
     try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_DG1}`
-        },
-        body: JSON.stringify(payload)
-      });
+      const response = await client.responses.create({
+    model: "gpt-4o",
+    input: message,
+});
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+console.log("response data is ",response.output_text);
 
-      const data = await response.json();
-
-      if (data.choices && data.choices.length > 0) {
-        return data.choices[0]?.message?.content || 'No content found';
+      const data = response.output_text
+      if(data!=null && data.trim() !== '') {
+        return data;
       }
       return 'No response generated';
 
@@ -227,12 +220,19 @@ export default function CreateProject({ name }: { name: string }) {
       });
       const data = await response.json();
 
-      const testMessage = `Analyze this repository code and provide a build score (0-100) and detailed feedback: ${JSON.stringify(data)}`;
+      const testMessage = `Analyze this repository code and provide a build score (0-100) and detailed feedback: ${JSON.stringify(data)} in json like {"buildScore":85,"feedback":"..."} format. please strict to this format and do not add any extra text. Only return the json object. dont add json key "data" or "result" or "response" or "output" or "message" or "text". Only return the json object.`;
       const response2 = await queryAiAgent(testMessage);
+      const newresponse = response2.split('```json')[1]?.split('```')[0].trim();
+      console.log('AI Response:', newresponse);
+      const parsedResponse = JSON.parse(newresponse);
 
-      const { buildScore, processedText } = processText(response2);
+      console.log('AI parsed Response:', parsedResponse);
+
+      const buildScore = parsedResponse.buildScore;
+      const feedback = parsedResponse.feedback;
+
       setBuildScore(buildScore?.toString() || '85');
-      setBuildText(processedText);
+      setBuildText(feedback || 'No feedback provided.');
     } catch (error) {
       console.error('Analysis error:', error);
       setBuildScore('--');
