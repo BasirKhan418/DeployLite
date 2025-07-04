@@ -25,7 +25,9 @@ import {
   Plus,
   Brain,
   Database,
-  Zap
+  Zap,
+  Sparkles,
+  Bot
 } from "lucide-react";
 
 interface KnowledgeFile {
@@ -37,6 +39,7 @@ interface KnowledgeFile {
   status: 'uploading' | 'processing' | 'ready' | 'failed';
   url?: string;
   vectorized?: boolean;
+  provider?: 'openai' | 'gemini';
 }
 
 interface KnowledgeBaseManagerProps {
@@ -44,6 +47,39 @@ interface KnowledgeBaseManagerProps {
   knowledgeBase: any[];
   onUpdate: () => void;
 }
+
+// AI Provider Toggle Component
+const AIProviderToggle = ({ provider, onProviderChange }: { 
+  provider: 'openai' | 'gemini', 
+  onProviderChange: (provider: 'openai' | 'gemini') => void 
+}) => {
+  return (
+    <div className="inline-flex bg-gray-800/80 rounded-lg p-1 border border-gray-600/50">
+      <button
+        onClick={() => onProviderChange('openai')}
+        className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
+          provider === 'openai'
+            ? 'bg-purple-500 text-white shadow-lg'
+            : 'text-gray-400 hover:text-gray-300 hover:bg-gray-700/50'
+        }`}
+      >
+        <Brain className="w-4 h-4" />
+        OpenAI
+      </button>
+      <button
+        onClick={() => onProviderChange('gemini')}
+        className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
+          provider === 'gemini'
+            ? 'bg-pink-500 text-white shadow-lg'
+            : 'text-gray-400 hover:text-gray-300 hover:bg-gray-700/50'
+        }`}
+      >
+        <Sparkles className="w-4 h-4" />
+        Gemini
+      </button>
+    </div>
+  );
+};
 
 const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
   chatbotId,
@@ -55,6 +91,7 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
   const [dragOver, setDragOver] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [processing, setProcessing] = useState(false);
+  const [aiProvider, setAiProvider] = useState<'openai' | 'gemini'>('openai');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Supported file types based on backend capabilities
@@ -181,7 +218,8 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
           type: file.type || 'application/octet-stream',
           size: file.size,
           uploadDate: new Date().toISOString(),
-          status: 'uploading'
+          status: 'uploading',
+          provider: aiProvider
         };
 
         setFiles(prev => [...prev, tempFile]);
@@ -190,8 +228,9 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
         const formData = new FormData();
         formData.append('file', file);
         formData.append('chatbotId', chatbotId);
+        formData.append('provider', aiProvider);
 
-        // Simulate API call for S3 upload
+        // Simulate API call for S3 upload with provider
         const response = await fetch('/api/chatbot/knowledge-base/upload', {
           method: 'POST',
           body: formData
@@ -203,12 +242,12 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
           // Update file status to processing
           setFiles(prev => prev.map(f => 
             f.id === tempFile.id 
-              ? { ...f, status: 'processing', id: result.fileId, url: result.url }
+              ? { ...f, status: 'processing', id: result.fileId, url: result.url, provider: aiProvider }
               : f
           ));
 
-          // Start vectorization process
-          await processFile(result.fileId);
+          // Start vectorization process with selected provider
+          await processFile(result.fileId, aiProvider);
           
         } else {
           // Update file status to failed
@@ -224,7 +263,7 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
         setUploadProgress(((i + 1) / fileArray.length) * 100);
       }
 
-      toast.success(`Successfully uploaded ${fileArray.length} file(s)`);
+      toast.success(`Successfully uploaded ${fileArray.length} file(s) to ${aiProvider.toUpperCase()}`);
       onUpdate();
       
     } catch (error) {
@@ -236,7 +275,7 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
     }
   };
 
-  const processFile = async (fileId: string) => {
+  const processFile = async (fileId: string, provider: 'openai' | 'gemini') => {
     try {
       const response = await fetch('/api/chatbot/knowledge-base/process', {
         method: 'POST',
@@ -245,7 +284,8 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
         },
         body: JSON.stringify({
           fileId,
-          chatbotId
+          chatbotId,
+          provider
         })
       });
 
@@ -254,10 +294,10 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
       if (result.success) {
         setFiles(prev => prev.map(f => 
           f.id === fileId 
-            ? { ...f, status: 'ready', vectorized: true }
+            ? { ...f, status: 'ready', vectorized: true, provider }
             : f
         ));
-        toast.success('File processed and vectorized successfully');
+        toast.success(`File processed with ${provider.toUpperCase()} successfully`);
       } else {
         setFiles(prev => prev.map(f => 
           f.id === fileId 
@@ -341,7 +381,7 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ chatbotId })
+        body: JSON.stringify({ chatbotId, provider: aiProvider })
       });
 
       const result = await response.json();
@@ -388,21 +428,65 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
     }
   };
 
+  const getProviderIcon = (provider?: 'openai' | 'gemini') => {
+    if (provider === 'openai') {
+      return <Brain className="w-3 h-3 text-purple-400" />;
+    } else if (provider === 'gemini') {
+      return <Sparkles className="w-3 h-3 text-pink-400" />;
+    }
+    return null;
+  };
+
   return (
     <div className="space-y-6">
       {/* Upload Area */}
       <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20">
         <CardHeader>
-          <CardTitle className="flex items-center gap-3 text-xl text-gray-200">
-            <Database className="w-6 h-6 text-pink-400" />
-            Knowledge Base Manager
-          </CardTitle>
-          <CardDescription className="text-gray-400">
-            Upload documents, images, and other files to train your chatbot
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-3 text-xl text-gray-200">
+                <Database className="w-6 h-6 text-pink-400" />
+                Knowledge Base Manager
+              </CardTitle>
+              <CardDescription className="text-gray-400">
+                Upload documents, images, and other files to train your chatbot
+              </CardDescription>
+            </div>
+            
+            {/* AI Provider Toggle */}
+            <div className="flex flex-col items-end gap-2">
+              <div className="text-xs text-gray-400 font-medium">AI Provider</div>
+              <AIProviderToggle provider={aiProvider} onProviderChange={setAiProvider} />
+            </div>
+          </div>
         </CardHeader>
 
         <CardContent>
+          {/* Provider Info Banner */}
+          <div className={`mb-6 p-4 rounded-xl border ${
+            aiProvider === 'openai' 
+              ? 'bg-purple-500/10 border-purple-500/20' 
+              : 'bg-pink-500/10 border-pink-500/20'
+          }`}>
+            <div className="flex items-center gap-3">
+              {aiProvider === 'openai' ? (
+                <Brain className="w-5 h-5 text-purple-400" />
+              ) : (
+                <Sparkles className="w-5 h-5 text-pink-400" />
+              )}
+              <div>
+                <h4 className={`font-medium ${
+                  aiProvider === 'openai' ? 'text-purple-400' : 'text-pink-400'
+                }`}>
+                  {aiProvider === 'openai' ? 'OpenAI GPT' : 'Google Gemini'} Selected
+                </h4>
+                <p className="text-gray-400 text-sm">
+                  Files will be processed and vectorized using {aiProvider === 'openai' ? 'OpenAI embeddings' : 'Gemini embeddings'}
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* File Upload Zone */}
           <div
             className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 ${
@@ -447,12 +531,15 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
                 <h3 className="text-lg font-semibold text-gray-200 mb-2">
                   {uploading ? 'Uploading Files...' : 'Upload Knowledge Base Files'}
                 </h3>
-                <p className="text-gray-400 mb-4">
+                <p className="text-gray-400 mb-2">
                   Drag and drop files here, or click to browse
+                </p>
+                <p className="text-sm text-gray-500">
+                  Files will be processed with {aiProvider.toUpperCase()}
                 </p>
 
                 {uploading && (
-                  <div className="space-y-2">
+                  <div className="space-y-2 mt-4">
                     <Progress value={uploadProgress} className="h-2" />
                     <p className="text-sm text-amber-400">
                       Upload progress: {uploadProgress.toFixed(0)}%
@@ -463,7 +550,7 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
                 {!uploading && (
                   <Button
                     variant="outline"
-                    className="border-pink-500/50 text-pink-400 hover:bg-pink-500/10"
+                    className="border-pink-500/50 text-pink-400 hover:bg-pink-500/10 mt-4"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Choose Files
@@ -556,12 +643,23 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
                             <span>{formatFileSize(file.size)}</span>
                             <span>•</span>
                             <span>{new Date(file.uploadDate).toLocaleDateString()}</span>
+                            {file.provider && (
+                              <>
+                                <span>•</span>
+                                <div className="flex items-center gap-1">
+                                  {getProviderIcon(file.provider)}
+                                  <span className={file.provider === 'openai' ? 'text-purple-400' : 'text-pink-400'}>
+                                    {file.provider.toUpperCase()}
+                                  </span>
+                                </div>
+                              </>
+                            )}
                             {file.vectorized && (
                               <>
                                 <span>•</span>
                                 <div className="flex items-center gap-1">
-                                  <Brain className="w-3 h-3 text-pink-400" />
-                                  <span className="text-pink-400">Vectorized</span>
+                                  <Brain className="w-3 h-3 text-emerald-400" />
+                                  <span className="text-emerald-400">Vectorized</span>
                                 </div>
                               </>
                             )}
@@ -628,7 +726,7 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
               <div>
                 <h3 className="text-amber-300 font-semibold">Processing Files</h3>
                 <p className="text-amber-200/80 text-sm">
-                  Your files are being processed and vectorized for optimal search performance.
+                  Your files are being processed and vectorized with {aiProvider.toUpperCase()} for optimal search performance.
                 </p>
               </div>
             </div>
