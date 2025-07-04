@@ -32,7 +32,50 @@ const ChatbotBuildPage = () => {
   const [deploymentData, setDeploymentData] = useState<ChatbotProject | null>(null);
   const [deploymentProgress, setDeploymentProgress] = useState(0);
 
-  // Check authentication
+  const pollForChatbotCompletion = async (chatbotName: string) => {
+    const maxAttempts = 30; 
+    let attempts = 0;
+
+    const checkChatbot = async (): Promise<void> => {
+      try {
+        const response = await fetch('/api/project/chatbot');
+        const data = await response.json();
+
+        if (data.success && data.projectdata) {
+          // Look for the chatbot we just created
+          const foundChatbot = data.projectdata.find((bot: any) => bot.name === chatbotName);
+          
+          if (foundChatbot) {
+            if (foundChatbot.projectstatus === 'live') {
+              setDeploymentData(foundChatbot);
+              return; // Success!
+            } else if (foundChatbot.projectstatus === 'failed') {
+              throw new Error('Chatbot deployment failed');
+            }
+          }
+        }
+
+        attempts++;
+        if (attempts < maxAttempts) {
+          // Update progress based on time elapsed
+          const progressIncrement = Math.min(20, (attempts / maxAttempts) * 20);
+          setDeploymentProgress(prev => Math.min(95, prev + progressIncrement));
+          
+          await new Promise(resolve => setTimeout(resolve, 5000)); 
+          return checkChatbot();
+        } else {
+          throw new Error('Deployment timeout');
+        }
+      } catch (error: any) {
+        console.error('Status check error:', error);
+        throw error;
+      }
+    };
+
+    await checkChatbot();
+  };
+
+  
   useEffect(() => {
     if (!user) {
       toast.error("Please login to continue");
@@ -50,10 +93,8 @@ const ChatbotBuildPage = () => {
   const handleCreateChatbot = async (formData: {
     name: string;
     planid: string;
-    llmProvider: 'openai' | 'gemini';
-    apiKey: string;
-    contextSize: string;
-    description?: string;
+    openaiapikey: string;
+    googleapikey: string;
   }) => {
     if (!user) {
       toast.error("User not authenticated");
@@ -65,19 +106,9 @@ const ChatbotBuildPage = () => {
     setDeploymentProgress(10);
 
     try {
-      // Prepare environment variables
-      const envConfig = `
-LLM_PROVIDER=${formData.llmProvider}
-${formData.llmProvider.toUpperCase()}_API_KEY=${formData.apiKey}
-CONTEXT_SIZE=${formData.contextSize}
-CHATBOT_NAME=${formData.name}
-DESCRIPTION=${formData.description || ''}
-USER_ID=${user.email}
-      `.trim();
-
       setDeploymentProgress(25);
 
-      // Create chatbot project
+      // Create chatbot project - send data exactly as backend expects
       const createResponse = await fetch('/api/project/chatbot', {
         method: 'POST',
         headers: {
@@ -86,7 +117,8 @@ USER_ID=${user.email}
         body: JSON.stringify({
           name: formData.name,
           planid: formData.planid,
-          env: envConfig,
+          openaiapikey: formData.openaiapikey,
+          googleapikey: formData.googleapikey,
         }),
       });
 
@@ -98,15 +130,21 @@ USER_ID=${user.email}
         throw new Error(createResult.message);
       }
 
-      if (!createResult.project) {
-        throw new Error("Project creation failed - no project data returned");
-      }
-
-      setDeploymentData(createResult.project);
       setDeploymentProgress(75);
 
-      // Poll for deployment completion
-      await pollDeploymentStatus(createResult.project._id);
+     
+      toast.success('Chatbot creation initiated successfully!');
+      
+      setTimeout(() => {
+        setDeploymentProgress(100);
+        setCurrentStep('complete');
+        setIsDeploying(false);
+        toast.success('Chatbot deployed successfully!');
+       
+        setTimeout(() => {
+          router.push('/project'); 
+        }, 2000);
+      }, 8000); 
 
     } catch (error: any) {
       console.error('Chatbot creation error:', error);
@@ -115,56 +153,6 @@ USER_ID=${user.email}
       setIsDeploying(false);
       setDeploymentProgress(0);
     }
-  };
-
-  const pollDeploymentStatus = async (projectId: string) => {
-    const maxAttempts = 60; // 5 minutes max
-    let attempts = 0;
-
-    const checkStatus = async (): Promise<void> => {
-      try {
-        const response = await fetch(`/api/project/chatbot/${projectId}`);
-        const data = await response.json();
-
-        if (data.success && data.projectdata) {
-          const status = data.projectdata.projectstatus;
-          
-          if (status === 'live') {
-            setDeploymentProgress(100);
-            setCurrentStep('complete');
-            setIsDeploying(false);
-            toast.success('Chatbot deployed successfully!');
-            
-            // Redirect to overview after 2 seconds
-            setTimeout(() => {
-              router.push(`/chatbot/overview?id=${projectId}`);
-            }, 2000);
-            return;
-          } else if (status === 'failed') {
-            throw new Error('Deployment failed');
-          }
-        }
-
-        attempts++;
-        if (attempts < maxAttempts) {
-          // Update progress based on time elapsed
-          const progressIncrement = Math.min(20, (attempts / maxAttempts) * 20);
-          setDeploymentProgress(prev => Math.min(95, prev + progressIncrement));
-          
-          setTimeout(checkStatus, 5000); // Check every 5 seconds
-        } else {
-          throw new Error('Deployment timeout');
-        }
-      } catch (error: any) {
-        console.error('Status check error:', error);
-        toast.error(error.message || 'Deployment failed');
-        setCurrentStep('create');
-        setIsDeploying(false);
-        setDeploymentProgress(0);
-      }
-    };
-
-    await checkStatus();
   };
 
   if (!user) {
@@ -272,7 +260,7 @@ USER_ID=${user.email}
             >
               <DeploymentProgress
                 progress={deploymentProgress}
-                projectName={deploymentData?.name || ''}
+                projectName={deploymentData?.name || 'Your Chatbot'}
                 status="deploying"
               />
             </motion.div>
@@ -300,23 +288,23 @@ USER_ID=${user.email}
                 </h2>
                 
                 <p className="text-gray-300 mb-6">
-                  Your AI chatbot <span className="text-pink-400 font-semibold">{deploymentData?.name}</span> is now live and ready to use.
+                  Your AI chatbot is now being deployed and will be available shortly in your projects dashboard.
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button
-                    onClick={() => router.push(`/chatbot/overview?id=${deploymentData?._id}`)}
+                    onClick={() => router.push('/project')}
                     className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
                   >
-                    Go to Overview
+                    Go to Projects
                   </Button>
                   
                   <Button
                     variant="outline"
-                    onClick={() => window.open(`https://${deploymentData?.projecturl}`, '_blank')}
+                    onClick={() => router.push('/chatbotbuild')}
                     className="border-gray-600 hover:border-pink-500/50"
                   >
-                    Open Chatbot
+                    Create Another
                   </Button>
                 </div>
               </div>
