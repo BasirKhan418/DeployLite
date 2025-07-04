@@ -266,14 +266,14 @@ const ChatbotOverviewPage = () => {
                   <div className="flex items-center space-x-2">
                     <Button
                       variant="outline"
-                      onClick={() => copyToClipboard(`https://${chatbotData.projecturl}`)}
+                      onClick={() => copyToClipboard(`http://${chatbotData.url}?url=http://${chatbotData.url}:5080`)}
                       className="border-gray-600 hover:border-pink-500/50"
                     >
                       <Copy className="w-4 h-4 mr-2" />
                       Copy URL
                     </Button>
                     <Button
-                      onClick={() => window.open(`https://${chatbotData.projecturl}`, '_blank')}
+                      onClick={() => window.open(`http://${chatbotData.url}?url=http://${chatbotData.url}:5080`, '_blank')}
                       className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
                     >
                       <ExternalLink className="w-4 h-4 mr-2" />

@@ -102,11 +102,6 @@ const ChatbotBuildPage = () => {
       return;
     }
     
-    if (!user.connectgithub) {
-      toast.error("Please connect your GitHub account first");
-      router.push("/project");
-      return;
-    }
   }, [user, router]);
 
   const handleCreateChatbot = async (formData: {
@@ -150,9 +145,7 @@ const ChatbotBuildPage = () => {
       }
 
       toast.success('Chatbot creation initiated successfully!');
-      
-      // Start 22-second container deployment process
-      await startContainerDeployment(formData.name);
+      router.push(`/chatbotbuild/overview?id=${createResult.project?._id}`);
 
     } catch (error: any) {
       console.error('Chatbot creation error:', error);
