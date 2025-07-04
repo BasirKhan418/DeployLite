@@ -34,11 +34,13 @@ interface Message {
   typing?: boolean;
   sources?: string[];
   provider?: 'openai' | 'gemini';
+  
 }
 
 interface ChatInterfaceProps {
   chatbotUrl: string;
   isLive: boolean;
+  url: string;
 }
 
 // AI Provider Toggle Component
@@ -74,7 +76,7 @@ const AIProviderToggle = ({ provider, onProviderChange }: {
   );
 };
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatbotUrl, isLive }) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatbotUrl, isLive ,url}) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -128,16 +130,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatbotUrl, isLive }) => 
       setMessages(prev => [...prev, typingMessage]);
 
       // Simulate API call to chatbot with provider selection
-      const response = await fetch('/api/chat/llm', {
+      const response = await fetch(`http://${url}:5080/ai/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_CHAT_API_KEY}` // This would be set up
         },
         body: JSON.stringify({
-          question: inputMessage.trim(),
-          provider: aiProvider,
-          stream: false
+          query: inputMessage.trim(),
+          type: aiProvider,
         })
       });
 
@@ -148,7 +148,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatbotUrl, isLive }) => 
         const filtered = prev.filter(msg => !msg.typing);
         const botResponse: Message = {
           id: Date.now().toString(),
-          content: data.choices?.[0]?.message?.content || 
+          content: data.data || 
                    `I'm sorry, I couldn't process your request at the moment using ${aiProvider.toUpperCase()}. Please try again.`,
           sender: 'bot',
           timestamp: new Date(),

@@ -601,58 +601,7 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
        
       {/* Files List */}
      
-      <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-gray-200">Uploaded Files</CardTitle>
-              <CardDescription>
-                {files.length} files in knowledge base
-              </CardDescription>
-            </div>
-            
-            {files.some(f => f.status === 'failed') && (
-              <Button
-                onClick={retryProcessing}
-                disabled={processing}
-                variant="outline"
-                className="border-amber-500/50 text-amber-400 hover:bg-amber-500/10"
-              >
-                {processing ? (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                ) : (
-                  <Zap className="w-4 h-4 mr-2" />
-                )}
-                Retry Processing
-              </Button>
-            )}
-          </div>
-        </CardHeader>
-
-        <CardContent>
-          {files.length === 0 ? (
-            <div className="text-center py-12">
-              <Database className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-200 mb-2">No files uploaded yet</h3>
-              <p className="text-gray-400">
-                Upload your first document to start building your knowledge base
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-             {files.map((item:string)=>{
-              return (
-                <div className="flex items-center justify-between p-4 rounded-lg border bg-gray-800/50 hover:bg-gray-800/70 transition-all duration-200" key={item.id} onClick={()=>{
-              window.open(item,"_blank")
-            }}>
-                  {item}
-                </div>
-              )
-             })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+     
 
       {/* Processing Status */}
       {files.some(f => f.status === 'processing') && (

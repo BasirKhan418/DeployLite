@@ -369,6 +369,7 @@ const ChatbotOverviewPage = () => {
               <ChatInterface 
                 chatbotUrl={`https://${chatbotData.projecturl}`}
                 isLive={chatbotData.projectstatus === 'live'}
+                url={chatbotData.url || 'localhost'}
               />
             </TabsContent>
 
