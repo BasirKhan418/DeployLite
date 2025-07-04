@@ -200,7 +200,7 @@ const project = new ChatbotBuilder({
             startbilingdate: startbilingdate,
             endbilingdate: endbilingdate,
             knowledgebase: [],
-            dburl: `mongodb://localhost:27017/${name}_vectordb` // Default vector DB URL
+            dburl: `http:${data2.url}:6333` // Default vector DB URL
         });
         
         await project.save();
