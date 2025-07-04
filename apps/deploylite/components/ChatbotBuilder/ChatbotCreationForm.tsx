@@ -6,14 +6,11 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
 import { 
   Loader2, 
   Bot, 
-  Zap, 
   Eye, 
   EyeOff, 
   Info, 
@@ -41,10 +38,8 @@ interface PricingPlan {
 interface FormData {
   name: string;
   planid: string;
-  llmProvider: 'openai' | 'gemini';
-  apiKey: string;
-  contextSize: string;
-  description?: string;
+  openaiapikey: string;
+  googleapikey: string;
 }
 
 interface ChatbotCreationFormProps {
@@ -59,15 +54,14 @@ const ChatbotCreationForm: React.FC<ChatbotCreationFormProps> = ({
   const [formData, setFormData] = useState<FormData>({
     name: '',
     planid: '',
-    llmProvider: 'openai',
-    apiKey: '',
-    contextSize: '4096',
-    description: ''
+    openaiapikey: '',
+    googleapikey: ''
   });
 
   const [plans, setPlans] = useState<PricingPlan[]>([]);
   const [loadingPlans, setLoadingPlans] = useState(true);
-  const [showApiKey, setShowApiKey] = useState(false);
+  const [showOpenAIKey, setShowOpenAIKey] = useState(false);
+  const [showGoogleKey, setShowGoogleKey] = useState(false);
   const [nameError, setNameError] = useState('');
 
   // Fetch pricing plans
@@ -108,15 +102,6 @@ const ChatbotCreationForm: React.FC<ChatbotCreationFormProps> = ({
     }
   };
 
-  const handleLLMProviderChange = (provider: 'openai' | 'gemini') => {
-    setFormData(prev => ({
-      ...prev,
-      llmProvider: provider,
-      contextSize: provider === 'openai' ? '4096' : '2048', // Default context sizes
-      apiKey: '' // Clear API key when switching providers
-    }));
-  };
-
   const validateForm = (): boolean => {
     if (!formData.name.trim()) {
       toast.error('Please enter a chatbot name');
@@ -138,8 +123,9 @@ const ChatbotCreationForm: React.FC<ChatbotCreationFormProps> = ({
       return false;
     }
 
-    if (!formData.apiKey.trim()) {
-      toast.error(`Please enter your ${formData.llmProvider.toUpperCase()} API key`);
+    // At least one API key is required
+    if (!formData.openaiapikey.trim() && !formData.googleapikey.trim()) {
+      toast.error('Please provide at least one API key (OpenAI or Google)');
       return false;
     }
 
@@ -152,25 +138,6 @@ const ChatbotCreationForm: React.FC<ChatbotCreationFormProps> = ({
     }
 
     onSubmit(formData);
-  };
-
-  const getLLMProviderInfo = (provider: 'openai' | 'gemini') => {
-    return {
-      openai: {
-        name: 'OpenAI GPT',
-        description: 'Best for larger context windows and complex reasoning',
-        maxContext: '128K tokens',
-        icon: '🤖',
-        color: 'from-green-400 to-emerald-400'
-      },
-      gemini: {
-        name: 'Google Gemini',
-        description: 'Optimized for smaller context and faster responses',
-        maxContext: '32K tokens',
-        icon: '✨',
-        color: 'from-blue-400 to-cyan-400'
-      }
-    }[provider];
   };
 
   return (
@@ -186,14 +153,14 @@ const ChatbotCreationForm: React.FC<ChatbotCreationFormProps> = ({
             Configure Your AI Chatbot
           </CardTitle>
           <CardDescription className="text-gray-400">
-            Set up your intelligent chatbot with custom knowledge base and LLM integration
+            Set up your intelligent chatbot with custom knowledge base and AI integration
           </CardDescription>
         </CardHeader>
 
         <CardContent>
           <div className="space-y-6">
             {/* Basic Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-gray-300">
                   Chatbot Name *
@@ -217,132 +184,89 @@ const ChatbotCreationForm: React.FC<ChatbotCreationFormProps> = ({
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="description" className="text-gray-300">
-                  Description (Optional)
-                </Label>
-                <Textarea
-                  id="description"
-                  placeholder="Brief description of your chatbot's purpose..."
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  className="bg-black/50 border-gray-700 text-white placeholder-gray-400 focus:border-pink-500 min-h-[100px]"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-
-            {/* LLM Provider Selection */}
-            <div className="space-y-4">
-              <Label className="text-gray-300 text-lg">LLM Provider *</Label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {(['openai', 'gemini'] as const).map((provider) => {
-                  const info = getLLMProviderInfo(provider);
-                  const isSelected = formData.llmProvider === provider;
-                  
-                  return (
-                    <motion.div
-                      key={provider}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <Card
-                        className={`cursor-pointer transition-all duration-300 ${
-                          isSelected
-                            ? 'border-pink-500/50 bg-gradient-to-br from-pink-500/10 to-purple-500/10'
-                            : 'border-gray-700 hover:border-gray-600 bg-gray-900/50'
-                        }`}
-                        onClick={() => handleLLMProviderChange(provider)}
-                      >
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-3">
-                              <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${info.color} flex items-center justify-center text-xl`}>
-                                {info.icon}
-                              </div>
-                              <div>
-                                <h3 className="font-semibold text-gray-200">{info.name}</h3>
-                                <p className="text-sm text-gray-400">{info.maxContext}</p>
-                              </div>
-                            </div>
-                            <div className={`w-4 h-4 rounded-full border-2 ${
-                              isSelected ? 'border-pink-500 bg-pink-500' : 'border-gray-500'
-                            }`}>
-                              {isSelected && (
-                                <div className="w-full h-full rounded-full bg-white transform scale-50"></div>
-                              )}
-                            </div>
-                          </div>
-                          <p className="text-sm text-gray-400">{info.description}</p>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* API Key and Context Size */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="apiKey" className="text-gray-300">
-                  {formData.llmProvider.toUpperCase()} API Key *
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="apiKey"
-                    type={showApiKey ? "text" : "password"}
-                    placeholder={`Enter your ${formData.llmProvider.toUpperCase()} API key`}
-                    value={formData.apiKey}
-                    onChange={(e) => handleInputChange('apiKey', e.target.value)}
-                    className="bg-black/50 border-gray-700 text-white placeholder-gray-400 focus:border-pink-500 pr-10"
-                    disabled={isLoading}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-gray-700"
-                    onClick={() => setShowApiKey(!showApiKey)}
-                  >
-                    {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </Button>
+              {/* AI API Keys */}
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-gray-200">AI Provider Configuration</h3>
+                  <p className="text-gray-400 text-sm">
+                    Provide at least one API key. You can use both providers for redundancy.
+                  </p>
                 </div>
-                <p className="text-gray-500 text-sm flex items-center gap-1">
-                  <Info className="w-3 h-3" />
-                  Your API key is encrypted and stored securely
-                </p>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="contextSize" className="text-gray-300">
-                  Context Window Size
-                </Label>
-                <select
-                  id="contextSize"
-                  value={formData.contextSize}
-                  onChange={(e) => handleInputChange('contextSize', e.target.value)}
-                  className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-md text-white focus:border-pink-500 focus:outline-none"
-                  disabled={isLoading}
-                >
-                  {formData.llmProvider === 'openai' ? (
-                    <>
-                      <option value="4096">4K tokens (Standard)</option>
-                      <option value="8192">8K tokens (Enhanced)</option>
-                      <option value="16384">16K tokens (Large)</option>
-                      <option value="32768">32K tokens (Extra Large)</option>
-                    </>
-                  ) : (
-                    <>
-                      <option value="2048">2K tokens (Standard)</option>
-                      <option value="4096">4K tokens (Enhanced)</option>
-                      <option value="8192">8K tokens (Large)</option>
-                    </>
-                  )}
-                </select>
-                <p className="text-gray-500 text-sm">
-                  Larger context allows more conversation history
-                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* OpenAI API Key */}
+                  <div className="space-y-2">
+                    <Label htmlFor="openaiapikey" className="text-gray-300 flex items-center gap-2">
+                      🤖 OpenAI API Key
+                      <Badge variant="secondary" className="text-xs bg-green-500/10 text-green-400 border-green-500/30">
+                        Optional
+                      </Badge>
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="openaiapikey"
+                        type={showOpenAIKey ? "text" : "password"}
+                        placeholder="sk-..."
+                        value={formData.openaiapikey}
+                        onChange={(e) => handleInputChange('openaiapikey', e.target.value)}
+                        className="bg-black/50 border-gray-700 text-white placeholder-gray-400 focus:border-pink-500 pr-10"
+                        disabled={isLoading}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-gray-700"
+                        onClick={() => setShowOpenAIKey(!showOpenAIKey)}
+                      >
+                        {showOpenAIKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                    <p className="text-gray-500 text-sm">
+                      Best for complex reasoning and large context windows
+                    </p>
+                  </div>
+
+                  {/* Google API Key */}
+                  <div className="space-y-2">
+                    <Label htmlFor="googleapikey" className="text-gray-300 flex items-center gap-2">
+                      ✨ Google API Key
+                      <Badge variant="secondary" className="text-xs bg-blue-500/10 text-blue-400 border-blue-500/30">
+                        Optional
+                      </Badge>
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="googleapikey"
+                        type={showGoogleKey ? "text" : "password"}
+                        placeholder="AIza..."
+                        value={formData.googleapikey}
+                        onChange={(e) => handleInputChange('googleapikey', e.target.value)}
+                        className="bg-black/50 border-gray-700 text-white placeholder-gray-400 focus:border-pink-500 pr-10"
+                        disabled={isLoading}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-gray-700"
+                        onClick={() => setShowGoogleKey(!showGoogleKey)}
+                      >
+                        {showGoogleKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                    <p className="text-gray-500 text-sm">
+                      Fast responses and optimized for smaller contexts
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                  <p className="text-blue-300 text-sm flex items-center gap-1">
+                    <Info className="w-3 h-3" />
+                    Your API keys are encrypted and stored securely. The chatbot will automatically use the best available provider.
+                  </p>
+                </div>
               </div>
             </div>
 
