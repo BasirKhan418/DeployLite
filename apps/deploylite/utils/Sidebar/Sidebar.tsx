@@ -271,7 +271,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </Button>
       </Link>
 
-      <Link href="/chatbotbuild" passHref>
+      <Link href="/project/chatbot" passHref>
         <Button
           variant="ghost"
           className={cn(

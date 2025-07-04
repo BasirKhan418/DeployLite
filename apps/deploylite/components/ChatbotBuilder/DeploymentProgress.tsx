@@ -91,7 +91,7 @@ const DeploymentProgress: React.FC<DeploymentProgressProps> = ({
 
   const getEstimatedTime = () => {
     const remaining = 100 - progress;
-    const estimatedMinutes = Math.ceil((remaining / 100) * 5); // Assume 5 minutes total
+    const estimatedMinutes = Math.ceil((remaining / 100) * 5); 
     return estimatedMinutes;
   };
 

@@ -102,6 +102,7 @@ const ChatbotStats: React.FC<ChatbotStatsProps> = ({ chatbotData }) => {
       icon: TrendingUp,
       color: "from-pink-400 to-rose-400"
     }
+    
   ];
 
   const resourceUsage = [
