@@ -81,10 +81,10 @@ const ChatbotOverviewPage = () => {
       const data = await response.json();
 
       if (data.success) {
-        setChatbotData(data.projectdata);
+        setChatbotData(data.data);
       } else {
         toast.error(data.message || "Failed to fetch chatbot details");
-        router.push("/project");
+       
       }
     } catch (error) {
       console.error("Error fetching chatbot data:", error);
@@ -184,7 +184,7 @@ const ChatbotOverviewPage = () => {
           <Bot className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-200 mb-2">Chatbot Not Found</h2>
           <p className="text-gray-400 mb-6">The requested chatbot could not be found.</p>
-          <Button onClick={() => router.push("/project")}>
+          <Button onClick={() => router.push("/project/chatbot")}>
             Back to Projects
           </Button>
         </div>
@@ -204,7 +204,7 @@ const ChatbotOverviewPage = () => {
           <div className="flex items-center space-x-4">
             <Button
               variant="ghost"
-              onClick={() => router.push('/project')}
+              onClick={() => router.push('/project/chatbot')}
               className="text-gray-400 hover:text-pink-300"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />

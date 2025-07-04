@@ -74,7 +74,7 @@ const ChatbotBuildPage = () => {
           
           // Redirect to overview page after 2 seconds
           setTimeout(() => {
-            router.push(`/chatbotbuild/overview?id=${foundChatbot._id}`);
+            router.push(`/chatbot/overview?id=${foundChatbot._id}`);
           }, 2000);
         } else {
           // If not found, show error but stay on page
@@ -425,7 +425,7 @@ const ChatbotBuildPage = () => {
                 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button
-                    onClick={() => router.push(`/chatbotbuild/overview?id=${deploymentData?._id}`)}
+                    onClick={() => router.push(`/chatbot/overview?id=${deploymentData?._id}`)}
                     className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
                   >
                     Go to Overview
