@@ -16,6 +16,7 @@ import {
   ArrowRight 
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { FaRobot } from "react-icons/fa";
 
 interface NoProjectProps {
   name: string;
@@ -49,6 +50,20 @@ const NoProject: React.FC<NoProjectProps> = ({ name }) => {
           icon: <CloudLightning className="w-16 h-16 text-pink-400" />,
           gradient: "from-pink-400 to-purple-400",
           buttonText: "Create Virtual Space",
+          features: [
+            { text: "VS Code in Browser", icon: <Code className="w-4 h-4" /> },
+            { text: "Full Linux Terminal", icon: <Terminal className="w-4 h-4" /> },
+            { text: "Persistent Storage", icon: <Database className="w-4 h-4" /> },
+            { text: "Secure Access", icon: <Monitor className="w-4 h-4" /> }
+          ]
+        };case "chatbot":
+        return {
+          title: "ChatBot Builder",
+          subtitle: "Cloud development environments",
+          description: "Set up containerized development environments with VS Code in the browser. Perfect for coding, testing, and collaboration from anywhere.",
+          icon: <FaRobot className="w-16 h-16 text-pink-400" />,
+          gradient: "from-pink-400 to-purple-400",
+          buttonText: "Create RAG ChatBot",
           features: [
             { text: "VS Code in Browser", icon: <Code className="w-4 h-4" /> },
             { text: "Full Linux Terminal", icon: <Terminal className="w-4 h-4" /> },
