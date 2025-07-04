@@ -30,7 +30,8 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
           "/verifyemail",
           "/otp",
           "/githubauth",
-          "/githuberr"
+          "/githuberr",
+          "/chatbotbuild"
         ];
 
         if (!publicRoutes.includes(pathname)) {
