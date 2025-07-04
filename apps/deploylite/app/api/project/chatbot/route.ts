@@ -183,7 +183,7 @@ export const POST = async (req: NextRequest) => {
             startbilingdate: startbilingdate,
             endbilingdate: endbilingdate,
             knowledgebase: [],
-            dburl: `mongodb://localhost:27017/${name}_vectordb` // Default vector DB URL
+            dburl: `` // Default vector DB URL
         });
         
         console.log("Project object before save:", project);

@@ -3,8 +3,28 @@ const path = require('path');
 const Redis = require('ioredis');
 const axios = require('axios');
 const fs = require('fs');
-
+const http = require('http');
 // Redis configuration (Aiven)
+
+const serveStaticHTML = () => {
+    const filePath = path.join(__dirname, 'output', 'index.html');
+
+    const server = http.createServer((req, res) => {
+        fs.readFile(filePath, (err, data) => {
+            if (err) {
+                res.writeHead(500);
+                return res.end('Error loading index.html');
+            }
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.end(data);
+        });
+    });
+
+    server.listen(80, () => {
+        publishLog("📡 Static HTML served on port 80", 'success');
+    });
+};
+
 const redisConfig = {
     host: 'valkey-1dec9a5f-basirkhanaws-5861.c.aivencloud.com',
     port: 24291,
@@ -65,7 +85,11 @@ const init = async () => {
     
         publishLog("✅ Deployment successful and server running fine", 'success');
         await runCommand(`cd ${appPath} && node src/index.js`);
+        publishLog("✅ Application started successfully", 'success');
+
+        serveStaticHTML();
         
+        publishLog("✅ Static HTML served successfully", 'success');
 
         
     } catch (err) {

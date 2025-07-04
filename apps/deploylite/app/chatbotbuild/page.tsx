@@ -39,12 +39,7 @@ const ChatbotBuildPage = () => {
       router.push("/login");
       return;
     }
-    
-    if (!user.connectgithub) {
-      toast.error("Please connect your GitHub account first");
-      router.push("/project");
-      return;
-    }
+  
   }, [user, router]);
 
   const handleCreateChatbot = async (formData: {
