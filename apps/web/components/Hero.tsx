@@ -4,7 +4,7 @@ import { ChevronRight } from 'lucide-react'
 
 export const Hero = () => {
   return (
-    <div className="relative bg-gray-950 pt-20 pb-16 sm:pt-24 sm:pb-20">
+    <div className="relative bg-gray-950 pt-20 pb-16 sm:pt-24 sm:pb-20" id='about'>
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-gray-900/50 to-gray-950"></div>
       
@@ -22,7 +22,7 @@ export const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <span className="text-sm font-medium text-gray-300">🎉 Version 2.0 is here</span>
+            <span className="text-sm font-medium text-gray-300">Version 2.0 is here</span>
             <ChevronRight className="ml-2 h-4 w-4 text-gray-400" />
           </motion.div>
           
@@ -59,7 +59,7 @@ export const Hero = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
           >
             <button 
-              className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 shadow-lg"
+              className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white px-8 py-3 rounded-lg font-medium shadow-lg transition-all duration-200"
               onClick={() => window.location.href = "https://app.deploylite.tech/signup"}
             >
               Start Deploying Free
@@ -77,7 +77,7 @@ export const Hero = () => {
             transition={{ duration: 0.8, delay: 0.8 }}
           >
             <div className="text-center">
-              <div className="text-2xl font-bold text-white">10k+</div>
+              <div className="text-2xl font-bold text-white">3k+</div>
               <div className="text-sm text-gray-400">Deployments</div>
             </div>
             <div className="text-center">
@@ -85,7 +85,7 @@ export const Hero = () => {
               <div className="text-sm text-gray-400">Uptime</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-white">5k+</div>
+              <div className="text-2xl font-bold text-white">500+</div>
               <div className="text-sm text-gray-400">Developers</div>
             </div>
             <div className="text-center">

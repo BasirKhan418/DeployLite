@@ -30,7 +30,7 @@ const plans: PricingPlan[] = [
       'Community support',
       'SSL certificates included',
     ],
-    buttonText: "Get Started as a beginner.",
+    buttonText: "Start Pro Trial",
     buttonVariant: 'outline'
   },
   {
@@ -49,7 +49,7 @@ const plans: PricingPlan[] = [
       'CI/CD integrations',
       'Staging environments',
     ],
-    buttonText: "Start Pro Trial",
+    buttonText: "Get Started as a beginner.",
     buttonVariant: 'primary'
   },
   {
