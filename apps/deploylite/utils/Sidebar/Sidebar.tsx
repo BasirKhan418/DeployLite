@@ -45,6 +45,7 @@ import {
 
 import LogoutModal from "../modals/LogoutModal";
 import LottieAnimation from "@/components/ui/LottieAnimation";
+import { FaRobot } from "react-icons/fa";
 
 function cn(...classes: (string | boolean | undefined)[]) {
   return classes.filter(Boolean).join(" ");
@@ -265,6 +266,34 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <span className="ml-3 transition-all duration-300">Database</span>
           )}
           {isActiveSubRoute("/project/database") && (
+            <div className="absolute right-2 w-1 h-6 bg-gradient-to-b from-pink-400 to-purple-400 rounded-full" />
+          )}
+        </Button>
+      </Link>
+
+      <Link href="/chatbotbuild" passHref>
+        <Button
+          variant="ghost"
+          className={cn(
+            "w-full justify-start rounded-xl transition-all duration-300 group relative overflow-hidden",
+            "h-12 text-sm font-medium",
+            isMobile ? "h-14 text-base" : "",
+            isActiveSubRoute("/chatbotbuild")
+              ? "bg-gradient-to-r from-pink-500/20 to-purple-500/20 text-pink-400 border border-pink-500/30 shadow-lg shadow-pink-500/10"
+              : "text-gray-300 hover:text-pink-300 hover:bg-gradient-to-r hover:from-pink-500/10 hover:to-purple-500/10 hover:border-pink-500/20 border border-transparent",
+            !isSidebarCollapsed || isMobile ? "px-4" : "px-2"
+          )}
+          onClick={() => isMobile && setIsSidebarOpen(false)}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-pink-600/0 to-purple-600/0 group-hover:from-pink-600/5 group-hover:to-purple-600/5 transition-all duration-300" />
+          <FaRobot className={cn("shrink-0 transition-all duration-300", 
+            isMobile ? "h-6 w-6" : "h-5 w-5",
+            isActiveSubRoute("/chatbotbuild") ? "text-pink-400" : "text-gray-400 group-hover:text-pink-300"
+          )} />
+          {(!isSidebarCollapsed || isMobile) && (
+            <span className="ml-3 transition-all duration-300">ChatBot Builder</span>
+          )}
+          {isActiveSubRoute("/chatbotbuild") && (
             <div className="absolute right-2 w-1 h-6 bg-gradient-to-b from-pink-400 to-purple-400 rounded-full" />
           )}
         </Button>
