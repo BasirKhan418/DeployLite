@@ -3,7 +3,6 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Sidebar from "@/utils/Sidebar/Sidebar";
-import Chatbot from '@/components/Chatbot';
 
 interface ClientLayoutProps {
   children: React.ReactNode;
@@ -87,7 +86,6 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
   return (
     <>
       <Sidebar>{children}</Sidebar>
-      <Chatbot />
     </>
   );
 }
