@@ -226,10 +226,13 @@ const project = new ChatbotBuilder({
         
         const result = await createdep.json();
 
+        console.log(result);
+
         if(result.success) {
             return NextResponse.json({
                 success: true,
                 message: "Chatbot created successfully",
+                project: project,
             }, { status: 201 });
         }
              }
