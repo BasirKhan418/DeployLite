@@ -68,11 +68,6 @@ const ChatbotOverviewPage = () => {
       return;
     }
 
-    if (!chatbotId) {
-      toast.error("Chatbot ID is required");
-      router.push("/project");
-      return;
-    }
 
     fetchChatbotData();
   }, [user, chatbotId, router]);
