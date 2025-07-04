@@ -34,7 +34,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
           "/chatbotbuild"
         ];
 
-        if (!publicRoutes.includes(pathname)) {
+        if (pathname && !publicRoutes.includes(pathname)) {
           router.push("/login");
         }
       }
@@ -50,10 +50,11 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
         "/verifyemail",
         "/otp",
         "/githubauth",
-        "/githuberr"
+        "/githuberr",
+        "/chatbotbuild"
       ];
 
-      if (!publicRoutes.includes(pathname)) {
+      if (pathname && !publicRoutes.includes(pathname)) {
         router.push("/login");
       }
     }
@@ -75,10 +76,11 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
     "/verifyemail",
     "/otp",
     "/githubauth",
-    "/githuberr"
+    "/githuberr",
+    "/chatbotbuild"
   ];
 
-  const isPublicRoute = publicRoutes.includes(pathname);
+  const isPublicRoute = pathname ? publicRoutes.includes(pathname) : false;
 
   if (isPublicRoute) {
     return <>{children}</>;
