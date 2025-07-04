@@ -127,7 +127,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </Link>
 
       {/* AI Workflows */}
-      <Link href="/ai" passHref>
+      <Link href="/aiagent" passHref>
         <Button
           variant="ghost"
           className={cn(
