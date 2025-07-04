@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 
 interface ChatbotData {
+  dburl: any;
   _id: string;
   name: string;
   projectstatus: string;
@@ -266,11 +267,13 @@ const ChatbotOverviewPage = () => {
                   <div className="flex items-center space-x-2">
                     <Button
                       variant="outline"
-                      onClick={() => copyToClipboard(`http://${chatbotData.url}?url=http://${chatbotData.url}:5080`)}
+                      onClick={() => {
+                        window.open(`${chatbotData.dburl}/dashboard`, '_blank');
+                      }}
                       className="border-gray-600 hover:border-pink-500/50"
                     >
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copy URL
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Open DB UI
                     </Button>
                     <Button
                       onClick={() => window.open(`http://${chatbotData.url}?url=http://${chatbotData.url}:5080`, '_blank')}

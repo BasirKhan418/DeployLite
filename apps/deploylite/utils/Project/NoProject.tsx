@@ -77,6 +77,10 @@ const NoProject: React.FC<NoProjectProps> = ({ name }) => {
   const config = getProjectConfig();
 
   const handleCreateProject = () => {
+    if(name=="chatbot") {
+      router.push(`/chatbotbuild`);
+      return;
+    }
     router.push(`/project/createproject/${name}`);
   };
 

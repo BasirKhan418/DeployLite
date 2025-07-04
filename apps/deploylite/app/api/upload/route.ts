@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     await s3Client.send(command);
 
     // Return the S3 URL
-    const fileUrl = `https://${process.env.KNOWLEDGE_BASE_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${filename}`;
+    const fileUrl = `http://${process.env.KNOWLEDGE_BASE_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${filename}`;
 
     let findchatbot = await ChatbotBuilder.findOne({_id:formData.get('id')});
 
@@ -55,7 +55,10 @@ export async function POST(request: NextRequest) {
 
     //fetch and train the chatbot with the new knowledge base file
     try{
-    const response = await fetch(`http://${findchatbot.url}:5080/loaders/train}`, {
+        console.log('Training chatbot with new knowledge base file:', fileUrl);
+        console.log('Chatbot URL:', findchatbot.url);
+        console.log('Store Type:', formData.get('storeType'));
+    const response = await fetch(`http://${findchatbot.url}:5080/loaders/train`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -65,12 +68,16 @@ export async function POST(request: NextRequest) {
             storeType:formData.get('storeType')
         }),
     });
+    console.log('Training response status:', response);
     const data = await response.json();
+
+    console.log('Training response:', data);
+
   if(response.ok) {
     console.log('Chatbot trained successfully:', data);
     return NextResponse.json({ message: 'Chatbot trained successfully', fileUrl,success:true });
   }
-    console.error('Failed to train chatbot:', data);
+    
     return NextResponse.json({ error: 'Failed to train chatbot', details: data,success:false });
 }
 catch (error) {

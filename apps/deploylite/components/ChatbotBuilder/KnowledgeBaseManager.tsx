@@ -93,6 +93,7 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
   const [processing, setProcessing] = useState(false);
   const [aiProvider, setAiProvider] = useState<'openai' | 'gemini'>('openai');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [url, setUrl] = useState<string | null>(null);
 
   // Supported file types based on backend capabilities
   const supportedTypes = {
@@ -163,7 +164,7 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
-    const k = 1024;
+    const k = 100024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
@@ -227,45 +228,29 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
         // Simulate upload progress
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('chatbotId', chatbotId);
-        formData.append('provider', aiProvider);
+        formData.append('id', chatbotId);
+        formData.append('storeType', aiProvider);
 
         // Simulate API call for S3 upload with provider
-        const response = await fetch('/api/chatbot/knowledge-base/upload', {
+        const response = await fetch('/api/upload', {
           method: 'POST',
           body: formData
         });
 
         const result = await response.json();
+
+        console.log('Upload result:', result);
         
         if (result.success) {
-          // Update file status to processing
-          setFiles(prev => prev.map(f => 
-            f.id === tempFile.id 
-              ? { ...f, status: 'processing', id: result.fileId, url: result.url, provider: aiProvider }
-              : f
-          ));
-
-          // Start vectorization process with selected provider
-          await processFile(result.fileId, aiProvider);
-          
-        } else {
-          // Update file status to failed
-          setFiles(prev => prev.map(f => 
-            f.id === tempFile.id 
-              ? { ...f, status: 'failed' }
-              : f
-          ));
-          toast.error(`Failed to upload ${file.name}: ${result.message}`);
-        }
-
-        // Update progress
-        setUploadProgress(((i + 1) / fileArray.length) * 100);
-      }
+      
 
       toast.success(`Successfully uploaded ${fileArray.length} file(s) to ${aiProvider.toUpperCase()}`);
       onUpdate();
-      
+        }
+        else{
+          toast.error(`Failed to upload ${file.name}: ${result.error || 'Unknown error'}`);
+        }
+      }
     } catch (error) {
       console.error('Upload error:', error);
       toast.error('Upload failed. Please try again.');
@@ -399,6 +384,33 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
       setProcessing(false);
     }
   };
+
+  const trainOnCustomData = async () => {
+    try{
+    const response = await fetch('/api/upload/custom', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        url,
+        id: chatbotId,
+        provider: aiProvider
+      }),
+    })
+    const result = await response.json();
+    if (result.success) {
+      toast.success('Successfully trained on custom data');
+      onUpdate();
+    } else {
+      toast.error(`Failed to train on custom data: ${result.error || 'Unknown error'}`);
+    }
+  }
+    catch(error) {
+      console.error('Error training on custom data:', error);
+      toast.error('Failed to train on custom data');
+    }
+  }
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -578,8 +590,17 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
           </div>
         </CardContent>
       </Card>
-
+      <div className="flex items-center justify-between mt-4">
+        <input type="text" onChange={(e)=>{
+          setUrl((e.target as HTMLInputElement).value);
+        }} className="w-full p-2 m-2 rounded"/>
+        <Button
+        onClick={trainOnCustomData}
+        >Train Now</Button>
+      </div>
+       
       {/* Files List */}
+     
       <Card className="bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20">
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -619,99 +640,15 @@ const KnowledgeBaseManager: React.FC<KnowledgeBaseManagerProps> = ({
             </div>
           ) : (
             <div className="space-y-3">
-              <AnimatePresence>
-                {files.map((file) => {
-                  const { icon: FileIcon, color } = getFileIcon(file.name);
-                  const category = getFileCategory(file.name);
-                  
-                  return (
-                    <motion.div
-                      key={file.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors"
-                    >
-                      <div className="flex items-center space-x-4 flex-1 min-w-0">
-                        <div className={`p-2 rounded-lg ${category?.bgColor || 'bg-gray-700'}`}>
-                          <FileIcon className={`w-5 h-5 ${color}`} />
-                        </div>
-                        
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-gray-200 font-medium truncate">{file.name}</h4>
-                          <div className="flex items-center gap-3 text-sm text-gray-400">
-                            <span>{formatFileSize(file.size)}</span>
-                            <span>•</span>
-                            <span>{new Date(file.uploadDate).toLocaleDateString()}</span>
-                            {file.provider && (
-                              <>
-                                <span>•</span>
-                                <div className="flex items-center gap-1">
-                                  {getProviderIcon(file.provider)}
-                                  <span className={file.provider === 'openai' ? 'text-purple-400' : 'text-pink-400'}>
-                                    {file.provider.toUpperCase()}
-                                  </span>
-                                </div>
-                              </>
-                            )}
-                            {file.vectorized && (
-                              <>
-                                <span>•</span>
-                                <div className="flex items-center gap-1">
-                                  <Brain className="w-3 h-3 text-emerald-400" />
-                                  <span className="text-emerald-400">Vectorized</span>
-                                </div>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-3">
-                        <div className="flex items-center gap-2">
-                          {getStatusIcon(file.status)}
-                          <Badge className={`${getStatusColor(file.status)} text-xs`}>
-                            {file.status}
-                          </Badge>
-                        </div>
-
-                        <div className="flex items-center space-x-1">
-                          {file.url && file.status === 'ready' && (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => window.open(file.url, '_blank')}
-                              className="text-gray-400 hover:text-blue-300"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                          )}
-                          
-                          {file.url && (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => window.open(file.url, '_blank')}
-                              className="text-gray-400 hover:text-green-300"
-                            >
-                              <Download className="w-4 h-4" />
-                            </Button>
-                          )}
-                          
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => deleteFile(file.id)}
-                            className="text-gray-400 hover:text-red-300"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </AnimatePresence>
+             {files.map((item:string)=>{
+              return (
+                <div className="flex items-center justify-between p-4 rounded-lg border bg-gray-800/50 hover:bg-gray-800/70 transition-all duration-200" key={item.id} onClick={()=>{
+              window.open(item,"_blank")
+            }}>
+                  {item}
+                </div>
+              )
+             })}
             </div>
           )}
         </CardContent>
