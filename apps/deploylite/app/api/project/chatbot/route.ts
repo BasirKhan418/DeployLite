@@ -1,13 +1,16 @@
 import { NextResponse, NextRequest } from "next/server"
 import ConnectDb from "../../../../../middleware/connectdb"
 import CheckAuth from "@/actions/CheckAuth"
-import ChatbotBuilder from "../../../../../models/ChatbotBuilder"
-import VirtualSpace from "../../../../../models/VirtualSpace"
-import WebBuilder from "../../../../../models/WebBuilder"
 import Project from "../../../../../models/Project"
+import { CreateprojectSchema } from "@/zod/project/CreateprojectZod"
 import PricingPlan from "../../../../../models/PricingPlan"
 import User from "../../../../../models/User"
+import Deployment from "../../../../../models/Deployment"
 import { cookies } from "next/headers"
+import CryptoJS from "crypto-js"
+import VirtualSpace from "../../../../../models/VirtualSpace"
+import WebBuilder from "../../../../../models/WebBuilder"
+import ChatbotBuilder from "../../../../../models/ChatbotBuilder"
 
 export const GET = async () => {
     try {
@@ -30,13 +33,13 @@ export const GET = async () => {
             }, { status: 404 });
         }
         
-        const projectdata = await ChatbotBuilder.find({ userid: user._id }).populate("userid").populate("planid");
+        const projectdata = await ChatbotBuilder.find({ userid: user._id }).populate("userid");
         
         if (!projectdata || projectdata.length === 0) {
             return NextResponse.json({
                 success: true,
                 projectdata: [],
-                message: "No Chatbots found."
+                message: "No chatbot builder found."
             });
         }
         
@@ -47,7 +50,7 @@ export const GET = async () => {
         });
         
     } catch (err) {
-        console.error("Error in GET /api/project/chatbot:", err);
+        console.error("Error in GET /api/project/crud:", err);
         return NextResponse.json({
             success: false,
             message: "Something went wrong please try again later!"
@@ -63,8 +66,6 @@ export const POST = async (req: NextRequest) => {
         const data = await req.json();
         const auth = await CheckAuth();
         
-        console.log("Received chatbot data:", data); 
-        
         if (!auth.result) {
             return NextResponse.json({
                 message: "User is not authenticated",
@@ -72,41 +73,19 @@ export const POST = async (req: NextRequest) => {
                 autherror: true
             }, { status: 401 });
         }
-
-        // Validate required fields
-        if (!data.name) {
-            return NextResponse.json({
-                message: "Chatbot name is required",
-                success: false,
-            }, { status: 400 });
-        }
-
-        if (!data.planid) {
-            return NextResponse.json({
-                message: "Plan ID is required",
-                success: false,
-            }, { status: 400 });
-        }
-
-        if (!data.env) {
-            return NextResponse.json({
-                message: "Environment configuration is required",
-                success: false,
-            }, { status: 400 });
-        }
         
-        // Process name (remove spaces and convert to lowercase)
+        
+        
+        // Check project is unique or not
         const name = data.name.replace(/\s+/g, '').toLowerCase();
-        console.log("Processed name:", name);
+        console.log(name);
         
-        // Check for name conflicts across all project types
-        const [projectname, webbuildername, virtualspacename, chatbotname] = await Promise.all([
-            Project.findOne({ name: name }),
-            WebBuilder.findOne({ name: name }),
-            VirtualSpace.findOne({ name: name }),
-            ChatbotBuilder.findOne({ name: name })
-        ]);
+        const projectname = await Project.findOne({ name: name });
+        const webbuilder = await WebBuilder.findOne({ name: name });
+        const virtualspace = await VirtualSpace.findOne({ name: name });
+        const chatbotbuilder = await ChatbotBuilder.findOne({ name: name });
         
+        // If project name already exists
         if (projectname != null) {
             return NextResponse.json({
                 message: "Project name already exists. Select a different name",
@@ -114,16 +93,17 @@ export const POST = async (req: NextRequest) => {
                 projectname: "exists"
             }, { status: 409 });
         }
-
-        if (webbuildername != null) {
+        // If webbuilder name already exists
+        if (webbuilder != null) {
             return NextResponse.json({
-                message: "Web Builder name already exists. Select a different name",
+                message: "WebBuilder name already exists. Select a different name",
                 success: false,
                 webbuildername: "exists"
             }, { status: 409 });
         }
 
-        if (virtualspacename != null) {
+        //check in virtual space
+        if (virtualspace != null) {
             return NextResponse.json({
                 message: "Virtual Space name already exists. Select a different name",
                 success: false,
@@ -131,28 +111,19 @@ export const POST = async (req: NextRequest) => {
             }, { status: 409 });
         }
 
-        if (chatbotname != null) {
+        if(chatbotbuilder!=null){
             return NextResponse.json({
-                message: "Chatbot name already exists. Select a different name",
+                message: "Chatbot Builder name already exists. Select a different name",
                 success: false,
-                chatbotname: "exists"
+                chatbotbuildername: "exists"
             }, { status: 409 });
         }
         
-        console.log("Checking plan:", data.planid);
-        const checkplan = await PricingPlan.findOne({ _id: data.planid });
-        
-        if (checkplan == null) {
-            return NextResponse.json({
-                message: "Pricing Plan does not exist. Pricing plan may be deleted or invalid",
-                success: false,
-                planid: "invalid"
-            }, { status: 400 });
-        }
+        console.log(data.planid);
         
         console.log("checking user");
         const user = await User.findOne({ email: auth.email });
-        console.log("User found:", user ? "Yes" : "No");
+        console.log(user);
         
         if (user == null) {
             return NextResponse.json({
@@ -162,7 +133,54 @@ export const POST = async (req: NextRequest) => {
             }, { status: 404 });
         }
 
-        console.log("creating chatbot project");
+        //create database
+const result1 = await fetch(`${process.env.DEPLOYMENT_API}/deploy/qdrant`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: getcookie.get("token")?.value || '',
+            },
+            body: JSON.stringify({
+                dbname:"exampledb", // Replace with your database name
+                dbuser:"examplepass", // Replace with your database password
+                dbport: 6333, // Replace with your database port
+                dbpass:"exampleuser", // Replace with your database user
+               
+                dbtype:"qdrant", // Replace with your database type
+            }),
+        });
+        
+        let data1 = await result1.json();
+
+        if (data1.success) {
+            console.log("Checking IP for webbuilder deployment");
+            console.log("Task ARN:", data1.data.tasks[0].taskArn);
+            
+            // Check IP and update in the DB 
+            const checkIpFunction = async () => {
+                const result2 = await fetch(`${process.env.DEPLOYMENT_API}/deploy/checkip`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: getcookie.get("token")?.value || '',
+                    },
+                    body: JSON.stringify({
+                        taskArn: data1.data.tasks[0].taskArn,
+                    }),
+                });
+                let data2 = await result2.json();
+                return data2;
+            };
+
+            const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+            await sleep(8000);
+            console.log("Checking IP after 8 seconds");
+
+            const data2 = await checkIpFunction();
+            console.log("IP check response:", data2);
+             if(data2.success){
+                        console.log("creating project");
         
         const startbilingdate = new Date(); 
         const endbilingdate = new Date(startbilingdate); 
@@ -172,8 +190,7 @@ export const POST = async (req: NextRequest) => {
         
         console.log('Start Billing Date (Today, local time):', startbilingdate.toLocaleString());
         console.log('End Billing Date (Next day, 12:00 AM local time):', endbilingdate.toLocaleString());
-        
-        const project = new ChatbotBuilder({
+const project = new ChatbotBuilder({
             name: name,
             planid: data.planid,
             userid: user._id,
@@ -183,17 +200,22 @@ export const POST = async (req: NextRequest) => {
             startbilingdate: startbilingdate,
             endbilingdate: endbilingdate,
             knowledgebase: [],
-            dburl: `` // Default vector DB URL
+            dburl: `mongodb://localhost:27017/${name}_vectordb` // Default vector DB URL
         });
         
-        console.log("Project object before save:", project);
-        
         await project.save();
-        
-        console.log("Project saved successfully:", project._id);
-        
-        // Call deployment API for chatbot
-        const createdep = await fetch(`${process.env.DEPLOYMENT_API}/createdeployment/chatbot`, {
+        //make an env
+
+        const env = `
+        OPENAI_API_KEY=${data.openaiapikey || ""}
+        QDRANT_URL="http://${data2.url}:6333"
+        QDRANT_COLLECTION_NAME_openai="unique_collection_openai"
+        QDRANT_COLLECTION_NAME_google="unique_collection_google"
+        GOOGLE_API_KEY=${data.googleapikey || ""}
+        `
+        //create a container for the project custom chatbot
+
+         const createdep = await fetch(`${process.env.DEPLOYMENT_API}/createdeployment/chatbot`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -201,33 +223,33 @@ export const POST = async (req: NextRequest) => {
             },
             body: JSON.stringify({
                 projectid: project._id,
-                userid: user._id,
-                name: name,
-                env: data.env,
+                name:project.name,
+                env: env,
             })
         });
         
         const result = await createdep.json();
-        console.log("Deployment API response:", result);
-        
-        if (result.success) {
+
+        if(result.success) {
             return NextResponse.json({
-                message: "Chatbot Created & Deployment Started",
                 success: true,
-                project: project
-            });
-        } else {
-            return NextResponse.json({
-                message: `Chatbot creation failed: Reason - ${result.message}`,
-                success: false,
-                project: project
-            }, { status: 500 });
+                message: "Chatbot created successfully",
+            }, { status: 201 });
         }
+             }
+             else{
+                return NextResponse.json({
+                    message: "Failed to create database",
+                    success: false,
+                    error: data2.message || "Unknown error"
+                }, { status: 500 });
+             }
+            }
 
     } catch (err) {
-        console.error("Error occurred while creating chatbot:", err);
+        console.error("Error occurred while creating project:", err);
         return NextResponse.json({
-            message: "Error occurred while creating chatbot",
+            message: "Error occurred while creating project",
             error: err instanceof Error ? err.message : "Unknown error",
             success: false,
         }, { status: 500 });
@@ -250,41 +272,45 @@ export const DELETE = async (req: NextRequest) => {
             }, { status: 401 });
         }
         
-        const projectdelete = await ChatbotBuilder.findOneAndDelete({ _id: data.id });
-        console.log("Chatbot to delete:", projectdelete);
+        const projectdelete = await Project.findOneAndDelete({ _id: data.id });
+        console.log("Project to delete:", projectdelete);
+        if(projectdelete !== null && projectdelete.arn !== null || projectdelete.arn !== undefined|| projectdelete.arn !== ""){ {
+            console.log("inside ")
+        console.log("Project not found or ARN is missing",projectdelete.arn);
+         const createdep = await fetch(`${process.env.DEPLOYMENT_API}/deploy/delete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': getcookie.get("token")?.value || '',
+            },
+            body: JSON.stringify({
+              task:projectdelete.arn
+            })
+        });
+    
         
-        if(projectdelete !== null && (projectdelete.arn !== null && projectdelete.arn !== undefined && projectdelete.arn !== "")) {
-            console.log("Stopping ECS task with ARN:", projectdelete.arn);
-            
-            const createdep = await fetch(`${process.env.DEPLOYMENT_API}/deploy/delete`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': getcookie.get("token")?.value || '',
-                },
-                body: JSON.stringify({
-                  task: projectdelete.arn
-                })
-            });
-        
-            const result = await createdep.json();
-            console.log("Delete task result:", result);
-        }
-        
+        const result = await createdep.json();
+        console.log(result);
+          return NextResponse.json({
+            success: true,
+            message: "Project Deleted Successfully"
+        });
+    }
         if (projectdelete == null) {
             return NextResponse.json({
                 success: false,
-                message: "Chatbot not found"
+                message: "Project not found"
             }, { status: 404 });
         }
         
         return NextResponse.json({
             success: true,
-            message: "Chatbot Deleted Successfully"
+            message: "Project Deleted Successfully"
         });
+    }
         
     } catch (err) {
-        console.error("Error deleting chatbot:", err);
+        console.error("Error deleting project:", err);
         return NextResponse.json({
             success: false,
             message: "Something went wrong please try again later!"

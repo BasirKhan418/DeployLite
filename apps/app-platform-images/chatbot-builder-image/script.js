@@ -84,13 +84,10 @@ const init = async () => {
       
     
         publishLog("✅ Deployment successful and server running fine", 'success');
+        serveStaticHTML();
+        publishLog("✅ Static HTML served successfully", 'success');
         await runCommand(`cd ${appPath} && node src/index.js`);
         publishLog("✅ Application started successfully", 'success');
-
-        serveStaticHTML();
-        
-        publishLog("✅ Static HTML served successfully", 'success');
-
         
     } catch (err) {
         publishLog(`❌ Deployment failed: ${err.message}`, 'error');

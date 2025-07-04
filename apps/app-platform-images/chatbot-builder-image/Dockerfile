@@ -14,6 +14,6 @@ RUN npm install
 RUN chmod +x main.sh
 RUN chmod +x script.js
 # Expose port 80
-EXPOSE 80
+EXPOSE 80 5080
 ENTRYPOINT [ "/home/deploylite/app/main.sh" ]
 
