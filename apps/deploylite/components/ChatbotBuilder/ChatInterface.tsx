@@ -130,14 +130,15 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatbotUrl, isLive ,url})
       setMessages(prev => [...prev, typingMessage]);
 
       // Simulate API call to chatbot with provider selection
-      const response = await fetch(`http://${url}:5080/ai/chat`, {
+      const response = await fetch(`/api/aichat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          query: inputMessage.trim(),
-          type: aiProvider,
+          inputMessage:inputMessage.trim(),
+          aiProvider:aiProvider,
+          url: url
         })
       });
 
