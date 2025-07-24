@@ -1,84 +1,62 @@
-# Turborepo starter
+# 🚀 DeployLite
 
-This Turborepo starter is maintained by the Turborepo core team.
+**DeployLite** is your modern cloud deployment platform — enabling fast, secure, and intelligent deployments of websites, applications, databases, WordPress, and even AI-powered chatbot builders — all with just a few clicks or a single prompt.
 
-## Using this example
+🌐 **Live Site:** [https://deploylite.tech](https://deploylite.tech)
 
-Run the following command:
+---
 
-```sh
-npx create-turbo@latest
-```
+## 🎥 Demo Video
 
-## What's inside?
+[![Watch Demo](https://image.mux.com/RmqfQNfZaTtB5aDJ01c02brJLRfOfO8xPxVLKC4NLTBaE/thumbnail.jpg?time=1)](https://player.mux.com/RmqfQNfZaTtB5aDJ01c02brJLRfOfO8xPxVLKC4NLTBaE)
 
-This Turborepo includes the following packages/apps:
+_Click the image to watch the full DeployLite demo_
 
-### Apps and Packages
+---
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+## ✨ Features
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+### 🚀 One-Click Deployments
+- Static sites (HTML, JS, React, Next.js)
+- Node.js, Express, full-stack apps
+- Container-based custom apps (via Docker)
+- WordPress apps and CMS-based sites
 
-### Utilities
+### 🧠 AI-Powered Prompt Deployments
+Deploy using just a **prompt**!  
+Describe your stack, and our **Agentic AI** figures out the best infrastructure.
 
-This Turborepo has some additional tools already setup for you:
+**Example:**
+> “Deploy a chatbot builder with in-memory vector DB and autoscaling on AWS Fargate.”
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+DeployLite intelligently provisions infrastructure and handles setup — instantly.
 
-### Build
+### 🗄️ Smart Database Deployment
+- PostgreSQL, MySQL, MongoDB support
+- In-memory **Vector DBs** for LLM-based apps
+- Automatic binding with frontends and APIs
+- Private & secure access to DB instances
 
-To build all apps and packages, run the following command:
+### 🧠 Built-in Agent for AWS Integration
+Connect your AWS account and let **DeployLite Agent** do the heavy lifting:
+- Provision compute, storage, and networking
+- Use existing AWS services like Fargate, Lambda, S3, RDS
+- Run serverless or container apps at scale
+- Ideal for teams & startups
 
-```
-cd my-turborepo
-pnpm build
-```
+> **Bonus:** Full IAM-based secure connection setup. No manual AWS CLI needed.
 
-### Develop
+### 🤖 Chatbot Builder with Vector Memory
+- Build and deploy intelligent chatbots
+- Powered by in-memory vector DB
+- Train your bot by uploading docs or via prompt
+- API-ready + web widget support
 
-To develop all apps and packages, run the following command:
+### 📊 Beautiful Unified Dashboard
+- Manage all your sites, databases, and bots
+- View logs, status, domains, and analytics
+- Switch between environments (dev/stage/prod)
 
-```
-cd my-turborepo
-pnpm dev
-```
 
-### Remote Caching
+<img width="1912" height="945" alt="image" src="https://github.com/user-attachments/assets/431128dd-212c-45d6-8eac-b33516f1e3d6" />
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
