@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Loader2, Database, Globe, MessageSquare, Cloud, Settings, Sparkles, Zap, Code, Server } from 'lucide-react';
+import { Send, Bot, User, Loader2, Database, Globe, MessageSquare, Cloud, Settings, Sparkles, Zap, Code, Server, Terminal, Activity, Monitor, GitBranch } from 'lucide-react';
 
 interface Message {
   id: number;
@@ -143,21 +143,21 @@ const DeployliteApp: React.FC = () => {
       icon: Globe, 
       action: () => setInputMessage('I want to deploy a web application'),
       description: 'Launch your web application',
-      gradient: 'from-blue-500 to-cyan-500'
+      gradient: 'from-pink-500 to-purple-500'
     },
     { 
       label: 'Create Database', 
       icon: Database, 
       action: () => setInputMessage('I need to create a database'),
       description: 'Set up a new database',
-      gradient: 'from-purple-500 to-pink-500'
+      gradient: 'from-cyan-500 to-blue-500'
     },
     { 
       label: 'Build Chatbot', 
       icon: MessageSquare, 
       action: () => setInputMessage('I want to create a chatbot'),
       description: 'Create an AI chatbot',
-      gradient: 'from-green-500 to-teal-500'
+      gradient: 'from-emerald-500 to-green-500'
     },
     { 
       label: 'Virtual Space', 
@@ -174,166 +174,158 @@ const DeployliteApp: React.FC = () => {
 
   const getProjectIcon = (type: string): React.ReactNode => {
     switch (type) {
-      case 'appplatform': return <Globe className="w-5 h-5 text-blue-600" />;
-      case 'createDatabase': return <Database className="w-5 h-5 text-purple-600" />;
-      case 'createChatbot': return <MessageSquare className="w-5 h-5 text-green-600" />;
-      case 'createVirtualSpace': return <Cloud className="w-5 h-5 text-orange-600" />;
-      default: return <Settings className="w-5 h-5 text-gray-600" />;
+      case 'appplatform': return <Globe className="w-5 h-5 text-pink-400" />;
+      case 'createDatabase': return <Database className="w-5 h-5 text-cyan-400" />;
+      case 'createChatbot': return <MessageSquare className="w-5 h-5 text-emerald-400" />;
+      case 'createVirtualSpace': return <Cloud className="w-5 h-5 text-orange-400" />;
+      default: return <Settings className="w-5 h-5 text-gray-400" />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* Enhanced Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <div className="relative">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-                  <Sparkles className="w-6 h-6 text-white" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  Deploylite
-                </h1>
-                <p className="text-sm text-gray-500">AI-Powered Deployment Platform</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setActiveTab('projects')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    activeTab === 'projects'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  <Server className="w-4 h-4 inline mr-2" />
-                  Projects
-                  {projects.length > 0 && (
-                    <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-600 rounded-full text-xs">
-                      {projects.length}
-                    </span>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
+    <div className=" bg-black text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'chat' ? (
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Enhanced Quick Actions Sidebar */}
             <div className="lg:col-span-1">
-              <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6">
-                <div className="flex items-center space-x-2 mb-6">
-                  <Zap className="w-5 h-5 text-yellow-500" />
-                  <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
-                </div>
-                <div className="space-y-4">
-                  {quickActions.map((action, index) => (
-                    <button
-                      key={index}
-                      onClick={action.action}
-                      className="w-full group relative overflow-hidden rounded-xl border border-gray-200 hover:border-transparent transition-all duration-300 hover:shadow-lg hover:scale-105"
-                    >
-                      <div className={`absolute inset-0 bg-gradient-to-r ${action.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
-                      <div className="relative p-4">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <div className={`p-2 rounded-lg bg-gradient-to-r ${action.gradient} text-white`}>
-                            <action.icon className="w-4 h-4" />
+              <div className="relative bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20 rounded-2xl p-6 shadow-xl shadow-pink-500/10">
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 to-purple-500/5 rounded-2xl" />
+                <div className="relative">
+                  <div className="flex items-center space-x-3 mb-8">
+                    <div className="p-2 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-xl">
+                      <Zap className="w-6 h-6 text-pink-400" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white">Quick Actions</h3>
+                  </div>
+                  <div className="space-y-4">
+                    {quickActions.map((action, index) => (
+                      <button
+                        key={index}
+                        onClick={action.action}
+                        className="w-full group relative overflow-hidden rounded-xl border border-gray-700/50 hover:border-pink-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-pink-500/20 hover:scale-105"
+                      >
+                        <div className={`absolute inset-0 bg-gradient-to-r ${action.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+                        <div className="relative p-4">
+                          <div className="flex items-center space-x-3 mb-3">
+                            <div className={`p-2 rounded-lg bg-gradient-to-r ${action.gradient} shadow-lg`}>
+                              <action.icon className="w-5 h-5 text-white" />
+                            </div>
+                            <span className="font-semibold text-white group-hover:text-pink-300 transition-colors">
+                              {action.label}
+                            </span>
                           </div>
-                          <span className="font-medium text-gray-900 group-hover:text-gray-800">
-                            {action.label}
-                          </span>
+                          <p className="text-sm text-gray-400 text-left group-hover:text-gray-300 transition-colors">
+                            {action.description}
+                          </p>
                         </div>
-                        <p className="text-xs text-gray-500 text-left group-hover:text-gray-600">
-                          {action.description}
-                        </p>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* AI Status Indicator */}
+                  <div className="mt-8 p-4 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse" />
+                        <div className="absolute inset-0 w-3 h-3 bg-emerald-400 rounded-full animate-ping opacity-75" />
                       </div>
-                    </button>
-                  ))}
+                      <div>
+                        <p className="text-sm font-semibold text-emerald-300">AI Agent Online</p>
+                        <p className="text-xs text-emerald-400/70">Ready to assist with deployments</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Enhanced Chat Interface */}
             <div className="lg:col-span-3">
-              <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 h-[650px] flex flex-col overflow-hidden">
+              <div className="relative bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20 rounded-2xl h-[700px] flex flex-col overflow-hidden shadow-xl shadow-pink-500/10">
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 to-purple-500/5 rounded-2xl" />
+                
                 {/* Chat Header */}
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-t-2xl">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                      <MessageSquare className="w-5 h-5 text-white" />
+                <div className="relative bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 text-white p-6 rounded-t-2xl">
+                  <div className="absolute inset-0 bg-black/20 rounded-t-2xl" />
+                  <div className="relative flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/30">
+                      <Bot className="w-6 h-6 text-white" />
                     </div>
-                    <div>
-                      <h2 className="text-xl font-semibold">AI Assistant</h2>
-                      <p className="text-blue-100 text-sm">Ready to help you deploy and build</p>
+                    <div className="flex-1">
+                      <h2 className="text-2xl font-bold mb-1">AI Deployment Assistant</h2>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                        <p className="text-white/90 text-sm font-medium">Ready to deploy your next project</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-lg border border-white/30">
+                        <span className="text-xs font-semibold">LIVE</span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                <div className="relative flex-1 overflow-y-auto p-6 space-y-6 bg-gradient-to-b from-transparent to-gray-900/20">
                   {messages.map((message) => (
                     <div
                       key={message.id}
                       className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
-                        className={`max-w-xs lg:max-w-md ${
+                        className={`max-w-xs lg:max-w-md relative group ${
                           message.role === 'user'
-                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                            ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg shadow-pink-500/25'
                             : message.isError
-                            ? 'bg-red-50 text-red-800 border border-red-200 shadow-md'
-                            : 'bg-white text-gray-800 shadow-md border border-gray-100'
-                        } rounded-2xl overflow-hidden`}
+                            ? 'bg-gradient-to-r from-red-500/20 to-red-600/20 text-red-100 border border-red-500/30 shadow-lg shadow-red-500/20'
+                            : 'bg-gradient-to-r from-gray-800 to-gray-700 text-white shadow-lg border border-gray-600/50'
+                        } rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105`}
                       >
-                        <div className="p-4">
+                        <div className="p-5">
                           <div className="flex items-start space-x-3">
-                            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                            <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
                               message.role === 'user' 
-                                ? 'bg-white/20' 
+                                ? 'bg-white/20 backdrop-blur-sm' 
                                 : message.isError 
-                                ? 'bg-red-100' 
-                                : 'bg-gradient-to-r from-blue-500 to-indigo-500'
+                                ? 'bg-red-500/30' 
+                                : 'bg-gradient-to-r from-pink-500/30 to-purple-500/30'
+                            } border ${
+                              message.role === 'user' 
+                                ? 'border-white/30' 
+                                : 'border-gray-600/50'
                             }`}>
                               {message.role === 'assistant' ? (
-                                <Bot className={`w-4 h-4 ${message.isError ? 'text-red-600' : 'text-white'}`} />
+                                <Bot className={`w-5 h-5 ${message.isError ? 'text-red-300' : 'text-pink-300'}`} />
                               ) : (
-                                <User className="w-4 h-4 text-white" />
+                                <User className="w-5 h-5 text-white" />
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm leading-relaxed">{message.content}</p>
+                              <p className="text-sm leading-relaxed font-medium">{message.content}</p>
                               {message.toolResults && message.toolResults.length > 0 && (
-                                <div className="mt-3 pt-3 border-t border-gray-200/50">
-                                  <div className="space-y-2">
+                                <div className="mt-4 pt-4 border-t border-white/20">
+                                  <div className="space-y-3">
                                     {message.toolResults.map((result, index) => (
                                       <div
                                         key={index}
-                                        className={`text-xs p-3 rounded-lg ${
+                                        className={`text-xs p-3 rounded-lg border transition-all duration-300 ${
                                           result.error
-                                            ? 'bg-red-50 text-red-700 border border-red-200'
-                                            : 'bg-green-50 text-green-700 border border-green-200'
+                                            ? 'bg-red-500/20 text-red-200 border-red-500/30'
+                                            : 'bg-emerald-500/20 text-emerald-200 border-emerald-500/30'
                                         }`}
                                       >
                                         <div className="flex items-center space-x-2">
-                                          <Code className="w-3 h-3" />
-                                          <span className="font-medium">{result.message}</span>
+                                          <Terminal className="w-3 h-3" />
+                                          <span className="font-semibold">{result.message}</span>
                                         </div>
                                       </div>
                                     ))}
                                   </div>
                                 </div>
                               )}
-                              <p className="text-xs mt-2 opacity-60">
+                              <p className="text-xs mt-3 opacity-70 font-medium">
                                 {formatTimestamp(message.timestamp)}
                               </p>
                             </div>
@@ -344,14 +336,14 @@ const DeployliteApp: React.FC = () => {
                   ))}
                   {isLoading && (
                     <div className="flex justify-start">
-                      <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100">
+                      <div className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-2xl p-5 shadow-lg border border-gray-600/50 max-w-xs">
                         <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
-                            <Bot className="w-4 h-4 text-white" />
+                          <div className="w-10 h-10 bg-gradient-to-r from-pink-500/30 to-purple-500/30 rounded-full flex items-center justify-center border border-gray-600/50">
+                            <Bot className="w-5 h-5 text-pink-300" />
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-                            <span className="text-sm text-gray-600">Deploylite is thinking...</span>
+                          <div className="flex items-center space-x-3">
+                            <Loader2 className="w-5 h-5 animate-spin text-pink-400" />
+                            <span className="text-sm text-gray-300 font-medium">Deploylite is thinking...</span>
                           </div>
                         </div>
                       </div>
@@ -360,30 +352,35 @@ const DeployliteApp: React.FC = () => {
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* Enhanced Input */}
-                <div className="border-t border-gray-200/50 p-6 bg-white/50">
-                  <div className="flex space-x-4">
+                {/* Chat Input */}
+                <div className="relative p-6 bg-gradient-to-r from-black via-gray-900/80 to-black border-t border-pink-500/20">
+                  <form onSubmit={handleSendMessage} className="flex items-center space-x-4">
                     <div className="flex-1 relative">
                       <input
                         type="text"
                         value={inputMessage}
                         onChange={(e) => setInputMessage(e.target.value)}
-                        placeholder="Ask me to deploy an app, create a database, or anything else..."
-                        className="w-full border border-gray-300 rounded-xl px-6 py-4 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80 backdrop-blur-sm placeholder-gray-400 text-gray-900 shadow-sm"
+                        placeholder="Ask me to deploy an app, create a database, or build something amazing..."
+                        className="w-full bg-gradient-to-r from-gray-800 to-gray-700 border border-gray-600/50 rounded-2xl px-6 py-4 pr-16 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-pink-500/50 transition-all duration-300 shadow-lg"
                         disabled={isLoading}
-                        onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(e)}
                       />
                       <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
                         <Sparkles className="w-5 h-5 text-gray-400" />
                       </div>
                     </div>
                     <button
-                      onClick={handleSendMessage}
+                      type="submit"
                       disabled={isLoading || !inputMessage.trim()}
-                      className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:hover:scale-100"
+                      className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white px-8 py-4 rounded-2xl transition-all duration-300 shadow-lg shadow-pink-500/25 hover:shadow-pink-500/40 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:shadow-pink-500/25 flex items-center justify-center"
                     >
                       <Send className="w-5 h-5" />
                     </button>
+                  </form>
+                  
+                  {/* Input Helper */}
+                  <div className="mt-3 flex items-center justify-center gap-2 text-xs text-gray-500">
+                    <Activity className="w-3 h-3" />
+                    <span>Powered by advanced AI deployment algorithms</span>
                   </div>
                 </div>
               </div>
@@ -391,76 +388,90 @@ const DeployliteApp: React.FC = () => {
           </div>
         ) : (
           /* Enhanced Projects Tab */
-          <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8">
-            <div className="flex items-center space-x-3 mb-8">
-              <Server className="w-6 h-6 text-blue-600" />
-              <h2 className="text-3xl font-bold text-gray-900">Your Projects</h2>
-            </div>
-            {projects.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="relative mb-8">
-                  <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto">
-                    <Bot className="w-12 h-12 text-blue-600" />
-                  </div>
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-white" />
-                  </div>
+          <div className="relative bg-gradient-to-br from-black via-gray-900/90 to-black backdrop-blur-xl border border-pink-500/20 rounded-2xl p-8 shadow-xl shadow-pink-500/10">
+            <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 to-purple-500/5 rounded-2xl" />
+            <div className="relative">
+              <div className="flex items-center space-x-4 mb-8">
+                <div className="p-3 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-xl">
+                  <Server className="w-8 h-8 text-pink-400" />
                 </div>
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">No projects yet</h3>
-                <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                  Start by deploying your first application or creating a database. 
-                  Deploylite will help you build amazing things!
-                </p>
-                <button
-                  onClick={() => setActiveTab('chat')}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 font-medium"
-                >
-                  <Zap className="w-5 h-5 inline mr-2" />
-                  Start Building
-                </button>
+                <div>
+                  <h2 className="text-3xl font-bold text-white">Your Projects</h2>
+                  <p className="text-gray-400">Manage and monitor your deployments</p>
+                </div>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {projects.map((project) => (
-                  <div key={project.id} className="group relative bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 hover:scale-105 overflow-hidden">
-                    <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
-                    <div className="relative">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-2 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg">
-                            {getProjectIcon(project.type)}
+              {projects.length === 0 ? (
+                <div className="text-center py-20">
+                  <div className="relative mb-8">
+                    <div className="w-32 h-32 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-3xl flex items-center justify-center mx-auto border border-pink-500/30">
+                      <Bot className="w-16 h-16 text-pink-400" />
+                    </div>
+                    <div className="absolute -top-2 -right-2 w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center shadow-lg">
+                      <Sparkles className="w-5 h-5 text-white" />
+                    </div>
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-4">No projects yet</h3>
+                  <p className="text-gray-400 mb-8 max-w-md mx-auto leading-relaxed">
+                    Start by deploying your first application or creating a database. 
+                    Deploylite AI will help you build amazing things!
+                  </p>
+                  <button
+                    onClick={() => setActiveTab('chat')}
+                    className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white px-8 py-4 rounded-2xl transition-all duration-300 shadow-lg shadow-pink-500/25 hover:shadow-pink-500/40 hover:scale-105 font-semibold flex items-center gap-3 mx-auto"
+                  >
+                    <Zap className="w-5 h-5" />
+                    Start Building with AI
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {projects.map((project) => (
+                    <div key={project.id} className="group relative bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-gray-700/50 p-6 hover:shadow-xl hover:shadow-pink-500/20 transition-all duration-300 hover:scale-105 overflow-hidden">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-pink-500/10 to-purple-500/10 rounded-full -translate-y-12 translate-x-12 group-hover:scale-150 transition-transform duration-500" />
+                      <div className="relative">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="p-2 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-xl">
+                              {getProjectIcon(project.type)}
+                            </div>
+                            <h3 className="font-bold text-white group-hover:text-pink-300 transition-colors">
+                              {project.name}
+                            </h3>
                           </div>
-                          <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                            {project.name}
-                          </h3>
-                        </div>
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          project.status === 'active' 
-                            ? 'bg-green-100 text-green-700 border border-green-200' 
-                            : 'bg-yellow-100 text-yellow-700 border border-yellow-200'
-                        }`}>
-                          {project.status}
-                        </span>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm text-gray-500">Type:</span>
-                          <span className="text-sm font-medium text-gray-700">
-                            {project.type.replace('create', '').replace('app', 'App')}
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${
+                            project.status === 'active' 
+                              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' 
+                              : 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
+                          }`}>
+                            {project.status}
                           </span>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm text-gray-500">Created:</span>
-                          <span className="text-sm font-medium text-gray-700">
-                            {project.createdAt.toLocaleDateString()}
-                          </span>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-400">Type:</span>
+                            <span className="text-sm font-semibold text-gray-300 bg-gray-700/50 px-3 py-1 rounded-lg">
+                              {project.type.replace('create', '').replace('app', 'App')}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-400">Created:</span>
+                            <span className="text-sm font-semibold text-gray-300">
+                              {project.createdAt.toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-6 pt-4 border-t border-gray-700/50">
+                          <button className="w-full bg-gradient-to-r from-pink-500/20 to-purple-500/20 hover:from-pink-500/30 hover:to-purple-500/30 border border-pink-500/30 text-pink-300 py-2 rounded-lg transition-all duration-300 text-sm font-semibold">
+                            View Details
+                          </button>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

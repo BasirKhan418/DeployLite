@@ -60,7 +60,7 @@ const NoProject: React.FC<NoProjectProps> = ({ name }) => {
         return {
           title: "ChatBot Builder",
           subtitle: "Cloud development environments",
-          description: "Set up containerized development environments with VS Code in the browser. Perfect for coding, testing, and collaboration from anywhere.",
+          description: "Create Your RAG based chatbot by giving your custom knowledge base ",
           icon: <FaRobot className="w-16 h-16 text-pink-400" />,
           gradient: "from-pink-400 to-purple-400",
           buttonText: "Create RAG ChatBot",
