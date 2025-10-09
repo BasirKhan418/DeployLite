@@ -2,8 +2,7 @@
 
 **DeployLite** is your modern cloud deployment platform — enabling fast, secure, and intelligent deployments of websites, applications, databases, WordPress, and even AI-powered chatbot builders — all with just a few clicks or a single prompt.
 
-🌐 **Live Site:** [https://deploylite.tech](https://deploylite.tech)
-
+🌐 **Live Site:** DM ME FOR EARLY ACCCESS 
 ---
 
 ## 🎥 Demo Video
